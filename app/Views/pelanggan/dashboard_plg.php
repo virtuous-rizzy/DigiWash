@@ -76,37 +76,6 @@ $foto = foto_profil();
 
         </div>
 
-        <p class="hello">
-            Hello, <?= $e($nama) ?>
-            <small>Mau laundry apa hari ini?</small>
-        </p>
-
-        <div class="cards">
-            <div class="card c-purple">
-                <small>Pesanan Aktif</small>
-                <strong><?= $pesananAktif ?></strong>
-            </div>
-            <div class="card c-pink">
-                <small>Sistem Pengiriman</small>
-                <strong><?= $e($statusCuci) ?></strong>
-            </div>
-            <div class="card c-green">
-                <small>Sistem Pembayaran</small>
-                <strong><?= $e($statusBayar) ?></strong>
-            </div>
-        </div>
-
-        <div class="menu">
-            <h4>Menu Utama</h4>
-            <div class="menu-grid">
-                <a class="menu-item" href="<?= base_url('layanan') ?>"><span>📋</span>Buat Pesanan</a>
-                <a class="menu-item" href="#" data-soon><span>🧾</span>Riwayat Pesanan</a>
-                <a class="menu-item" href="#" data-soon><span>🚚</span>Tracking Laundry</a>
-                <a class="menu-item" href="#" data-soon><span>👛</span>Pembayaran</a>
-                <a class="menu-item" href="#" data-soon><span>💬</span>Kritik &amp; Saran</a>
-            </div>
-        </div>
-
     </div>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
