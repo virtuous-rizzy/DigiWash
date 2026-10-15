@@ -190,10 +190,214 @@ ALTER TABLE `pelanggan`
 --
 
 --
+-- Table structure for table `layanan`
+--
+
+CREATE TABLE `layanan` (
+  `id_layanan` int(10) UNSIGNED NOT NULL,
+  `nama_layanan` varchar(100) NOT NULL,
+  `jenis_layanan` enum('kiloan','satuan') NOT NULL DEFAULT 'kiloan',
+  `harga_per_kg` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `harga_flat` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `estimasi_hari` int(11) NOT NULL DEFAULT 3,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `deskripsi` text DEFAULT NULL,
+  `ikon` varchar(50) DEFAULT 'bi-basket2-fill'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `layanan`
+--
+
+INSERT INTO `layanan` (`id_layanan`, `nama_layanan`, `jenis_layanan`, `harga_per_kg`, `harga_flat`, `estimasi_hari`, `is_active`, `deskripsi`, `ikon`) VALUES
+(1, 'Laundry Reguler', 'kiloan', 7000.00, 0.00, 3, 1, 'Estimasi 3 hari kerja, bersih, wangi & rapi', 'bi-basket2-fill'),
+(2, 'Laundry Express', 'kiloan', 12000.00, 0.00, 1, 1, 'Estimasi 1 hari kerja, prioritas kilat', 'bi-lightning-charge-fill'),
+(3, 'Laundry Satuan', 'satuan', 0.00, 5000.00, 2, 1, 'Jasa cuci satuan seperti jas, selimut, boneka, sepatu', 'bi-tag-fill'),
+(4, 'Laundry Bed Cover', 'kiloan', 7000.00, 35000.00, 3, 1, 'Cuci bed cover, sprei, selimut besar', 'bi-layers-fill');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pesanan`
+--
+
+CREATE TABLE `pesanan` (
+  `id_pesanan` int(10) UNSIGNED NOT NULL,
+  `id_pelanggan` int(10) UNSIGNED NOT NULL,
+  `id_layanan` int(10) UNSIGNED NOT NULL,
+  `id_admin` int(10) UNSIGNED DEFAULT NULL,
+  `tanggal` datetime NOT NULL DEFAULT current_timestamp(),
+  `berat` decimal(6,2) NOT NULL DEFAULT 1.00,
+  `alamat_pengambilan` text NOT NULL,
+  `alamat_pengantaran` text NOT NULL,
+  `status_pesanan` enum('menunggu','dikonfirmasi','dijemput','dicuci','disetrika','diantar','selesai','dibatalkan') NOT NULL DEFAULT 'menunggu',
+  `catatan` text DEFAULT NULL,
+  `detail_satuan` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pembayaran`
+--
+
+CREATE TABLE `pembayaran` (
+  `id_pembayaran` int(10) UNSIGNED NOT NULL,
+  `id_pesanan` int(10) UNSIGNED NOT NULL,
+  `id_admin` int(10) UNSIGNED DEFAULT NULL,
+  `metode` varchar(50) NOT NULL,
+  `status_bayar` enum('belum_dibayar','menunggu_verifikasi','lunas','gagal') NOT NULL DEFAULT 'menunggu_verifikasi',
+  `bukti_bayar` varchar(255) DEFAULT NULL,
+  `total_bayar` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `tanggal_bayar` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `distribusi`
+--
+
+CREATE TABLE `distribusi` (
+  `id_distribusi` int(10) UNSIGNED NOT NULL,
+  `id_pesanan` int(10) UNSIGNED NOT NULL,
+  `id_kurir` int(10) UNSIGNED DEFAULT NULL,
+  `jenis_kendaraan` varchar(50) DEFAULT NULL,
+  `biaya` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `status_antar` enum('menunggu_kurir','proses_antar','terkirim') NOT NULL DEFAULT 'menunggu_kurir',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `kritik_saran`
+--
+
+CREATE TABLE `kritik_saran` (
+  `id_kritik` int(10) UNSIGNED NOT NULL,
+  `id_pelanggan` int(10) UNSIGNED NOT NULL,
+  `pesan` text NOT NULL,
+  `tanggal` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `layanan`
+--
+ALTER TABLE `layanan`
+  ADD PRIMARY KEY (`id_layanan`);
+
+--
+-- Indexes for table `pesanan`
+--
+ALTER TABLE `pesanan`
+  ADD PRIMARY KEY (`id_pesanan`),
+  ADD KEY `fk_pesanan_pelanggan` (`id_pelanggan`),
+  ADD KEY `fk_pesanan_layanan` (`id_layanan`),
+  ADD KEY `fk_pesanan_admin` (`id_admin`);
+
+--
+-- Indexes for table `pembayaran`
+--
+ALTER TABLE `pembayaran`
+  ADD PRIMARY KEY (`id_pembayaran`),
+  ADD KEY `fk_pembayaran_pesanan` (`id_pesanan`),
+  ADD KEY `fk_pembayaran_admin` (`id_admin`);
+
+--
+-- Indexes for table `distribusi`
+--
+ALTER TABLE `distribusi`
+  ADD PRIMARY KEY (`id_distribusi`),
+  ADD KEY `fk_distribusi_pesanan` (`id_pesanan`),
+  ADD KEY `fk_distribusi_kurir` (`id_kurir`);
+
+--
+-- Indexes for table `kritik_saran`
+--
+ALTER TABLE `kritik_saran`
+  ADD PRIMARY KEY (`id_kritik`),
+  ADD KEY `fk_kritik_pelanggan` (`id_pelanggan`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `layanan`
+--
+ALTER TABLE `layanan`
+  MODIFY `id_layanan` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `pesanan`
+--
+ALTER TABLE `pesanan`
+  MODIFY `id_pesanan` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pembayaran`
+--
+ALTER TABLE `pembayaran`
+  MODIFY `id_pembayaran` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `distribusi`
+--
+ALTER TABLE `distribusi`
+  MODIFY `id_distribusi` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `kritik_saran`
+--
+ALTER TABLE `kritik_saran`
+  MODIFY `id_kritik` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
 -- Constraints for table `alamat_pelanggan`
 --
 ALTER TABLE `alamat_pelanggan`
   ADD CONSTRAINT `fk_alamat_pelanggan` FOREIGN KEY (`id_pelanggan`) REFERENCES `pelanggan` (`id_pelanggan`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `pesanan`
+--
+ALTER TABLE `pesanan`
+  ADD CONSTRAINT `fk_pesanan_pelanggan` FOREIGN KEY (`id_pelanggan`) REFERENCES `pelanggan` (`id_pelanggan`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pesanan_layanan` FOREIGN KEY (`id_layanan`) REFERENCES `layanan` (`id_layanan`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `fk_pesanan_admin` FOREIGN KEY (`id_admin`) REFERENCES `admin` (`id_admin`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `pembayaran`
+--
+ALTER TABLE `pembayaran`
+  ADD CONSTRAINT `fk_pembayaran_pesanan` FOREIGN KEY (`id_pesanan`) REFERENCES `pesanan` (`id_pesanan`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pembayaran_admin` FOREIGN KEY (`id_admin`) REFERENCES `admin` (`id_admin`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `distribusi`
+--
+ALTER TABLE `distribusi`
+  ADD CONSTRAINT `fk_distribusi_pesanan` FOREIGN KEY (`id_pesanan`) REFERENCES `pesanan` (`id_pesanan`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_distribusi_kurir` FOREIGN KEY (`id_kurir`) REFERENCES `kurir` (`id_kurir`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `kritik_saran`
+--
+ALTER TABLE `kritik_saran`
+  ADD CONSTRAINT `fk_kritik_pelanggan` FOREIGN KEY (`id_pelanggan`) REFERENCES `pelanggan` (`id_pelanggan`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

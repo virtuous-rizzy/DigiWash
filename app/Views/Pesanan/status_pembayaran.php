@@ -110,7 +110,7 @@
 
     <!-- Header -->
     <div class="page-header">
-        <a href="<?= base_url('pesanan/pembayaran') ?>" class="btn-back">&#8592;</a>
+        <a href="<?= base_url('pesanan/upload-bukti') ?>" class="btn-back">&#8592;</a>
         <span class="page-title">Status Pembayaran</span>
     </div>
 
@@ -148,6 +148,12 @@
             <span class="detail-key">Jumlah</span>
             <span class="detail-val">Rp <?= number_format((int) $total, 0, ',', '.') ?></span>
         </div>
+        <?php if (!empty($bukti_url)): ?>
+        <div class="detail-row">
+            <span class="detail-key">Bukti Bayar</span>
+            <span class="detail-val"><a href="<?= esc($bukti_url, 'attr') ?>" target="_blank" rel="noopener" style="color:#033B59;text-decoration:none;">Lihat bukti</a></span>
+        </div>
+        <?php endif; ?>
         <div class="detail-row">
             <span class="detail-key">Status</span>
             <span class="detail-val status-menunggu">Menunggu</span>

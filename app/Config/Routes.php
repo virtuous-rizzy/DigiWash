@@ -64,6 +64,10 @@ $routes->group('admin', ['filter' => 'role:admin'], static function ($routes) {
     $routes->get('kelola/tambah', 'Admin\KelolaAdm::tambah');
     $routes->post('kelola/simpan', 'Admin\KelolaAdm::simpan');
     $routes->post('kelola/status/(:segment)/(:num)', 'Admin\KelolaAdm::status/$1/$2');
+
+    $routes->get('transaksi', 'Admin\TransaksiAdm::index');
+    $routes->post('transaksi/verifikasi/(:num)', 'Admin\TransaksiAdm::verifikasi/$1');
+    $routes->post('transaksi/tolak/(:num)', 'Admin\TransaksiAdm::tolak/$1');
 });
 
 // Kurir
@@ -90,4 +94,7 @@ $routes->group('pesanan', ['filter' => 'role:pelanggan', 'namespace' => 'App\Con
     $routes->post('proses-pembayaran', 'Pesanan::prosesPembayaran');
     $routes->get('status-pembayaran', 'Pesanan::statusPembayaran');
     $routes->get('tracking', 'Pesanan::tracking');
+    $routes->get('upload-bukti', 'Pesanan::uploadBukti');
+    $routes->post('simpan-bukti', 'Pesanan::simpanBukti');
+    $routes->get('riwayat', 'Pesanan::riwayatPesanan');
 });

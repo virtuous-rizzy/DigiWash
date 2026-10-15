@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -104,6 +105,11 @@
             flex-shrink: 0;
         }
 
+        .service-img-emoji i {
+            color: #033B59;
+            line-height: 1;
+        }
+
         .service-text { flex: 1; }
 
         .service-name {
@@ -132,6 +138,30 @@
             flex-shrink: 0;
             margin-left: 8px;
         }
+
+        /* ===== Tablet & Desktop: melebar, kartu jadi grid 2 kolom ===== */
+        @media (min-width: 768px) {
+            .mobile-wrap { max-width: 960px; min-height: auto; }
+
+            .page-header { padding: 32px 40px 24px; }
+
+            .card-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+                padding: 0 40px 40px;
+            }
+
+            .service-card { min-height: 120px; }
+        }
+
+        /* Layar pendek (laptop kecil): rapatkan sedikit supaya tidak scroll */
+        @media (min-width: 768px) and (max-height: 600px) {
+            .page-header { padding: 20px 40px 16px; }
+            .card-list { gap: 14px; padding-bottom: 24px; }
+            .service-card { min-height: 100px; }
+            .service-img-emoji { width: 64px; height: 64px; font-size: 30px; }
+        }
     </style>
 </head>
 <body>
@@ -142,51 +172,24 @@
         </div>
 
         <div class="card-list">
-
-            <a href="<?= base_url('pesanan/buat-pesanan?layanan=Reguler') ?>" class="service-card">
-                <div class="service-left">
-                    <div class="service-img-emoji">🧺</div>
-                    <div class="service-text">
-                        <div class="service-name">Laundry Reguler</div>
-                        <div class="service-desc">Estimasi 3 hari</div>
+            <?php foreach (($daftarLayanan ?? []) as $row): 
+                $namaRaw   = (string) ($row['nama_layanan'] ?? 'Reguler');
+                $namaParam = str_ireplace(['Laundry ', ' '], ['', ''], $namaRaw);
+                $deskripsi = (string) ($row['deskripsi'] ?? ('Estimasi ' . ($row['estimasi_hari'] ?? 3) . ' hari'));
+                $ikon      = (string) ($row['ikon'] ?? 'bi-basket2-fill');
+                $idLayanan = (int) ($row['id_layanan'] ?? 1);
+            ?>
+                <a href="<?= base_url('pesanan/buat-pesanan?layanan=' . urlencode($namaParam) . '&id=' . $idLayanan) ?>" class="service-card">
+                    <div class="service-left">
+                        <div class="service-img-emoji"><i class="bi <?= esc($ikon) ?>"></i></div>
+                        <div class="service-text">
+                            <div class="service-name"><?= esc($namaRaw) ?></div>
+                            <div class="service-desc"><?= nl2br(esc($deskripsi)) ?></div>
+                        </div>
                     </div>
-                </div>
-                <div class="radio-dot"></div>
-            </a>
-
-            <a href="<?= base_url('pesanan/buat-pesanan?layanan=Express') ?>" class="service-card">
-                <div class="service-left">
-                    <div class="service-img-emoji">⚡</div>
-                    <div class="service-text">
-                        <div class="service-name">Laundry Express</div>
-                        <div class="service-desc">Estimasi 1 hari</div>
-                    </div>
-                </div>
-                <div class="radio-dot"></div>
-            </a>
-
-            <a href="<?= base_url('pesanan/buat-pesanan?layanan=Satuan') ?>" class="service-card">
-                <div class="service-left">
-                    <div class="service-img-emoji">👔</div>
-                    <div class="service-text">
-                        <div class="service-name">Laundry Satuan</div>
-                        <div class="service-desc">Jasa cuci satuan<br>Seperti jas, selimut, boneka</div>
-                    </div>
-                </div>
-                <div class="radio-dot"></div>
-            </a>
-
-            <a href="<?= base_url('pesanan/buat-pesanan?layanan=BedCover') ?>" class="service-card">
-                <div class="service-left">
-                    <div class="service-img-emoji">🛏️</div>
-                    <div class="service-text">
-                        <div class="service-name">Laundry Bed Cover</div>
-                        <div class="service-desc">Cuci bed cover, sprei, selimut besar</div>
-                    </div>
-                </div>
-                <div class="radio-dot"></div>
-            </a>
-
+                    <div class="radio-dot"></div>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
 </body>

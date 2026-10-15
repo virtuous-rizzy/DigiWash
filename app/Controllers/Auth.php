@@ -215,6 +215,10 @@ class Auth extends BaseController
                     'role' => $peran,
                     'peran' => $peran,
                     'user_id' => (int) $akun[$kolomId],
+                    $kolomId => (int) $akun[$kolomId],
+                    'id_pelanggan' => $peran === 'pelanggan' ? (int) $akun[$kolomId] : null,
+                    'id_admin' => $peran === 'admin' ? (int) $akun[$kolomId] : null,
+                    'id_kurir' => $peran === 'kurir' ? (int) $akun[$kolomId] : null,
                     'nama' => (string) $akun['nama'],
                     'email' => (string) $akun['email'],
                 ]);

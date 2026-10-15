@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background: #F0EFEF;
@@ -63,7 +64,8 @@
         .service-box-inner {
             display: flex; align-items: center; justify-content: space-between; gap: 10px;
         }
-        .service-box-icon { font-size: 32px; flex-shrink: 0; }
+        .service-box-icon { font-size: 32px; flex-shrink: 0; line-height: 1; }
+        .service-box-icon i { color: #033B59; }
         .service-box-info { flex: 1; }
         .service-box-name {
             font-family: 'Roboto', sans-serif; font-weight: 600;
@@ -131,9 +133,9 @@
         .input-icon-group { position: relative; margin-bottom: 20px; }
         .input-icon-group .input-box { padding-right: 44px; margin-bottom: 0; }
         .input-icon {
-            position: absolute; right: 12px; top: 50%;
-            transform: translateY(-50%); font-size: 18px; opacity: 0.5;
-            pointer-events: none;
+            position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%); font-size: 16px; color: #033B59; opacity: 0.6;
+            pointer-events: none; line-height: 1;
         }
 
         /* ── Cost box ── */
@@ -164,16 +166,20 @@
             font-family: 'Roboto', sans-serif; font-weight: 600;
             font-size: 13px; line-height: 22px; color: #033B59;
         }
+        .satuan-banner i { margin-right: 6px; }
         .satuan-grid {
             display: grid; grid-template-columns: repeat(2, 1fr);
             gap: 12px; margin-bottom: 20px;
         }
         .satuan-card {
             background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
-            padding: 12px 10px 10px; text-align: center; transition: border-color 0.2s;
+            padding: 12px 10px 10px; text-align: center;
+            transition: border-color 0.2s, background 0.2s;
         }
         .satuan-card:hover { border-color: #033B59; }
-        .satuan-icon { font-size: 28px; margin-bottom: 4px; }
+        .satuan-card.active { border-color: #033B59; background: #F3F9FD; }
+        .satuan-icon { font-size: 28px; margin-bottom: 4px; line-height: 1.2; }
+        .satuan-icon i { color: #033B59; }
         .satuan-name { font-weight: 600; font-size: 12px; color: #1e293b; }
         .satuan-price { font-weight: 400; font-size: 11px; color: #64748b; margin: 2px 0 8px; }
         .satuan-counter { display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -197,8 +203,79 @@
         .modal-content { border-radius: 14px; }
         .modal-header { border-bottom: 1px solid #f0eeee; padding: 16px 20px 12px; }
         .modal-title { font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 16px; color: #033B59; }
+        .modal-title i { margin-right: 6px; }
         .modal-body { padding: 16px 20px; font-size: 13px; color: #333; }
         .modal-footer { border-top: 1px solid #f0eeee; padding: 12px 20px; gap: 10px; }
+
+        /* =====================================================
+           RESPONSIVE
+           HP (< 600px)   : persis seperti mockup
+           Tablet portrait: kolom tunggal, sedikit lebih lebar
+           Desktop (>=900): 2 kolom — form kiri, ringkasan biaya
+                            menempel (sticky) di kanan
+           ===================================================== */
+        @media (min-width: 600px) and (max-width: 899px) {
+            .mobile-wrap { max-width: 560px; }
+        }
+
+        @media (min-width: 900px) {
+            .mobile-wrap { max-width: 1080px; min-height: auto; padding-bottom: 48px; }
+
+            .page-header { padding: 32px 40px 24px; }
+            .form-area   { padding: 0 40px; }
+
+            #formPesanan {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 340px;
+                gap: 32px;
+                align-items: start;
+            }
+
+            /* panel ringkasan ikut turun saat halaman di-scroll */
+            .col-side { position: sticky; top: 24px; }
+
+            /* alamat & tanggal sejajar */
+            .meta-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                column-gap: 20px;
+            }
+
+            .satuan-grid { grid-template-columns: repeat(4, 1fr); }
+            .satuan-icon { font-size: 30px; }
+
+            /* total sudah tampil di panel kanan */
+            .subtotal-bar { display: none; }
+
+            .service-box-icon {
+                width: 56px; height: 56px; border-radius: 12px;
+                background: #E8F4FD;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 28px;
+            }
+
+            /* panel ringkasan */
+            .cost-box {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+                background: #033B59;
+                border-radius: 16px;
+                padding: 26px 24px;
+                margin-bottom: 14px;
+            }
+            .cost-label  { color: #CEE4F0; font-size: 14px; font-weight: 500; }
+            .cost-detail { color: #fff; font-size: 16px; font-weight: 500; }
+            .cost-total  { color: #8BE79A; font-size: 38px; line-height: 1.1; }
+
+            .btn-submit {
+                height: 50px;
+                background: #CEE4F0;
+                color: #033B59;
+                border-color: transparent;
+            }
+            .btn-submit:hover { background: #b8d8ea; }
+        }
     </style>
 </head>
 <body>
@@ -214,188 +291,203 @@
         <form action="<?= base_url('pesanan/ringkasan') ?>" method="post" id="formPesanan">
             <?= csrf_field() ?>
             <!-- Hidden inputs – JANGAN DIHAPUS -->
+            <input type="hidden" name="id_layanan" value="<?= (int) ($id_layanan ?? 1) ?>">
             <input type="hidden" name="layanan" value="<?= (string) $layanan ?>">
             <input type="hidden" name="alamat" id="inputAlamat" value="<?= (string) $alamat ?>">
             <input type="hidden" name="tanggal_penjemputan" value="<?= (string) $tanggal ?>">
             <input type="hidden" id="harga_per_kg" value="<?= (int) $harga_per_kg ?>">
             <input type="hidden" id="detail_satuan" name="detail_satuan" value="">
 
-            <!-- ── SERVICE BOX ── -->
-            <div class="service-box">
-                <div class="service-box-label">Layanan</div>
-                <div class="service-box-inner">
-                    <span class="service-box-icon">
+            <!-- ══ KOLOM KIRI: FORM ══ -->
+            <div class="col-main">
+
+                <!-- ── SERVICE BOX ── -->
+                <div class="service-box">
+                    <div class="service-box-label">Layanan</div>
+                    <div class="service-box-inner">
                         <?php
-                            if ($layanan === 'Express')      echo '⚡';
-                            elseif ($layanan === 'BedCover') echo '🛏️';
-                            elseif ($layanan === 'Satuan')   echo '👔';
-                            else                             echo '🧺';
+                            if ($layanan === 'Express')      $ikon = 'bi-lightning-charge-fill';
+                            elseif ($layanan === 'BedCover') $ikon = 'bi-layers-fill';
+                            elseif ($layanan === 'Satuan')   $ikon = 'bi-tag-fill';
+                            else                             $ikon = 'bi-basket2-fill';
                         ?>
-                    </span>
-                    <div class="service-box-info">
-                        <div class="service-box-name">Laundry <?= (string) $layanan ?></div>
-                        <div class="service-box-price">
-                            <?= ($layanan === 'Satuan')
-                                ? 'Pencucian per item'
-                                : 'Rp ' . number_format((int) $harga_per_kg, 0, ',', '.') . ' / Kg' ?>
+                        <span class="service-box-icon"><i class="bi <?= $ikon ?>"></i></span>
+                        <div class="service-box-info">
+                            <div class="service-box-name">Laundry <?= (string) $layanan ?></div>
+                            <div class="service-box-price">
+                                <?= ($layanan === 'Satuan')
+                                    ? 'Pencucian per item'
+                                    : 'Rp ' . number_format((int) $harga_per_kg, 0, ',', '.') . ' / Kg' ?>
+                            </div>
+                        </div>
+                        <a href="<?= base_url('pesanan/pilih-layanan') ?>" class="btn-ubah">Ubah</a>
+                    </div>
+                </div>
+
+                <?php if ($layanan === 'Satuan'): ?>
+                <!-- ══ SATUAN MODE ══ -->
+                <div class="satuan-banner">
+                    <i class="bi bi-lightbulb-fill"></i>Harga per item — pilih item yang ingin dicuci
+                </div>
+
+                <span class="section-label">Pilih Item Satuan</span>
+                <div class="satuan-grid">
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-briefcase-fill"></i></div>
+                        <div class="satuan-name">Jas Formal</div>
+                        <div class="satuan-price">Rp 25.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('jas',-1)">−</button>
+                            <span id="qty_jas" class="satuan-qty">0</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('jas',1)">+</button>
                         </div>
                     </div>
-                    <a href="<?= base_url('pesanan/pilih-layanan') ?>" class="btn-ubah">Ubah</a>
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-snow2"></i></div>
+                        <div class="satuan-name">Jaket</div>
+                        <div class="satuan-price">Rp 15.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('jaket',-1)">−</button>
+                            <span id="qty_jaket" class="satuan-qty">0</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('jaket',1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-gem"></i></div>
+                        <div class="satuan-name">Gaun Pesta</div>
+                        <div class="satuan-price">Rp 35.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('gaun',-1)">−</button>
+                            <span id="qty_gaun" class="satuan-qty">1</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('gaun',1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-person-walking"></i></div>
+                        <div class="satuan-name">Sepatu</div>
+                        <div class="satuan-price">Rp 10.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('sepatu',-1)">−</button>
+                            <span id="qty_sepatu" class="satuan-qty">0</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('sepatu',1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-moon-stars-fill"></i></div>
+                        <div class="satuan-name">Selimut</div>
+                        <div class="satuan-price">Rp 20.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('selimut',-1)">−</button>
+                            <span id="qty_selimut" class="satuan-qty">0</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('selimut',1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-backpack2-fill"></i></div>
+                        <div class="satuan-name">Tas Ransel</div>
+                        <div class="satuan-price">Rp 18.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('tas',-1)">−</button>
+                            <span id="qty_tas" class="satuan-qty">0</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('tas',1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-person-standing"></i></div>
+                        <div class="satuan-name">Kaos Oblong</div>
+                        <div class="satuan-price">Rp 8.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('kaos',-1)">−</button>
+                            <span id="qty_kaos" class="satuan-qty">0</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('kaos',1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="satuan-card">
+                        <div class="satuan-icon"><i class="bi bi-plus-circle-fill"></i></div>
+                        <div class="satuan-name">Lainnya</div>
+                        <div class="satuan-price">Rp 12.000</div>
+                        <div class="satuan-counter">
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('lainnya',-1)">−</button>
+                            <span id="qty_lainnya" class="satuan-qty">0</span>
+                            <button type="button" class="satuan-btn" onclick="updateSatuan('lainnya',1)">+</button>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
 
-            <?php if ($layanan === 'Satuan'): ?>
-            <!-- ══ SATUAN MODE ══ -->
-            <div class="satuan-banner">
-                💡 Harga per item — pilih item yang ingin dicuci
-            </div>
+                <div class="subtotal-bar">
+                    <span class="subtotal-label">Subtotal Item</span>
+                    <span class="subtotal-val" id="subtotal_items">Rp 35.000</span>
+                </div>
 
-            <span class="section-label">Pilih Item Satuan</span>
-            <div class="satuan-grid">
+                <input type="hidden" name="berat" value="1">
 
-                <div class="satuan-card">
-                    <div class="satuan-icon">🥼</div>
-                    <div class="satuan-name">Jas Formal</div>
-                    <div class="satuan-price">Rp 25.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('jas',-1)">−</button>
-                        <span id="qty_jas" class="satuan-qty">0</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('jas',1)">+</button>
+                <?php else: ?>
+                <!-- ══ KILOAN MODE ══ -->
+                <span class="section-label">Berat Cucian (Kg)</span>
+                <div class="weight-group">
+                    <button type="button" class="counter-btn" onclick="ubahBerat(-1)">−</button>
+                    <div class="counter-divider"></div>
+                    <input type="number" id="berat" name="berat" class="counter-value" value="5" min="1" readonly>
+                    <div class="counter-divider"></div>
+                    <button type="button" class="counter-btn" onclick="ubahBerat(1)">+</button>
+                </div>
+                <?php endif; ?>
+
+                <div class="meta-grid">
+                    <!-- ── ALAMAT PENJEMPUTAN ── -->
+                    <div>
+                        <span class="section-label">Alamat Penjemputan</span>
+                        <div class="info-card">
+                            <div class="info-card-addr" id="displayAlamat"><?= (string) $alamat ?></div>
+                            <button type="button" class="btn-ubah"
+                                data-bs-toggle="modal" data-bs-target="#modalUbahAlamat">Ubah</button>
+                        </div>
+                    </div>
+
+                    <!-- ── TANGGAL PENJEMPUTAN ── -->
+                    <div>
+                        <span class="section-label">Tanggal Penjemputan</span>
+                        <div class="input-icon-group">
+                            <input type="text" class="input-box" value="<?= (string) $tanggal ?>" readonly>
+                            <span class="input-icon"><i class="bi bi-calendar-event-fill"></i></span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="satuan-card">
-                    <div class="satuan-icon">🧥</div>
-                    <div class="satuan-name">Jaket</div>
-                    <div class="satuan-price">Rp 15.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('jaket',-1)">−</button>
-                        <span id="qty_jaket" class="satuan-qty">0</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('jaket',1)">+</button>
+                <!-- ── CATATAN ── -->
+                <span class="section-label">Catatan Tambahan (Opsional)</span>
+                <textarea name="catatan" class="textarea-box"
+                    placeholder="Contoh : Rumah Putih Mobil Agya putih"></textarea>
+
+            </div><!-- /.col-main -->
+
+            <!-- ══ KOLOM KANAN: RINGKASAN BIAYA + SUBMIT ══ -->
+            <div class="col-side">
+                <!-- ── RINCIAN BIAYA ── -->
+                <div class="cost-box">
+                    <div>
+                        <div class="cost-label">Rincian Biaya</div>
+                        <div class="cost-detail" id="text_calc">
+                            5 Kg x Rp <?= number_format((int) $harga_per_kg, 0, ',', '.') ?>
+                        </div>
                     </div>
+                    <div class="cost-total" id="text_total">Rp 35.000</div>
                 </div>
+                <input type="hidden" id="total_harga" name="total_harga" value="35000">
 
-                <div class="satuan-card">
-                    <div class="satuan-icon">👗</div>
-                    <div class="satuan-name">Gaun Pesta</div>
-                    <div class="satuan-price">Rp 35.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('gaun',-1)">−</button>
-                        <span id="qty_gaun" class="satuan-qty">1</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('gaun',1)">+</button>
-                    </div>
-                </div>
+                <!-- ── SUBMIT ── -->
+                <button type="submit" class="btn-submit">Lanjut Ke Ringkasan</button>
+            </div><!-- /.col-side -->
 
-                <div class="satuan-card">
-                    <div class="satuan-icon">👟</div>
-                    <div class="satuan-name">Sepatu</div>
-                    <div class="satuan-price">Rp 10.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('sepatu',-1)">−</button>
-                        <span id="qty_sepatu" class="satuan-qty">0</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('sepatu',1)">+</button>
-                    </div>
-                </div>
-
-                <div class="satuan-card">
-                    <div class="satuan-icon">🧣</div>
-                    <div class="satuan-name">Selimut</div>
-                    <div class="satuan-price">Rp 20.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('selimut',-1)">−</button>
-                        <span id="qty_selimut" class="satuan-qty">0</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('selimut',1)">+</button>
-                    </div>
-                </div>
-
-                <div class="satuan-card">
-                    <div class="satuan-icon">🎒</div>
-                    <div class="satuan-name">Tas Ransel</div>
-                    <div class="satuan-price">Rp 18.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('tas',-1)">−</button>
-                        <span id="qty_tas" class="satuan-qty">0</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('tas',1)">+</button>
-                    </div>
-                </div>
-
-                <div class="satuan-card">
-                    <div class="satuan-icon">👕</div>
-                    <div class="satuan-name">Kaos Oblong</div>
-                    <div class="satuan-price">Rp 8.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('kaos',-1)">−</button>
-                        <span id="qty_kaos" class="satuan-qty">0</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('kaos',1)">+</button>
-                    </div>
-                </div>
-
-                <div class="satuan-card">
-                    <div class="satuan-icon">✨</div>
-                    <div class="satuan-name">Lainnya</div>
-                    <div class="satuan-price">Rp 12.000</div>
-                    <div class="satuan-counter">
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('lainnya',-1)">−</button>
-                        <span id="qty_lainnya" class="satuan-qty">0</span>
-                        <button type="button" class="satuan-btn" onclick="updateSatuan('lainnya',1)">+</button>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="subtotal-bar">
-                <span class="subtotal-label">Subtotal Item</span>
-                <span class="subtotal-val" id="subtotal_items">Rp 35.000</span>
-            </div>
-
-            <input type="hidden" name="berat" value="1">
-
-            <?php else: ?>
-            <!-- ══ KILOAN MODE ══ -->
-            <span class="section-label">Berat Cucian (Kg)</span>
-            <div class="weight-group">
-                <button type="button" class="counter-btn" onclick="ubahBerat(-1)">−</button>
-                <div class="counter-divider"></div>
-                <input type="number" id="berat" name="berat" class="counter-value" value="5" min="1" readonly>
-                <div class="counter-divider"></div>
-                <button type="button" class="counter-btn" onclick="ubahBerat(1)">+</button>
-            </div>
-            <?php endif; ?>
-
-            <!-- ── ALAMAT PENJEMPUTAN ── -->
-            <span class="section-label">Alamat Penjemputan</span>
-            <div class="info-card">
-                <div class="info-card-addr" id="displayAlamat"><?= (string) $alamat ?></div>
-                <button type="button" class="btn-ubah"
-                    data-bs-toggle="modal" data-bs-target="#modalUbahAlamat">Ubah</button>
-            </div>
-
-            <!-- ── TANGGAL PENJEMPUTAN ── -->
-            <span class="section-label">Tanggal Penjemputan</span>
-            <div class="input-icon-group">
-                <input type="text" class="input-box" value="<?= (string) $tanggal ?>" readonly>
-                <span class="input-icon">📅</span>
-            </div>
-
-            <!-- ── CATATAN ── -->
-            <span class="section-label">Catatan Tambahan (Opsional)</span>
-            <textarea name="catatan" class="textarea-box"
-                placeholder="Contoh : Rumah Putih Mobil Agya putih"></textarea>
-
-            <!-- ── RINCIAN BIAYA ── -->
-            <div class="cost-box">
-                <div>
-                    <div class="cost-label">Rincian Biaya</div>
-                    <div class="cost-detail" id="text_calc">
-                        5 Kg x Rp <?= number_format((int) $harga_per_kg, 0, ',', '.') ?>
-                    </div>
-                </div>
-                <div class="cost-total" id="text_total">Rp 35.000</div>
-            </div>
-            <input type="hidden" id="total_harga" name="total_harga" value="35000">
-
-            <!-- ── SUBMIT ── -->
-            <button type="submit" class="btn-submit">Lanjut Ke Ringkasan</button>
         </form>
     </div><!-- /.form-area -->
 </div><!-- /.mobile-wrap -->
@@ -405,7 +497,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalUbahAlamatLabel">📍 Ubah Alamat Penjemputan</h5>
+                <h5 class="modal-title" id="modalUbahAlamatLabel"><i class="bi bi-geo-alt-fill"></i>Ubah Alamat Penjemputan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -455,7 +547,9 @@
     function updateSatuan(item, val) {
         if (itemsSatuan[item] + val >= 0) {
             itemsSatuan[item] += val;
-            document.getElementById('qty_' + item).innerText = itemsSatuan[item];
+            let qtyEl = document.getElementById('qty_' + item);
+            qtyEl.innerText = itemsSatuan[item];
+            qtyEl.closest('.satuan-card').classList.toggle('active', itemsSatuan[item] > 0);
             hitungTotal();
         }
     }
@@ -502,6 +596,14 @@
         document.getElementById('inputAlamatBaru').value =
             document.getElementById('inputAlamat').value;
     });
+
+    /* Tandai kartu satuan yang sudah berisi (nilai awal) */
+    if (isSatuan) {
+        for (let k in itemsSatuan) {
+            let el = document.getElementById('qty_' + k);
+            if (el) el.closest('.satuan-card').classList.toggle('active', itemsSatuan[k] > 0);
+        }
+    }
 
     hitungTotal();
 </script>
