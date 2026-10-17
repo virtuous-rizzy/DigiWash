@@ -3,8 +3,9 @@
 <?= $this->section('isi') ?>
 <?php
 $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
-$tab = $tab ?? 'semua';
-$q   = $q ?? '';
+$tab       = $tab ?? 'semua';
+$q         = $q ?? '';
+$kurirList = $kurirList ?? [];
 ?>
 
 <style>
@@ -147,11 +148,64 @@ $q   = $q ?? '';
     border: 1px solid #e2e8f0;
     box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 }
+.order-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
 .order-id-label {
     font-size: 15px;
     font-weight: 800;
     color: #0f172a;
+    margin-bottom: 0;
+}
+.btn-preview-tracking {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0284c7;
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.btn-preview-tracking:hover {
+    background: #0284c7;
+    color: #fff;
+}
+.kurir-badge-row {
     margin-bottom: 12px;
+}
+.assigned-kurir-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 8px;
+}
+.unassigned-kurir-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    color: #854d0e;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 8px;
 }
 .customer-section {
     display: flex;
@@ -319,6 +373,25 @@ $q   = $q ?? '';
     </div>
 </div>
 
+<?php if (session()->getFlashdata('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show py-2 px-3 mb-3 fw-bold small rounded-3 d-flex align-items-center justify-content-between" role="alert">
+        <div><i class="bi bi-check-circle-fill me-2"></i><?= esc((string) session()->getFlashdata('success')) ?></div>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('errors')): ?>
+    <div class="alert alert-danger alert-dismissible fade show py-2 px-3 mb-3 fw-bold small rounded-3" role="alert">
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Terjadi Kesalahan:</span>
+        </div>
+        <?php foreach ((array) session()->getFlashdata('errors') as $err): ?>
+            <div><?= esc((string) $err) ?></div>
+        <?php endforeach; ?>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
 <!-- Tab Filter -->
 <div class="filter-tabs">
     <a href="<?= base_url('admin/pesanan?tab=semua' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
@@ -400,7 +473,12 @@ $q   = $q ?? '';
         ?>
 
         <div class="order-card">
-            <div class="order-id-label"><?= $e($kodePesanan) ?></div>
+            <div class="order-header-row">
+                <div class="order-id-label"><?= $e($kodePesanan) ?></div>
+                <a href="<?= base_url('pesanan/tracking/' . $idPesanan) ?>" target="_blank" class="btn-preview-tracking" title="Buka Tracking Pelanggan">
+                    <i class="bi bi-geo-alt-fill"></i> Tracking Pelanggan &nearr;
+                </a>
+            </div>
 
             <div class="customer-section">
                 <div class="customer-avatar">
@@ -413,10 +491,27 @@ $q   = $q ?? '';
                 <div class="customer-info">
                     <div class="customer-name"><?= $e($namaPlg) ?></div>
                     <div class="customer-desc">
-                        <?= $e((string)($p['nama_layanan'] ?? 'Laundry Reguler')) ?>
-                        · <?= (float)($p['berat'] ?? 1.0) ?> KG
+                        <?= $e((string)($p['nama_layanan'] ?? 'Laundry Reguler')) ?> · <?= (float)($p['berat'] ?? 1.0) ?> KG
+                        <?php if (! empty($p['alamat_pengambilan'])): ?>
+                            <br><i class="bi bi-geo-alt"></i> <?= $e((string)$p['alamat_pengambilan']) ?>
+                        <?php endif; ?>
                     </div>
                 </div>
+            </div>
+
+            <!-- Status Penugasan Kurir -->
+            <div class="kurir-badge-row">
+                <?php if (! empty($p['nama_kurir'])): ?>
+                    <div class="assigned-kurir-badge">
+                        <i class="bi bi-person-badge-fill"></i>
+                        <span>Kurir: <strong><?= $e($p['nama_kurir']) ?></strong> <?= ! empty($p['no_hp_kurir']) ? '(' . $e($p['no_hp_kurir']) . ')' : '' ?></span>
+                    </div>
+                <?php else: ?>
+                    <div class="unassigned-kurir-badge">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Belum ada kurir ditugaskan</span>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="current-status-title">
@@ -476,22 +571,62 @@ $q   = $q ?? '';
                 </div>
             </div>
 
-            <!-- Form Ubah Status -->
-            <form action="<?= base_url('admin/pesanan/update-status/' . $idPesanan) ?>" method="post" class="form-ubah-wrap">
-                <?= csrf_field() ?>
-                <label class="form-ubah-label">Ubah Status</label>
-                <select name="status_pesanan" class="status-dropdown" required>
-                    <option value="" disabled>Pilih Status Berikutnya</option>
-                    <option value="dikonfirmasi" <?= in_array($st, ['menunggu', 'dikonfirmasi'], true) ? 'selected' : '' ?>>Menunggu Kurir</option>
-                    <option value="dijemput" <?= $st === 'dijemput' ? 'selected' : '' ?>>Cucian Dijemput</option>
-                    <option value="dicuci" <?= $st === 'dicuci' ? 'selected' : '' ?>>Proses Cuci</option>
-                    <option value="disetrika" <?= $st === 'disetrika' ? 'selected' : '' ?>>Proses Setrika</option>
-                    <option value="diantar" <?= $st === 'diantar' ? 'selected' : '' ?>>Sedang Diantar</option>
-                    <option value="selesai" <?= $st === 'selesai' ? 'selected' : '' ?>>Selesai</option>
-                    <option value="dibatalkan" <?= $st === 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
-                </select>
-                <button type="submit" class="btn-simpan-status">Simpan Perubahan</button>
-            </form>
+            <!-- Form Ubah Status & Tugaskan Kurir -->
+            <?php if ($st === 'dibatalkan'): ?>
+                <div class="alert alert-danger py-2 px-3 fw-bold small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3">
+                    <i class="bi bi-x-circle-fill fs-5"></i>
+                    <div>
+                        <strong>Pesanan Dibatalkan</strong><br>
+                        <span class="fw-normal">Pesanan ini telah dibatalkan atau pembayaran ditolak oleh Admin. Status telah terkunci dan tidak dapat diubah lagi.</span>
+                    </div>
+                </div>
+            <?php elseif ($st === 'selesai'): ?>
+                <div class="alert alert-success py-2 px-3 fw-bold small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3">
+                    <i class="bi bi-check-circle-fill fs-5"></i>
+                    <div>
+                        <strong>Pesanan Selesai</strong><br>
+                        <span class="fw-normal">Pesanan telah selesai dan pakaian telah diterima oleh pelanggan. Status telah final.</span>
+                    </div>
+                </div>
+            <?php elseif (($p['status_bayar'] ?? '') !== 'lunas'): ?>
+                <div class="alert alert-warning py-2 px-3 fw-bold small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3">
+                    <i class="bi bi-clock-history fs-5"></i>
+                    <div>
+                        <strong>Menunggu Konfirmasi Pembayaran</strong><br>
+                        <span class="fw-normal">Pembayaran belum berstatus Lunas. Silakan <a href="<?= base_url('admin/transaksi?q=' . urlencode($kodePesanan)) ?>" class="fw-bold text-decoration-underline text-dark">verifikasi pembayaran di menu Transaksi</a> terlebih dahulu sebelum memproses status laundry.</span>
+                    </div>
+                </div>
+            <?php else: ?>
+                <form action="<?= base_url('admin/pesanan/update-status/' . $idPesanan) ?>" method="post" class="form-ubah-wrap">
+                    <?= csrf_field() ?>
+                    <div class="row g-2 mb-2">
+                        <div class="col-12 col-sm-6">
+                            <label class="form-ubah-label">Tugaskan Kurir</label>
+                            <select name="id_kurir" class="status-dropdown">
+                                <option value="">-- Bebas Diambil Kurir --</option>
+                                <?php foreach ($kurirList as $k): ?>
+                                    <option value="<?= (int)$k['id_kurir'] ?>" <?= ((int)($p['id_kurir'] ?? 0) === (int)$k['id_kurir']) ? 'selected' : '' ?>>
+                                        <?= $e($k['nama']) ?> (<?= ucfirst($k['status']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-ubah-label">Status Laundry</label>
+                            <select name="status_pesanan" class="status-dropdown" required>
+                                <option value="dikonfirmasi" <?= in_array($st, ['menunggu', 'dikonfirmasi'], true) ? 'selected' : '' ?>>Menunggu Kurir (Dikonfirmasi)</option>
+                                <option value="dijemput" <?= $st === 'dijemput' ? 'selected' : '' ?>>Cucian Dijemput</option>
+                                <option value="dicuci" <?= $st === 'dicuci' ? 'selected' : '' ?>>Proses Cuci</option>
+                                <option value="disetrika" <?= $st === 'disetrika' ? 'selected' : '' ?>>Proses Setrika</option>
+                                <option value="diantar" <?= $st === 'diantar' ? 'selected' : '' ?>>Sedang Diantar</option>
+                                <option value="selesai" <?= $st === 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                                <option value="dibatalkan" <?= $st === 'dibatalkan' ? 'selected' : '' ?>>Batalkan Pesanan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-simpan-status">Simpan Perubahan</button>
+                </form>
+            <?php endif; ?>
         </div>
     <?php endforeach; ?>
 <?php endif; ?>

@@ -77,6 +77,9 @@ $routes->group('admin', ['filter' => 'role:admin'], static function ($routes) {
 $routes->group('kurir', ['filter' => 'role:kurir'], static function ($routes) {
     $routes->get('dashboard', 'Kurir\DashboardKrr::index');
     $routes->get('tugas', 'Kurir\TugasKrr::index');
+    $routes->get('tugas/detail/(:num)', 'Kurir\TugasKrr::detail/$1');
+    $routes->post('tugas/update-aksi/(:num)', 'Kurir\TugasKrr::updateAksi/$1');
+    $routes->get('riwayat', 'Kurir\RiwayatKrr::index');
 
     $routes->get('akun', 'Kurir\AkunKrr::index');
     $routes->get('akun/data', 'Kurir\AkunKrr::data');

@@ -116,17 +116,35 @@ class TransaksiAdm extends BaseController
      */
     public function verifikasi(int $idPembayaran)
     {
-        $idAdmin = (int) (session()->get('id_admin') ?? 1);
+        $idAdmin = (int) (session()->get('id_admin') ?? session()->get('user_id') ?? 1);
         $model   = new PembayaranModel();
 
         try {
+            $transaksi = $model->find($idPembayaran);
+            if (! $transaksi) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' tidak ditemukan.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'lunas') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' sudah berstatus Lunas dan tidak dapat diubah lagi.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'gagal') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' sudah ditolak dan tidak dapat diverifikasi lagi.']);
+            }
+
             $berhasil = $model->verifikasiTransaksi($idPembayaran, $idAdmin);
             if ($berhasil) {
                 return redirect()->to(base_url('admin/transaksi'))
-                    ->with('success', 'Transaksi berhasil diverifikasi dan ditandai Lunas.');
+                    ->with('success', 'Transaksi #' . $idPembayaran . ' berhasil diverifikasi dan ditandai Lunas.');
             }
         } catch (\Throwable $th) {
             log_message('error', 'Verifikasi gagal: ' . $th->getMessage());
+            return redirect()->to(base_url('admin/transaksi'))
+                ->with('errors', ['Terjadi kesalahan saat memverifikasi transaksi: ' . $th->getMessage()]);
         }
 
         return redirect()->to(base_url('admin/transaksi'))
@@ -138,17 +156,35 @@ class TransaksiAdm extends BaseController
      */
     public function tolak(int $idPembayaran)
     {
-        $idAdmin = (int) (session()->get('id_admin') ?? 1);
+        $idAdmin = (int) (session()->get('id_admin') ?? session()->get('user_id') ?? 1);
         $model   = new PembayaranModel();
 
         try {
+            $transaksi = $model->find($idPembayaran);
+            if (! $transaksi) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' tidak ditemukan.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'gagal') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' sudah berstatus Ditolak dan tidak dapat diubah lagi.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'lunas') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' yang sudah berstatus Lunas tidak dapat ditolak.']);
+            }
+
             $berhasil = $model->tolakTransaksi($idPembayaran, $idAdmin);
             if ($berhasil) {
                 return redirect()->to(base_url('admin/transaksi'))
-                    ->with('success', 'Transaksi berhasil ditolak.');
+                    ->with('success', 'Transaksi #' . $idPembayaran . ' berhasil ditolak.');
             }
         } catch (\Throwable $th) {
             log_message('error', 'Tolak gagal: ' . $th->getMessage());
+            return redirect()->to(base_url('admin/transaksi'))
+                ->with('errors', ['Terjadi kesalahan saat menolak transaksi: ' . $th->getMessage()]);
         }
 
         return redirect()->to(base_url('admin/transaksi'))

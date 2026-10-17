@@ -227,6 +227,19 @@ $daftarTugas = $daftarTugas ?? [];
     <h1 class="tugas-title">Tugas Kurir</h1>
 </div>
 
+<?php if (session()->getFlashdata('pesan')): ?>
+    <div class="alert alert-success py-2 px-3 mb-3 fw-bold small rounded-3">
+        <?= session()->getFlashdata('pesan') ?>
+    </div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('errors')): ?>
+    <div class="alert alert-danger py-2 px-3 mb-3 fw-bold small rounded-3">
+        <?php foreach ((array) session()->getFlashdata('errors') as $err): ?>
+            <div><?= esc($err) ?></div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
 <!-- 2 Kartu Metrik Ringkasan -->
 <div class="krr-summary-row">
     <!-- 1. Tugas Aktif -->
@@ -371,9 +384,9 @@ $daftarTugas = $daftarTugas ?? [];
             </div>
 
             <!-- Action Button: Lihat Detail -->
-            <button type="button" class="btn-lihat-detail" onclick="tampilkanDetailInfo('<?= $e((string)$t['kode']) ?>', '<?= $e((string)$t['nama']) ?>')">
+            <a href="<?= base_url('kurir/tugas/detail/' . (int)$t['id_pesanan']) ?>" class="btn-lihat-detail">
                 Lihat Detail &gt;
-            </button>
+            </a>
         </div>
     <?php endforeach; ?>
 <?php endif; ?>

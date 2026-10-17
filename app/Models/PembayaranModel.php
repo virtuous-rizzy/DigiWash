@@ -89,6 +89,11 @@ class PembayaranModel extends Model
             return false;
         }
 
+        // Transaksi yang sudah lunas atau sudah ditolak tidak boleh diubah lagi
+        if ($transaksi['status_bayar'] === 'lunas' || $transaksi['status_bayar'] === 'gagal') {
+            return false;
+        }
+
         $this->update($idPembayaran, [
             'status_bayar' => 'lunas',
             'id_admin'     => $idAdmin,
@@ -115,6 +120,11 @@ class PembayaranModel extends Model
     {
         $transaksi = $this->find($idPembayaran);
         if (! $transaksi) {
+            return false;
+        }
+
+        // Transaksi yang sudah ditolak atau sudah lunas tidak boleh diubah lagi
+        if ($transaksi['status_bayar'] === 'gagal' || $transaksi['status_bayar'] === 'lunas') {
             return false;
         }
 

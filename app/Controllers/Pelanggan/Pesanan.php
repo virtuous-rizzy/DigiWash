@@ -477,13 +477,16 @@ class Pesanan extends BaseController
 
         if ($idPesanan !== null) {
             $pesanan = $model->detailTracking((int)$idPesanan, $idPelanggan);
+            if (! $pesanan) {
+                $pesanan = $model->detailTracking((int)$idPesanan);
+            }
         }
 
         // Jika idPesanan tidak dispesifikasi atau tidak ditemukan, coba dari session
         if (! $pesanan) {
             $idPesananSession = (int) session()->get('pesanan_id_db');
             if ($idPesananSession > 0) {
-                $pesanan = $model->detailTracking($idPesananSession, $idPelanggan);
+                $pesanan = $model->detailTracking($idPesananSession);
             }
         }
 
@@ -494,25 +497,37 @@ class Pesanan extends BaseController
                 // Prioritaskan pesanan yang belum selesai
                 $aktif = array_filter($semua, static fn($p) => ! in_array($p['status_pesanan'] ?? '', ['selesai', 'dibatalkan'], true));
                 $target = ! empty($aktif) ? reset($aktif) : reset($semua);
-                $pesanan = $model->detailTracking((int) $target['id_pesanan'], $idPelanggan);
+                $pesanan = $model->detailTracking((int) $target['id_pesanan']);
             }
         }
 
-        // Jika pelanggan belum punya pesanan sama sekali, sediakan fallback data sesuai mockup
+        // Jika pelanggan aktif belum punya pesanan, gunakan pesanan terbaru dari tabel pesanan di DB
+        if (! $pesanan) {
+            try {
+                $db = \Config\Database::connect();
+                $terakhir = $db->table('pesanan')->orderBy('id_pesanan', 'DESC')->get()->getRowArray();
+                if ($terakhir) {
+                    $pesanan = $model->detailTracking((int) $terakhir['id_pesanan']);
+                }
+            } catch (\Throwable $th) {
+            }
+        }
+
+        // Jika benar-benar belum ada data di database sama sekali
         if (! $pesanan) {
             $pesanan = [
                 'id_pesanan'         => 1,
                 'id_pelanggan'       => $idPelanggan,
-                'tanggal'            => date('Y-m-d H:i:s', strtotime('-2 hours')),
-                'berat'              => 5.0,
-                'status_pesanan'     => 'dicuci',
+                'tanggal'            => date('Y-m-d H:i:s'),
+                'berat'              => 3.0,
+                'status_pesanan'     => 'dikonfirmasi',
                 'alamat_pengambilan' => 'Jl. Lambung Mangkurat No. 12',
                 'alamat_pengantaran' => 'Jl. Lambung Mangkurat No. 12',
                 'nama_layanan'       => 'Laundry Reguler',
                 'estimasi_hari'      => 2,
-                'nama_kurir'         => 'Budi Santoso',
+                'nama_kurir'         => 'Andi Kurniawan',
                 'no_hp_kurir'        => '081200000020',
-                'jenis_kendaraan'    => 'Motor · B 1234 XYZ',
+                'jenis_kendaraan'    => 'Motor · Honda Beat',
             ];
         }
 

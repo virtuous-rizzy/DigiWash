@@ -135,22 +135,18 @@ $foto    = foto_profil();
 <script>
 (function () {
     var input = document.getElementById('inputFoto');
-    input.addEventListener('change', function () {
-        var f = input.files[0];
-        if (!f) return;
-        if (f.size > 2 * 1024 * 1024) {
-            alert('Ukuran foto maksimal 2 MB.');
-            input.value = '';
-            return;
-        }
-        document.getElementById('formFoto').submit();
-    });
-
-    document.querySelectorAll('form[data-konfirmasi]').forEach(function (f) {
-        f.addEventListener('submit', function (ev) {
-            if (!confirm(f.getAttribute('data-konfirmasi'))) ev.preventDefault();
+    if (input) {
+        input.addEventListener('change', function () {
+            var f = input.files[0];
+            if (!f) return;
+            if (f.size > 2 * 1024 * 1024) {
+                alert('Ukuran foto maksimal 2 MB.');
+                input.value = '';
+                return;
+            }
+            document.getElementById('formFoto').submit();
         });
-    });
+    }
 })();
 </script>
 <?= $this->endSection() ?>

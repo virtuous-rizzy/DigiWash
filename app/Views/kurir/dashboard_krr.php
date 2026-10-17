@@ -39,7 +39,7 @@ $badge = [
         <span class="ikon-besar">🚚</span>
         <span><strong>Tugas Antar</strong><small>Antar cucian bersih ke pelanggan</small></span>
     </a>
-    <a class="admin-card" href="<?= base_url('kurir/tugas?tab=semua') ?>">
+    <a class="admin-card" href="<?= base_url('kurir/riwayat') ?>">
         <span class="ikon-besar">🕘</span>
         <span><strong>Riwayat Tugas</strong><small>Lihat tugas yang sudah selesai</small></span>
     </a>

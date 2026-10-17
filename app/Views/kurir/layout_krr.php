@@ -15,6 +15,8 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Digiwash Kurir</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
 </head>
 <body>
@@ -27,7 +29,7 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
             <nav class="bottom-nav">
                 <a href="<?= base_url('kurir/dashboard') ?>" class="<?= $aktif === 'beranda' ? 'active' : '' ?>"><span>🏠</span>Beranda</a>
                 <a href="<?= base_url('kurir/tugas') ?>" class="<?= $aktif === 'tugas' ? 'active' : '' ?>"><span>📋</span>Tugas</a>
-                <a href="#" data-soon><span>🕘</span>Riwayat</a>
+                <a href="<?= base_url('kurir/riwayat') ?>" class="<?= $aktif === 'riwayat' ? 'active' : '' ?>"><span>🕘</span>Riwayat</a>
                 <a href="<?= base_url('kurir/akun') ?>" class="<?= $aktif === 'akun' ? 'active' : '' ?>"><span>👤</span>Akun</a>
             </nav>
 
@@ -54,6 +56,36 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<!-- Modal Konfirmasi Kurir (Sesuai Gaya Modal Admin) -->
+<div class="modal fade" id="modalKonfirmasiKrr" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: #033B59; color: #fff; padding: 14px 20px;">
+                <h6 class="modal-title fw-bold" id="modalKonfirmasiKrrTitle" style="margin: 0; font-size: 15px;">
+                    <i class="bi bi-question-circle me-2"></i>Konfirmasi
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div id="modalKonfirmasiKrrIcon" class="mb-3">
+                    <i class="bi bi-exclamation-circle text-warning" style="font-size: 48px;"></i>
+                </div>
+                <p id="modalKonfirmasiKrrPesan" style="font-size: 14px; color: #333; line-height: 1.5; margin: 0; font-weight: 500;"></p>
+            </div>
+            <div class="modal-footer" style="background: #f8f9fa; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; padding: 12px 20px;">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 px-3" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" id="btnKonfirmasiKrrSubmit" class="btn btn-sm btn-primary rounded-3 px-3 fw-bold" style="background: #033B59; border-color: #033B59;">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 (function () {
     var toast = document.getElementById('toast'), timer;
@@ -65,14 +97,68 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
     document.querySelectorAll('[data-soon]').forEach(function (el) {
         el.addEventListener('click', function (ev) { ev.preventDefault(); tampilkan('Fitur segera hadir'); });
     });
+
+    var targetAction = null;
+    var modalEl = document.getElementById('modalKonfirmasiKrr');
+    var bsModal = (typeof bootstrap !== 'undefined' && bootstrap.Modal) ? new bootstrap.Modal(modalEl) : null;
+
+    function bukaModalKonfirmasi(pesan, aksi, isDanger, judul) {
+        document.getElementById('modalKonfirmasiKrrPesan').textContent = pesan;
+        document.getElementById('modalKonfirmasiKrrTitle').innerHTML = '<i class="bi ' + (isDanger ? 'bi-exclamation-triangle-fill' : 'bi-question-circle-fill') + ' me-2"></i>' + (judul || 'Konfirmasi');
+        
+        var iconEl = document.getElementById('modalKonfirmasiKrrIcon');
+        iconEl.innerHTML = '<i class="bi ' + (isDanger ? 'bi-exclamation-triangle-fill' : 'bi-question-circle-fill') + '" style="font-size: 46px; color: ' + (isDanger ? '#E53935' : '#033B59') + ';"></i>';
+        
+        var btnSubmit = document.getElementById('btnKonfirmasiKrrSubmit');
+        var isLogout = (judul && judul.toLowerCase().includes('logout'));
+        if (isDanger) {
+            btnSubmit.className = 'btn btn-sm btn-danger rounded-3 px-3 fw-bold';
+            btnSubmit.style.background = '#E53935';
+            btnSubmit.style.borderColor = '#E53935';
+            btnSubmit.textContent = isLogout ? 'Ya, Keluar' : 'Ya, Lanjutkan';
+        } else {
+            btnSubmit.className = 'btn btn-sm btn-primary rounded-3 px-3 fw-bold';
+            btnSubmit.style.background = '#033B59';
+            btnSubmit.style.borderColor = '#033B59';
+            btnSubmit.textContent = 'Ya, Lanjutkan';
+        }
+
+        targetAction = aksi;
+        if (bsModal) {
+            bsModal.show();
+        } else {
+            if (confirm(pesan)) aksi();
+        }
+    }
+
+    document.getElementById('btnKonfirmasiKrrSubmit').addEventListener('click', function () {
+        if (bsModal) bsModal.hide();
+        if (typeof targetAction === 'function') {
+            targetAction();
+        }
+    });
+
     document.querySelectorAll('a[data-konfirmasi]').forEach(function (el) {
         el.addEventListener('click', function (ev) {
-            if (!confirm(el.getAttribute('data-konfirmasi'))) ev.preventDefault();
+            ev.preventDefault();
+            var pesan = el.getAttribute('data-konfirmasi');
+            var isLogout = el.classList.contains('btn-logout') || el.href.includes('keluar');
+            bukaModalKonfirmasi(pesan, function () {
+                window.location.href = el.href;
+            }, isLogout, isLogout ? 'Konfirmasi Logout' : 'Konfirmasi Tindakan');
         });
     });
+
     document.querySelectorAll('form[data-konfirmasi]').forEach(function (f) {
         f.addEventListener('submit', function (ev) {
-            if (!confirm(f.getAttribute('data-konfirmasi'))) ev.preventDefault();
+            if (f.dataset.confirmed === 'true') return;
+            ev.preventDefault();
+            var pesan = f.getAttribute('data-konfirmasi');
+            var isDanger = pesan.toLowerCase().includes('hapus') || pesan.toLowerCase().includes('batal');
+            bukaModalKonfirmasi(pesan, function () {
+                f.dataset.confirmed = 'true';
+                f.submit();
+            }, isDanger, isDanger ? 'Konfirmasi Tindakan' : 'Konfirmasi');
         });
     });
 })();

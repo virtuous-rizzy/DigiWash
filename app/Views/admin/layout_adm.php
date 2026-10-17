@@ -110,14 +110,17 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
         iconEl.innerHTML = '<i class="bi ' + (isDanger ? 'bi-exclamation-triangle-fill' : 'bi-question-circle-fill') + '" style="font-size: 46px; color: ' + (isDanger ? '#E53935' : '#033B59') + ';"></i>';
         
         var btnSubmit = document.getElementById('btnKonfirmasiAdminSubmit');
+        var isLogout = (judul && judul.toLowerCase().includes('logout'));
         if (isDanger) {
             btnSubmit.className = 'btn btn-sm btn-danger rounded-3 px-3 fw-bold';
             btnSubmit.style.background = '#E53935';
             btnSubmit.style.borderColor = '#E53935';
+            btnSubmit.textContent = isLogout ? 'Ya, Keluar' : 'Ya, Lanjutkan';
         } else {
             btnSubmit.className = 'btn btn-sm btn-primary rounded-3 px-3 fw-bold';
             btnSubmit.style.background = '#033B59';
             btnSubmit.style.borderColor = '#033B59';
+            btnSubmit.textContent = 'Ya, Lanjutkan';
         }
 
         targetAction = aksi;

@@ -32,6 +32,7 @@ class PesananAdm extends BaseController
         $q = trim((string) ($this->request->getGet('q') ?? ''));
 
         $model = new PesananModel();
+        $kurirModel = new \App\Models\KurirModel();
         $pesanan = [];
         $counts  = [
             'semua'    => 0,
@@ -39,56 +40,28 @@ class PesananAdm extends BaseController
             'diantar'  => 0,
             'selesai'  => 0,
         ];
+        $kurirList = [];
 
         try {
-            $pesanan = $model->semuaPesananAdmin($tab, $q);
-            $counts  = $model->hitungStatusAdmin();
+            $pesanan   = $model->semuaPesananAdmin($tab, $q);
+            $counts    = $model->hitungStatusAdmin();
+            $kurirList = $kurirModel->daftarKurirAktif();
         } catch (\Throwable $th) {
             log_message('error', 'Gagal memuat pesanan admin: ' . $th->getMessage());
         }
 
-        // Jika data pesanan di DB masih kosong untuk testing, siapkan dummy seperti di mockup (Akbar)
-        if (empty($pesanan) && $q === '' && $tab === 'semua' && $counts['semua'] === 0) {
-            $pesanan = [
-                [
-                    'id_pesanan'         => 2,
-                    'id_pelanggan'       => 1,
-                    'id_layanan'         => 1,
-                    'tanggal'            => date('Y-m-d H:i:s'),
-                    'berat'              => 5.00,
-                    'status_pesanan'     => 'dikonfirmasi',
-                    'alamat_pengambilan' => 'Jl. Melati No. 4',
-                    'alamat_pengantaran' => 'Jl. Melati No. 4',
-                    'catatan'            => '',
-                    'nama_pelanggan'     => 'Akbar',
-                    'no_hp_pelanggan'    => '085678901234',
-                    'foto_pelanggan'     => null,
-                    'nama_layanan'       => 'Laundry Reguler',
-                    'jenis_layanan'      => 'kiloan',
-                    'estimasi_hari'      => 3,
-                    'status_bayar'       => 'lunas',
-                    'total_bayar'        => 35000,
-                ],
-            ];
-            $counts = [
-                'semua'    => 1,
-                'diproses' => 1,
-                'diantar'  => 0,
-                'selesai'  => 0,
-            ];
-        }
-
         return view('admin/pesanan_adm', [
-            'pesanan' => $pesanan,
-            'tab'     => $tab,
-            'q'       => $q,
-            'counts'  => $counts,
-            'aktif'   => 'pesanan',
+            'pesanan'   => $pesanan,
+            'tab'       => $tab,
+            'q'         => $q,
+            'counts'    => $counts,
+            'kurirList' => $kurirList,
+            'aktif'     => 'pesanan',
         ]);
     }
 
     /**
-     * Update Status Laundry
+     * Update Status Laundry & Penugasan Kurir
      */
     public function updateStatus(int $idPesanan)
     {
@@ -97,6 +70,9 @@ class PesananAdm extends BaseController
         if (! in_array($status, self::STATUS_VALID, true)) {
             return redirect()->back()->with('errors', ['Status laundry yang dipilih tidak valid.']);
         }
+
+        $idKurirRaw = $this->request->getPost('id_kurir');
+        $idKurir = ($idKurirRaw !== null && $idKurirRaw !== '') ? (int) $idKurirRaw : null;
 
         $idAdmin = (int) (session()->get('id_admin') ?? session()->get('user_id') ?? 1);
         $model   = new PesananModel();
@@ -107,25 +83,84 @@ class PesananAdm extends BaseController
                 throw PageNotFoundException::forPageNotFound('Pesanan tidak ditemukan.');
             }
 
+            $currentStatus = (string) ($pesanan['status_pesanan'] ?? 'menunggu');
+
+            // Proteksi 1: Pesanan yang sudah dibatalkan tidak boleh diubah
+            if ($currentStatus === 'dibatalkan') {
+                return redirect()->to(base_url('admin/pesanan'))
+                    ->with('errors', ['Pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' sudah dibatalkan/ditolak dan tidak dapat diubah statusnya lagi.']);
+            }
+
+            // Proteksi 2: Pesanan yang sudah selesai tidak boleh diubah lagi
+            if ($currentStatus === 'selesai') {
+                return redirect()->to(base_url('admin/pesanan'))
+                    ->with('errors', ['Pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' sudah berstatus Selesai dan tidak dapat diubah statusnya lagi.']);
+            }
+
+            $db = \Config\Database::connect();
+
+            // Proteksi 3: Pengecekan status pembayaran
+            $pb = $db->table('pembayaran')->where('id_pesanan', $idPesanan)->get()->getRowArray();
+            $statusBayar = (string) ($pb['status_bayar'] ?? 'belum_dibayar');
+
+            if ($statusBayar === 'gagal') {
+                return redirect()->to(base_url('admin/pesanan'))
+                    ->with('errors', ['Pembayaran pesanan ini telah ditolak. Pesanan tidak dapat diproses.']);
+            }
+
+            if ($statusBayar !== 'lunas') {
+                return redirect()->to(base_url('admin/pesanan'))
+                    ->with('errors', ['Pembayaran pesanan ini belum berstatus Lunas. Silakan verifikasi pembayaran di menu Transaksi terlebih dahulu.']);
+            }
+
             $model->update($idPesanan, [
                 'status_pesanan' => $status,
                 'id_admin'       => $idAdmin,
             ]);
 
-            // Sinkronisasi status pengantaran jika ada data distribusi
-            $db = \Config\Database::connect();
-            if ($status === 'diantar') {
-                $db->table('distribusi')
-                    ->where('id_pesanan', $idPesanan)
-                    ->update(['status_antar' => 'proses_antar']);
-            } elseif ($status === 'selesai') {
-                $db->table('distribusi')
-                    ->where('id_pesanan', $idPesanan)
-                    ->update(['status_antar' => 'terkirim']);
+            // Jika admin membatalkan pesanan, sinkronkan juga ke tabel pembayaran
+            if ($status === 'dibatalkan') {
+                $db->table('pembayaran')->where('id_pesanan', $idPesanan)->update([
+                    'status_bayar' => 'gagal',
+                    'id_admin'     => $idAdmin,
+                ]);
+            }
+
+            // Sinkronisasi status pengantaran dan penugasan kurir di tabel distribusi
+            $dist = $db->table('distribusi')->where('id_pesanan', $idPesanan)->get()->getRowArray();
+            $statusAntar = match ($status) {
+                'diantar' => 'proses_antar',
+                'selesai' => 'terkirim',
+                default   => 'menunggu_kurir',
+            };
+
+            if ($dist) {
+                $updateDist = ['status_antar' => $statusAntar];
+                if ($idKurir !== null) {
+                    $updateDist['id_kurir'] = $idKurir;
+                }
+                $db->table('distribusi')->where('id_pesanan', $idPesanan)->update($updateDist);
+            } else {
+                $db->table('distribusi')->insert([
+                    'id_pesanan'   => $idPesanan,
+                    'id_kurir'     => $idKurir,
+                    'status_antar' => $statusAntar,
+                    'biaya'        => 0,
+                ]);
+            }
+
+            // Update status ketersediaan kurir jika ada kurir yang ditugaskan
+            $targetKurirId = $idKurir ?? ($dist['id_kurir'] ?? null);
+            if ($targetKurirId) {
+                if ($status === 'diantar' || $status === 'dijemput') {
+                    $db->table('kurir')->where('id_kurir', $targetKurirId)->update(['status' => 'bertugas']);
+                } elseif ($status === 'selesai' || $status === 'dibatalkan') {
+                    $db->table('kurir')->where('id_kurir', $targetKurirId)->update(['status' => 'tersedia']);
+                }
             }
 
             return redirect()->to(base_url('admin/pesanan'))
-                ->with('success', 'Status pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' berhasil diubah menjadi "' . ucwords(str_replace('_', ' ', $status)) . '".');
+                ->with('success', 'Status pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' berhasil diperbarui.');
         } catch (\Throwable $th) {
             log_message('error', 'Gagal update status pesanan: ' . $th->getMessage());
             return redirect()->back()->with('errors', ['Terjadi kesalahan saat memperbarui status.']);

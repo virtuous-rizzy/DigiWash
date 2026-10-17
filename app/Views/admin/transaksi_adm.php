@@ -582,6 +582,17 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
+    <?php if (session()->getFlashdata('errors')): ?>
+        <div class="flash-msg alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+            <div>
+                <?php foreach ((array) session()->getFlashdata('errors') as $err): ?>
+                    <div><?= esc((string) $err) ?></div>
+                <?php endforeach; ?>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
     <!-- ══ SEARCH & CONTROLS ══ -->
     <div class="controls-area">
@@ -743,33 +754,10 @@
                             </form>
 
                         <?php elseif ($statusBayar === 'lunas'): ?>
-                            <form action="<?= base_url('admin/transaksi/tolak/' . (int) $t['id_pembayaran']) ?>"
-                                  method="post"
-                                  id="form-tolak-<?= (int) $t['id_pembayaran'] ?>"
-                                  style="margin:0;">
-                                <?= csrf_field() ?>
-                                <button type="button"
-                                        class="btn-tolak"
-                                        onclick="bukaModalTolak(<?= (int) $t['id_pembayaran'] ?>, '<?= esc($nomorPesanan) ?>', '<?= esc($namaPelanggan) ?>')">
-                                    Tolak
-                                </button>
-                            </form>
-                            <span class="btn-lunas-static"><i class="bi bi-check-circle-fill me-1"></i>Lunas</span>
+                            <span class="btn-lunas-static"><i class="bi bi-check-circle-fill me-1"></i>Lunas (Dikonfirmasi)</span>
 
                         <?php else: ?>
                             <span class="btn-ditolak-static"><i class="bi bi-x-circle me-1"></i>Ditolak</span>
-                            <!-- Opsi verifikasi ulang jika salah tolak -->
-                            <form action="<?= base_url('admin/transaksi/verifikasi/' . (int) $t['id_pembayaran']) ?>"
-                                  method="post"
-                                  id="form-verif-<?= (int) $t['id_pembayaran'] ?>"
-                                  style="margin:0;">
-                                <?= csrf_field() ?>
-                                <button type="button"
-                                        class="btn-verifikasi"
-                                        onclick="bukaModalVerifikasi(<?= (int) $t['id_pembayaran'] ?>, '<?= esc($nomorPesanan) ?>', '<?= esc($namaPelanggan) ?>', 'Rp <?= number_format($totalBayar, 0, ',', '.') ?>')">
-                                    Verifikasi
-                                </button>
-                            </form>
                         <?php endif; ?>
                     </div>
 
