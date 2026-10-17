@@ -313,7 +313,7 @@ $kartuPesanan = static function (array $p, int $idx) use ($e, $badgeClass, $labe
     $harga        = $formatRupiah($total);
     $isAntar      = ($status === 'diantar');
     ?>
-    <a class="pesanan-card" href="<?= base_url('pesanan/tracking') ?>" id="card-<?= $e($status) ?>-<?= $idx ?>">
+    <a class="pesanan-card" href="<?= base_url('pesanan/tracking/' . (int)$p['id_pesanan']) ?>" id="card-<?= $e($status) ?>-<?= $idx ?>">
         <div class="card-top">
             <span class="order-id"><?= $e($nomorPesanan) ?></span>
             <span class="badge-status <?= $e($badge) ?>"><?= $e($label) ?></span>

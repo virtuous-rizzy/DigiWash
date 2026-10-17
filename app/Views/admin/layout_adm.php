@@ -28,7 +28,7 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
 
             <nav class="bottom-nav">
                 <a href="<?= base_url('admin/dashboard') ?>" class="<?= $aktif === 'beranda' ? 'active' : '' ?>"><span><i class="bi bi-house-door-fill"></i></span>Beranda</a>
-                <a href="#" data-soon><span><i class="bi bi-box-seam-fill"></i></span>Pesanan</a>
+                <a href="<?= base_url('admin/pesanan') ?>" class="<?= $aktif === 'pesanan' ? 'active' : '' ?>"><span><i class="bi bi-box-seam-fill"></i></span>Pesanan</a>
                 <a href="<?= base_url('admin/transaksi') ?>" class="<?= $aktif === 'transaksi' ? 'active' : '' ?>"><span><i class="bi bi-currency-dollar"></i></span>Transaksi</a>
                 <a href="<?= base_url('admin/akun') ?>" class="<?= $aktif === 'akun' ? 'active' : '' ?>"><span><i class="bi bi-person-fill"></i></span>Akun</a>
             </nav>

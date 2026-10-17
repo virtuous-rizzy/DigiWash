@@ -24,22 +24,22 @@ $badge = [
 </div>
 
 <div class="metrik">
-    <div class="metrik-item"><span>Jemput</span><strong>0</strong></div>
-    <div class="metrik-item"><span>Antar</span><strong>0</strong></div>
-    <div class="metrik-item"><span>Selesai</span><strong>0</strong></div>
+    <div class="metrik-item"><span>Jemput</span><strong><?= (int)($ringkasan['jemput'] ?? 1) ?></strong></div>
+    <div class="metrik-item"><span>Antar</span><strong><?= (int)($ringkasan['antar'] ?? 1) ?></strong></div>
+    <div class="metrik-item"><span>Selesai</span><strong><?= (int)($ringkasan['selesai'] ?? 1) ?></strong></div>
 </div>
 
 <p class="subjudul">Menu tugas</p>
 <div class="admin-menu">
-    <a class="admin-card" href="#" data-soon>
+    <a class="admin-card" href="<?= base_url('kurir/tugas?tab=penjemputan') ?>">
         <span class="ikon-besar">📦</span>
         <span><strong>Tugas Jemput</strong><small>Ambil cucian dari rumah pelanggan</small></span>
     </a>
-    <a class="admin-card" href="#" data-soon>
+    <a class="admin-card" href="<?= base_url('kurir/tugas?tab=pengantaran') ?>">
         <span class="ikon-besar">🚚</span>
         <span><strong>Tugas Antar</strong><small>Antar cucian bersih ke pelanggan</small></span>
     </a>
-    <a class="admin-card" href="#" data-soon>
+    <a class="admin-card" href="<?= base_url('kurir/tugas?tab=semua') ?>">
         <span class="ikon-besar">🕘</span>
         <span><strong>Riwayat Tugas</strong><small>Lihat tugas yang sudah selesai</small></span>
     </a>

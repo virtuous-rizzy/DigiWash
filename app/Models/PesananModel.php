@@ -109,4 +109,131 @@ class PesananModel extends Model
             ->whereNotIn('status_pesanan', ['selesai', 'dibatalkan'])
             ->countAllResults();
     }
+
+    /**
+     * Ambil semua pesanan untuk panel Admin (Mengupdate Status Laundry)
+     * lengkap dengan data pelanggan, layanan, pembayaran, dan kurir (jika ada).
+     */
+    public function semuaPesananAdmin(?string $tab = 'semua', string $q = ''): array
+    {
+        $builder = $this->db->table('pesanan p')
+            ->select([
+                'p.id_pesanan',
+                'p.id_pelanggan',
+                'p.id_layanan',
+                'p.tanggal',
+                'p.berat',
+                'p.status_pesanan',
+                'p.alamat_pengambilan',
+                'p.alamat_pengantaran',
+                'p.catatan',
+                'p.detail_satuan',
+                'p.created_at',
+                'p.updated_at',
+                'pl.nama AS nama_pelanggan',
+                'pl.no_hp AS no_hp_pelanggan',
+                'pl.foto AS foto_pelanggan',
+                'l.nama_layanan',
+                'l.jenis_layanan',
+                'l.harga_per_kg',
+                'l.harga_flat',
+                'l.estimasi_hari',
+                'pb.status_bayar',
+                'pb.metode',
+                'pb.total_bayar',
+                'd.id_kurir',
+                'k.nama AS nama_kurir',
+                'k.no_hp AS no_hp_kurir',
+            ])
+            ->join('pelanggan pl',  'pl.id_pelanggan = p.id_pelanggan', 'left')
+            ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')
+            ->join('pembayaran pb', 'pb.id_pesanan   = p.id_pesanan', 'left')
+            ->join('distribusi d',  'd.id_pesanan    = p.id_pesanan', 'left')
+            ->join('kurir k',       'k.id_kurir      = d.id_kurir', 'left');
+
+        // Filter tab
+        if ($tab === 'diproses') {
+            $builder->whereIn('p.status_pesanan', ['menunggu', 'dikonfirmasi', 'dijemput', 'dicuci', 'disetrika']);
+        } elseif ($tab === 'diantar') {
+            $builder->where('p.status_pesanan', 'diantar');
+        } elseif ($tab === 'selesai') {
+            $builder->where('p.status_pesanan', 'selesai');
+        }
+
+        // Search query
+        if ($q !== '') {
+            $builder->groupStart()
+                ->like('pl.nama', $q)
+                ->orLike('p.id_pesanan', $q)
+                ->orLike('l.nama_layanan', $q)
+                ->groupEnd();
+        }
+
+        return $builder->orderBy('p.id_pesanan', 'DESC')->get()->getResultArray();
+    }
+
+    /**
+     * Hitung jumlah pesanan untuk tab di halaman Admin
+     */
+    public function hitungStatusAdmin(): array
+    {
+        $db = $this->db;
+        $totalSemua = (int) $db->table('pesanan')->countAllResults();
+        $totalDiproses = (int) $db->table('pesanan')
+            ->whereIn('status_pesanan', ['menunggu', 'dikonfirmasi', 'dijemput', 'dicuci', 'disetrika'])
+            ->countAllResults();
+        $totalDiantar = (int) $db->table('pesanan')
+            ->where('status_pesanan', 'diantar')
+            ->countAllResults();
+        $totalSelesai = (int) $db->table('pesanan')
+            ->where('status_pesanan', 'selesai')
+            ->countAllResults();
+
+        return [
+            'semua'    => $totalSemua,
+            'diproses' => $totalDiproses,
+            'diantar'  => $totalDiantar,
+            'selesai'  => $totalSelesai,
+        ];
+    }
+
+    /**
+     * Detail lengkap satu pesanan untuk halaman Tracking
+     */
+    public function detailTracking(int $idPesanan, ?int $idPelanggan = null): ?array
+    {
+        $builder = $this->db->table('pesanan p')
+            ->select([
+                'p.*',
+                'pl.nama AS nama_pelanggan',
+                'pl.no_hp AS no_hp_pelanggan',
+                'pl.foto AS foto_pelanggan',
+                'l.nama_layanan',
+                'l.jenis_layanan',
+                'l.harga_per_kg',
+                'l.harga_flat',
+                'l.estimasi_hari',
+                'pb.status_bayar',
+                'pb.metode',
+                'pb.total_bayar',
+                'd.id_kurir',
+                'd.jenis_kendaraan',
+                'k.nama AS nama_kurir',
+                'k.no_hp AS no_hp_kurir',
+            ])
+            ->join('pelanggan pl',  'pl.id_pelanggan = p.id_pelanggan', 'left')
+            ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')
+            ->join('pembayaran pb', 'pb.id_pesanan   = p.id_pesanan', 'left')
+            ->join('distribusi d',  'd.id_pesanan    = p.id_pesanan', 'left')
+            ->join('kurir k',       'k.id_kurir      = d.id_kurir', 'left')
+            ->where('p.id_pesanan', $idPesanan);
+
+        if ($idPelanggan !== null) {
+            $builder->where('p.id_pelanggan', $idPelanggan);
+        }
+
+        $row = $builder->get()->getRowArray();
+        return is_array($row) ? $row : null;
+    }
 }
+

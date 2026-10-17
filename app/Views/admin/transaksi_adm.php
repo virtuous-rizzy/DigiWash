@@ -786,8 +786,8 @@
             <span><i class="bi bi-house-door-fill"></i></span>
             Beranda
         </a>
-        <a href="#" class="bottom-nav-item" data-soon>
-            <span><i class="bi bi-basket2-fill"></i></span>
+        <a href="<?= base_url('admin/pesanan') ?>" class="bottom-nav-item">
+            <span><i class="bi bi-box-seam-fill"></i></span>
             Pesanan
         </a>
         <a href="<?= base_url('admin/transaksi') ?>" class="bottom-nav-item active">

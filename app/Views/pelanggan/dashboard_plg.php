@@ -164,7 +164,7 @@ $foto = foto_profil();
                 <div class="menu-grid">
                     <a class="menu-item" href="<?= base_url('pesanan/pilih-layanan') ?>"><span><i class="bi bi-clipboard-plus-fill"></i></span>Buat Pesanan</a>
                     <a class="menu-item" href="<?= base_url('pesanan/riwayat') ?>"><span><i class="bi bi-receipt"></i></span>Riwayat Pesanan</a>
-                    <a class="menu-item" href="#" data-soon><span><i class="bi bi-truck"></i></span>Tracking Laundry</a>
+                    <a class="menu-item" href="<?= base_url('pesanan/tracking') ?>"><span><i class="bi bi-truck"></i></span>Tracking Laundry</a>
                     <a class="menu-item" href="#" data-soon><span><i class="bi bi-wallet2"></i></span>Pembayaran</a>
                     <a class="menu-item" href="#" data-soon><span><i class="bi bi-chat-dots-fill"></i></span>Kritik &amp; Saran</a>
                 </div>

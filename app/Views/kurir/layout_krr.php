@@ -26,7 +26,7 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
 
             <nav class="bottom-nav">
                 <a href="<?= base_url('kurir/dashboard') ?>" class="<?= $aktif === 'beranda' ? 'active' : '' ?>"><span>🏠</span>Beranda</a>
-                <a href="#" data-soon><span>📋</span>Tugas</a>
+                <a href="<?= base_url('kurir/tugas') ?>" class="<?= $aktif === 'tugas' ? 'active' : '' ?>"><span>📋</span>Tugas</a>
                 <a href="#" data-soon><span>🕘</span>Riwayat</a>
                 <a href="<?= base_url('kurir/akun') ?>" class="<?= $aktif === 'akun' ? 'active' : '' ?>"><span>👤</span>Akun</a>
             </nav>

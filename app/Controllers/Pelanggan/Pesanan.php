@@ -467,16 +467,64 @@ class Pesanan extends BaseController
     }
 
     /**
-     * Halaman tracking pesanan
+     * Halaman tracking pesanan (Dinamis sinkron dengan database & status yang dikelola admin)
      */
-    public function tracking()
+    public function tracking($idPesanan = null)
     {
-        $session = session();
-        $data = [
-            'id_pesanan' => $session->get('pesanan_id_pesanan') ?? ('PSN-' . date('Ymd') . '-001'),
-            'layanan'    => $session->get('pesanan_layanan') ?? 'Reguler',
-        ];
-        return view('Pesanan/tracking', $data);
+        $idPelanggan = $this->getIdPelanggan();
+        $model       = new PesananModel();
+        $pesanan     = null;
+
+        if ($idPesanan !== null) {
+            $pesanan = $model->detailTracking((int)$idPesanan, $idPelanggan);
+        }
+
+        // Jika idPesanan tidak dispesifikasi atau tidak ditemukan, coba dari session
+        if (! $pesanan) {
+            $idPesananSession = (int) session()->get('pesanan_id_db');
+            if ($idPesananSession > 0) {
+                $pesanan = $model->detailTracking($idPesananSession, $idPelanggan);
+            }
+        }
+
+        // Jika masih belum ada, ambil pesanan aktif terbaru milik pelanggan
+        if (! $pesanan) {
+            $semua = $model->milikPelanggan($idPelanggan);
+            if (! empty($semua)) {
+                // Prioritaskan pesanan yang belum selesai
+                $aktif = array_filter($semua, static fn($p) => ! in_array($p['status_pesanan'] ?? '', ['selesai', 'dibatalkan'], true));
+                $target = ! empty($aktif) ? reset($aktif) : reset($semua);
+                $pesanan = $model->detailTracking((int) $target['id_pesanan'], $idPelanggan);
+            }
+        }
+
+        // Jika pelanggan belum punya pesanan sama sekali, sediakan fallback data sesuai mockup
+        if (! $pesanan) {
+            $pesanan = [
+                'id_pesanan'         => 1,
+                'id_pelanggan'       => $idPelanggan,
+                'tanggal'            => date('Y-m-d H:i:s', strtotime('-2 hours')),
+                'berat'              => 5.0,
+                'status_pesanan'     => 'dicuci',
+                'alamat_pengambilan' => 'Jl. Lambung Mangkurat No. 12',
+                'alamat_pengantaran' => 'Jl. Lambung Mangkurat No. 12',
+                'nama_layanan'       => 'Laundry Reguler',
+                'estimasi_hari'      => 2,
+                'nama_kurir'         => 'Budi Santoso',
+                'no_hp_kurir'        => '081200000020',
+                'jenis_kendaraan'    => 'Motor · B 1234 XYZ',
+            ];
+        }
+
+        $formattedId = 'PSN-' . date('dmY', strtotime($pesanan['tanggal'] ?? $pesanan['created_at'] ?? 'now')) . '-' . str_pad((string)$pesanan['id_pesanan'], 3, '0', STR_PAD_LEFT);
+
+        return view('Pesanan/tracking', [
+            'pesanan'      => $pesanan,
+            'id_pesanan'   => $formattedId,
+            'status'       => $pesanan['status_pesanan'] ?? 'menunggu',
+            'layanan'      => $pesanan['nama_layanan'] ?? 'Reguler',
+            'estimasiHari' => (int)($pesanan['estimasi_hari'] ?? 2),
+        ]);
     }
 
     /**

@@ -15,7 +15,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
 
 <p class="subjudul">Pekerjaan harian</p>
 <div class="admin-menu">
-    <a class="admin-card" href="#" data-soon>
+    <a class="admin-card" href="<?= base_url('admin/pesanan') ?>">
         <span class="ikon-besar"><i class="bi bi-box-seam-fill" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Memproses Pesanan</strong><small>Lihat dan kelola pesanan baru</small></span>
     </a>
@@ -23,7 +23,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         <span class="ikon-besar"><i class="bi bi-cash-stack" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Memproses Transaksi</strong><small>Konfirmasi pembayaran dan kelola transaksi</small></span>
     </a>
-    <a class="admin-card" href="#" data-soon>
+    <a class="admin-card" href="<?= base_url('admin/pesanan') ?>">
         <span class="ikon-besar"><i class="bi bi-arrow-repeat" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Mengupdate Status Laundry</strong><small>Ubah status: diterima, dicuci, selesai, diantar</small></span>
     </a>
