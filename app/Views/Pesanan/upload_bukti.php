@@ -11,7 +11,7 @@ $errors = is_array($errors) ? $errors : [];
     <title>Upload Bukti Pembayaran - DigiWash</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -32,7 +32,7 @@ $errors = is_array($errors) ? $errors : [];
             justify-content: center;
             align-items: flex-start;
             background: var(--warna-latar);
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         .mobile-wrap {
@@ -215,7 +215,7 @@ $errors = is_array($errors) ? $errors : [];
 
     <!-- Header -->
     <div class="page-header">
-        <a href="<?= base_url('pesanan/pembayaran') ?>" class="btn-back" aria-label="Kembali">
+        <a href="<?= base_url('pesanan/pembayaran' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '')) ?>" class="btn-back" aria-label="Kembali">
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
         </a>
         <h1 class="page-title">Upload Bukti Bayar</h1>
@@ -275,9 +275,10 @@ $errors = is_array($errors) ? $errors : [];
 
         <!-- ══ Kanan: upload ══ -->
         <div class="col-kanan">
-            <form action="<?= base_url('pesanan/simpan-bukti') ?>" method="post"
+            <form action="<?= base_url('pesanan/simpan-bukti' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '')) ?>" method="post"
                   enctype="multipart/form-data" id="formBukti" novalidate>
                 <?= csrf_field() ?>
+                <input type="hidden" name="id_pesanan" value="<?= esc((string) ($id_pesanan_db ?? '')) ?>">
 
                 <div class="card-box">
                     <h2 class="card-title">Bukti Pembayaran</h2>
@@ -311,7 +312,7 @@ $errors = is_array($errors) ? $errors : [];
                     <span>Kirim Bukti Pembayaran</span>
                 </button>
 
-                <a href="<?= base_url('pesanan/pembayaran') ?>" class="link-ganti-metode">
+                <a href="<?= base_url('pesanan/pembayaran' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '')) ?>" class="link-ganti-metode">
                     Ganti metode pembayaran
                 </a>
             </form>

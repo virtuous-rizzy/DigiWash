@@ -64,10 +64,13 @@ $kartuPesanan = static function (array $p, int $idx) use ($badgeClass, $labelSta
     $sudahBayar    = in_array($statusBayar, ['lunas', 'menunggu_verifikasi'], true);
     $idPesanan     = (int)$p['id_pesanan'];
 
-    // Tentukan href: tracking jika sudah bayar, pembayaran jika belum
+    // Tentukan href: tracking jika sudah bayar, jika belum bayar arahkan langsung ke upload-bukti jika metode sudah dipilih atau ke pembayaran
+    $metodeDipilih = (string)($p['metode'] ?? '');
     $href = $sudahBayar
         ? base_url('pesanan/tracking/' . $idPesanan)
-        : base_url('pesanan/pembayaran/' . $idPesanan);
+        : ($metodeDipilih !== '' && $metodeDipilih !== 'Belum Dipilih'
+            ? base_url('pesanan/upload-bukti/' . $idPesanan)
+            : base_url('pesanan/pembayaran/' . $idPesanan));
     ?>
     <a class="pesanan-card" href="<?= $e($href) ?>" id="card-<?= $e($status) ?>-<?= $idx ?>">
         <div class="card-top">
@@ -80,7 +83,9 @@ $kartuPesanan = static function (array $p, int $idx) use ($badgeClass, $labelSta
         <div class="card-bottom">
             <span class="card-berat"><?= $e($berat) ?></span>
             <?php if (!$sudahBayar): ?>
-                <span class="card-keterangan" style="color:#E65100;font-weight:600;font-size:13px">⚠ Belum Bayar</span>
+                <span class="card-keterangan" style="color:#E65100;font-weight:600;font-size:13px">
+                    ⚠ <?= ($metodeDipilih !== '' && $metodeDipilih !== 'Belum Dipilih') ? 'Upload Bukti Bayar →' : 'Bayar Sekarang →' ?>
+                </span>
             <?php elseif ($isAntar): ?>
                 <span class="card-keterangan">Menunggu Penjemputan</span>
             <?php else: ?>

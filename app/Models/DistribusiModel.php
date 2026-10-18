@@ -42,6 +42,7 @@ class DistribusiModel extends Model
                 'p.berat',
                 'pl.nama AS nama_pelanggan',
                 'pl.no_hp AS no_hp_pelanggan',
+                'pl.foto AS foto_pelanggan',
                 'l.nama_layanan',
                 'pb.status_bayar',
             ])
@@ -138,6 +139,7 @@ class DistribusiModel extends Model
                 'p.berat',
                 'pl.nama AS nama_pelanggan',
                 'pl.no_hp AS no_hp_pelanggan',
+                'pl.foto AS foto_pelanggan',
                 'l.nama_layanan',
                 'l.jenis_layanan',
                 'l.estimasi_hari',
@@ -184,6 +186,7 @@ class DistribusiModel extends Model
                 'p.berat',
                 'pl.nama AS nama_pelanggan',
                 'pl.no_hp AS no_hp_pelanggan',
+                'pl.foto AS foto_pelanggan',
                 'l.nama_layanan',
                 'l.jenis_layanan',
                 'pb.status_bayar',
@@ -211,13 +214,21 @@ class DistribusiModel extends Model
         }
 
         if ($q !== '') {
+            $numOnly = 0;
+            if (preg_match('/(\d+)$/', trim($q), $matches)) {
+                $numOnly = (int) $matches[1];
+            }
+
             $builder->groupStart()
                 ->like('pl.nama', $q)
                 ->orLike('p.id_pesanan', $q)
                 ->orLike('p.alamat_pengantaran', $q)
                 ->orLike('p.alamat_pengambilan', $q)
-                ->orLike('l.nama_layanan', $q)
-                ->groupEnd();
+                ->orLike('l.nama_layanan', $q);
+            if ($numOnly > 0) {
+                $builder->orWhere('p.id_pesanan', $numOnly);
+            }
+            $builder->groupEnd();
         }
 
         $daftar = $builder->orderBy('p.id_pesanan', 'DESC')->get()->getResultArray();

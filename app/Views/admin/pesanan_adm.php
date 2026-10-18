@@ -363,19 +363,6 @@ $bulanIndo = [
     <h1 class="memproses-title">Memproses Pesanan</h1>
 </div>
 
-<!-- Flash Message -->
-<?php if (session()->getFlashdata('success')): ?>
-    <div class="alert alert-success py-2 px-3 mb-3 fw-bold small rounded-3 border-0">
-        <i class="bi bi-check-circle-fill me-1"></i> <?= $e((string) session()->getFlashdata('success')) ?>
-    </div>
-<?php endif; ?>
-<?php if (session()->getFlashdata('errors')): ?>
-    <div class="alert alert-danger py-2 px-3 mb-3 fw-bold small rounded-3 border-0">
-        <?php foreach ((array) session()->getFlashdata('errors') as $err): ?>
-            <div><i class="bi bi-exclamation-triangle-fill me-1"></i> <?= $e((string) $err) ?></div>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
 
 <!-- Baris Pencarian & Filter -->
 <form action="<?= base_url('admin/pesanan') ?>" method="get" class="search-filter-row">
@@ -498,8 +485,9 @@ $bulanIndo = [
                     <!-- Sisi Kiri: Avatar & Info Pelanggan -->
                     <div class="order-card-left">
                         <div class="order-avatar">
-                            <?php if ($fotoPlg !== '' && file_exists(FCPATH . 'uploads/' . $fotoPlg)): ?>
-                                <img src="<?= base_url('uploads/' . $fotoPlg) ?>" alt="<?= $e($namaPlg) ?>">
+                            <?php $urlFotoPlg = url_foto_profil($fotoPlg); ?>
+                            <?php if ($urlFotoPlg): ?>
+                                <img src="<?= $e($urlFotoPlg) ?>" alt="<?= $e($namaPlg) ?>">
                             <?php else: ?>
                                 <?= $e($inisialPlg) ?>
                             <?php endif; ?>

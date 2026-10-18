@@ -43,7 +43,7 @@ class TugasKrr extends BaseController
                 $isJemput = ($td['tipe'] === 'penjemputan');
 
                 $statusLabel = match ($stPsn) {
-                    'menunggu', 'dikonfirmasi' => 'Menunggu dijemput',
+                    'menunggu', 'dikonfirmasi' => (($td['status_antar'] ?? '') === 'proses_antar' ? 'OTW Menjemput' : 'Menunggu dijemput'),
                     'dijemput'                  => 'Sedang dijemput',
                     'disetrika'                 => 'Siap diantar',
                     'diantar'                   => 'Sedang diantar',
@@ -53,12 +53,15 @@ class TugasKrr extends BaseController
 
                 $statusColor = in_array($stPsn, ['disetrika', 'selesai'], true) ? 'green' : 'peach';
                 $alamat = $isJemput ? ($td['alamat_pengambilan'] ?? '-') : ($td['alamat_pengantaran'] ?? '-');
+                $tglObj = strtotime((string)($td['tanggal'] ?? 'now'));
+                $kodePesanan = 'PSN-' . date('dmY', $tglObj) . '-' . str_pad((string)$td['id_pesanan'], 3, '0', STR_PAD_LEFT);
 
                 $daftarTugas[] = [
                     'id_pesanan'   => (int) $td['id_pesanan'],
-                    'kode'         => '#DW-' . (1000 + (int)$td['id_pesanan']),
+                    'kode'         => $kodePesanan,
                     'tipe'         => $td['tipe'],
                     'nama'         => (string) ($td['nama_pelanggan'] ?? 'Pelanggan'),
+                    'foto'         => (string) ($td['foto_pelanggan'] ?? ''),
                     'alamat'       => (string) $alamat,
                     'jam'          => '09.00 - 10.00',
                     'status_label' => $statusLabel,
@@ -99,6 +102,7 @@ class TugasKrr extends BaseController
         }
 
         $stPesanan   = (string) ($tugas['status_pesanan'] ?? 'menunggu');
+        $statusAntar = (string) ($tugas['status_antar'] ?? 'menunggu_kurir');
         $statusBayar = (string) ($tugas['status_bayar'] ?? 'belum_dibayar');
 
         // Validasi apakah tugas ini legal untuk dijalankan kurir
@@ -113,9 +117,10 @@ class TugasKrr extends BaseController
         return view('kurir/tugas_detail_krr', [
             'tugas'        => $tugas,
             'idPesanan'    => $idPesanan,
-            'kode'         => '#DW-' . (1000 + $idPesanan),
+            'kode'         => 'PSN-' . date('dmY', strtotime((string)($tugas['tanggal'] ?? 'now'))) . '-' . str_pad((string)$idPesanan, 3, '0', STR_PAD_LEFT),
             'tipe'         => $tipe,
             'stPesanan'    => $stPesanan,
+            'statusAntar'  => $statusAntar,
             'statusBayar'  => $statusBayar,
             'isLunas'      => $isLunas,
             'isDibatalkan' => $isDibatalkan,
@@ -169,7 +174,10 @@ class TugasKrr extends BaseController
 
             if ($aksi === 'otw_jemput') {
                 $db->table('kurir')->where('id_kurir', $idKurir)->update(['status' => 'bertugas']);
-                $db->table('distribusi')->where('id_pesanan', $idPesanan)->update(['id_kurir' => $idKurir]);
+                $db->table('distribusi')->where('id_pesanan', $idPesanan)->update([
+                    'id_kurir'     => $idKurir,
+                    'status_antar' => 'proses_antar',
+                ]);
                 return redirect()->to(base_url('kurir/tugas/detail/' . $idPesanan))
                     ->with('success', 'Status diperbarui: Anda sedang dalam perjalanan menjemput cucian.');
             }

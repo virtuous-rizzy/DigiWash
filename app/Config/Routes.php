@@ -117,13 +117,18 @@ $routes->group('pesanan', ['filter' => 'role:pelanggan', 'namespace' => 'App\Con
     $routes->post('ringkasan', 'Pesanan::ringkasan');
     $routes->post('konfirmasi-pesanan', 'Pesanan::konfirmasiPesanan');
     $routes->get('pembayaran', 'Pesanan::pembayaran');
+    $routes->get('pembayaran/(:num)', 'Pesanan::pembayaran/$1');
     $routes->post('proses-pembayaran', 'Pesanan::prosesPembayaran');
+    $routes->post('proses-pembayaran/(:num)', 'Pesanan::prosesPembayaran/$1');
     $routes->get('status-pembayaran', 'Pesanan::statusPembayaran');
+    $routes->get('status-pembayaran/(:num)', 'Pesanan::statusPembayaran/$1');
     $routes->get('tracking', 'Pesanan::tracking');
     $routes->get('tracking/(:num)', 'Pesanan::tracking/$1');
     $routes->get('tracking/(:num)/(:segment)', 'Pesanan::tracking/$1/$2');
     $routes->get('upload-bukti', 'Pesanan::uploadBukti');
+    $routes->get('upload-bukti/(:num)', 'Pesanan::uploadBukti/$1');
     $routes->post('simpan-bukti', 'Pesanan::simpanBukti');
+    $routes->post('simpan-bukti/(:num)', 'Pesanan::simpanBukti/$1');
     $routes->get('riwayat', 'Pesanan::riwayatPesanan');
     $routes->get('notifikasi', 'Pesanan::notifikasi');
 });

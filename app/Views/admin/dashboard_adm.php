@@ -2,9 +2,9 @@
 
 <?= $this->section('isi') ?>
 <?php
-$e            = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
-$jmlAdmin     = (int) ($jmlAdmin ?? 0);
-$jmlKurir     = (int) ($jmlKurir ?? 0);
+$e = static fn(string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
+$jmlAdmin = (int) ($jmlAdmin ?? 0);
+$jmlKurir = (int) ($jmlKurir ?? 0);
 $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
 ?>
 
@@ -15,17 +15,14 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
 
 <p class="subjudul">Pekerjaan harian</p>
 <div class="admin-menu">
-    <a class="admin-card" href="<?= base_url('admin/pesanan') ?>">
-        <span class="ikon-besar"><i class="bi bi-box-seam-fill" style="color: #033B59; font-size: 32px;"></i></span>
-        <span><strong>Memproses Pesanan</strong><small>Lihat dan kelola pesanan baru</small></span>
-    </a>
     <a class="admin-card" href="<?= base_url('admin/transaksi') ?>">
         <span class="ikon-besar"><i class="bi bi-cash-stack" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Memproses Transaksi</strong><small>Konfirmasi pembayaran dan kelola transaksi</small></span>
     </a>
     <a class="admin-card" href="<?= base_url('admin/status-laundry') ?>">
         <span class="ikon-besar"><i class="bi bi-arrow-repeat" style="color: #033B59; font-size: 32px;"></i></span>
-        <span><strong>Mengupdate Status Laundry</strong><small>Ubah status: diterima, dicuci, selesai, diantar</small></span>
+        <span><strong>Mengupdate Status Laundry</strong><small>Ubah status: diterima, dicuci, selesai,
+                diantar</small></span>
     </a>
     <a class="admin-card" href="<?= base_url('admin/kelola-kritik') ?>">
         <span class="ikon-besar"><i class="bi bi-chat-dots-fill" style="color: #033B59; font-size: 32px;"></i></span>
@@ -45,5 +42,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
 </div>
 
 <p class="subjudul">Pesanan terbaru</p>
-<div class="panel kosong"><p>Belum ada pesanan.</p></div>
+<div class="panel kosong">
+    <p>Belum ada pesanan.</p>
+</div>
 <?= $this->endSection() ?>

@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buat Pesanan - DigiWash</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background: #F0EFEF;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -39,7 +39,7 @@
         }
         .page-title {
             position: absolute; left: 50%; transform: translateX(-50%);
-            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: 20px; line-height: 22px; color: #000; white-space: nowrap;
         }
 
@@ -47,7 +47,7 @@
         .form-area { padding: 0 23px; }
 
         .section-label {
-            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: 13px; line-height: 22px; color: #000;
             display: block; margin-bottom: 6px;
         }
@@ -58,7 +58,7 @@
             margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .service-box-label {
-            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: 13px; line-height: 22px; color: #000; margin-bottom: 4px;
         }
         .service-box-inner {
@@ -68,15 +68,15 @@
         .service-box-icon i { color: #033B59; }
         .service-box-info { flex: 1; }
         .service-box-name {
-            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: 13px; line-height: 22px; color: #000;
         }
         .service-box-price {
-            font-family: 'Roboto', sans-serif; font-weight: 400;
+            font-family: 'Poppins', sans-serif; font-weight: 400;
             font-size: 13px; line-height: 22px; color: #555;
         }
         .btn-ubah {
-            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: 15px; line-height: 22px; color: #033B59;
             text-decoration: none; white-space: nowrap;
             background: none; border: none; cursor: pointer; padding: 0;
@@ -98,7 +98,7 @@
         .counter-divider { width: 1px; height: 46px; background: #000; }
         .counter-value {
             flex: 1; text-align: center;
-            font-family: 'Roboto', sans-serif; font-weight: 300; font-size: 20px;
+            font-family: 'Poppins', sans-serif; font-weight: 300; font-size: 20px;
             color: #000; border: none; background: transparent; outline: none;
         }
 
@@ -110,7 +110,7 @@
             gap: 8px; min-height: 55px;
         }
         .info-card-addr {
-            font-family: 'Roboto', sans-serif; font-weight: 400;
+            font-family: 'Poppins', sans-serif; font-weight: 400;
             font-size: 12px; line-height: 22px; color: #000; flex: 1;
         }
 
@@ -118,14 +118,14 @@
         .input-box {
             background: #fff; border: 1px solid #D2CBCB; border-radius: 10px;
             height: 41px; width: 100%; padding: 8px 17px;
-            font-family: 'Roboto', sans-serif; font-weight: 400;
+            font-family: 'Poppins', sans-serif; font-weight: 400;
             font-size: 13px; color: #000; outline: none; margin-bottom: 20px;
         }
         .input-box:focus { border-color: #033B59; }
         .textarea-box {
             background: #fff; border: 1px solid #D2CBCB; border-radius: 10px;
             width: 100%; padding: 10px 17px;
-            font-family: 'Roboto', sans-serif; font-weight: 200;
+            font-family: 'Poppins', sans-serif; font-weight: 200;
             font-size: 13px; color: #000; outline: none;
             resize: vertical; min-height: 41px; margin-bottom: 20px;
         }
@@ -136,6 +136,17 @@
             position: absolute; right: 14px; top: 50%;
             transform: translateY(-50%); font-size: 16px; color: #033B59; opacity: 0.6;
             pointer-events: none; line-height: 1;
+        }
+        .input-date-box {
+            cursor: pointer;
+            position: relative;
+        }
+        .input-date-box::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
         }
 
         /* ── Cost box ── */
@@ -152,7 +163,7 @@
         .btn-submit {
             width: 100%; height: 41px; background: #033B59;
             border: 1px solid #D2CBCB; border-radius: 10px;
-            font-family: 'Roboto', sans-serif; font-weight: 700;
+            font-family: 'Poppins', sans-serif; font-weight: 700;
             font-size: 16px; color: #fff; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: background 0.2s;
@@ -163,7 +174,7 @@
         .satuan-banner {
             background: #E8F4FD; border-radius: 10px; padding: 12px 17px;
             margin-bottom: 16px; text-align: center;
-            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: 13px; line-height: 22px; color: #033B59;
         }
         .satuan-banner i { margin-right: 6px; }
@@ -217,7 +228,7 @@
         /* ── BS5 Modal overrides ── */
         .modal-content { border-radius: 14px; }
         .modal-header { border-bottom: 1px solid #f0eeee; padding: 16px 20px 12px; }
-        .modal-title { font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 16px; color: #033B59; }
+        .modal-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 16px; color: #033B59; }
         .modal-title i { margin-right: 6px; }
         .modal-body { padding: 16px 20px; font-size: 13px; color: #333; }
         .modal-footer { border-top: 1px solid #f0eeee; padding: 12px 20px; gap: 10px; }
@@ -478,8 +489,17 @@
                     <div>
                         <span class="section-label">Tanggal Penjemputan</span>
                         <div class="input-icon-group">
-                            <input type="text" class="input-box" value="<?= (string) $tanggal ?>" readonly>
-                            <span class="input-icon"><i class="bi bi-calendar-event-fill"></i></span>
+                            <input type="date"
+                                   id="tanggal_penjemputan"
+                                   name="tanggal_penjemputan"
+                                   class="input-box input-date-box"
+                                   value="<?= esc((string) ($tanggalYmd ?? date('Y-m-d'))) ?>"
+                                   min="<?= date('Y-m-d') ?>"
+                                   onclick="if (this.showPicker) this.showPicker()"
+                                   required>
+                            <span class="input-icon" onclick="var el = document.getElementById('tanggal_penjemputan'); if (el.showPicker) { el.showPicker(); } else { el.focus(); }">
+                                <i class="bi bi-calendar-event-fill"></i>
+                            </span>
                         </div>
                     </div>
                 </div>

@@ -6,6 +6,21 @@ $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 $tab       = $tab ?? 'semua';
 $q         = $q ?? '';
 $kurirList = $kurirList ?? [];
+
+$bulanIndo = [
+    'January'   => 'Januari',
+    'February'  => 'Februari',
+    'March'     => 'Maret',
+    'April'     => 'April',
+    'May'       => 'Mei',
+    'June'      => 'Juni',
+    'July'      => 'Juli',
+    'August'    => 'Agustus',
+    'September' => 'September',
+    'October'   => 'Oktober',
+    'November'  => 'November',
+    'December'  => 'Desember',
+];
 ?>
 
 <style>
@@ -361,6 +376,30 @@ $kurirList = $kurirList ?? [];
 .btn-simpan-status:active {
     transform: scale(0.99);
 }
+.btn-detail-order {
+    width: 100%;
+    padding: 10px 16px;
+    margin-top: 8px;
+    background: #fff;
+    color: #033B59;
+    border: 1.5px solid #033B59;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.btn-detail-order:hover {
+    background: #033B59;
+    color: #fff;
+}
+.btn-detail-order:active {
+    transform: scale(0.99);
+}
 </style>
 
 <div class="page-title-box d-flex align-items-center gap-2">
@@ -394,21 +433,21 @@ $kurirList = $kurirList ?? [];
 
 <!-- Tab Filter -->
 <div class="filter-tabs">
-    <a href="<?= base_url('admin/pesanan?tab=semua' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
+    <a href="<?= base_url('admin/status-laundry?tab=semua' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
        class="filter-tab-btn <?= $tab === 'semua' ? 'active' : '' ?>">
         Semua
     </a>
-    <a href="<?= base_url('admin/pesanan?tab=diproses' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
+    <a href="<?= base_url('admin/status-laundry?tab=diproses' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
        class="filter-tab-btn <?= $tab === 'diproses' ? 'active' : '' ?>">
         Diproses
         <span class="badge-count badge-blue"><?= (int)($counts['diproses'] ?? 0) ?></span>
     </a>
-    <a href="<?= base_url('admin/pesanan?tab=diantar' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
+    <a href="<?= base_url('admin/status-laundry?tab=diantar' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
        class="filter-tab-btn <?= $tab === 'diantar' ? 'active' : '' ?>">
         Diantar
         <span class="badge-count badge-red"><?= (int)($counts['diantar'] ?? 0) ?></span>
     </a>
-    <a href="<?= base_url('admin/pesanan?tab=selesai' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
+    <a href="<?= base_url('admin/status-laundry?tab=selesai' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
        class="filter-tab-btn <?= $tab === 'selesai' ? 'active' : '' ?>">
         Selesai
         <span class="badge-count badge-gray"><?= (int)($counts['selesai'] ?? 0) ?></span>
@@ -416,7 +455,7 @@ $kurirList = $kurirList ?? [];
 </div>
 
 <!-- Search & Filter Form -->
-<form method="get" action="<?= base_url('admin/pesanan') ?>" class="search-filter-row">
+<form method="get" action="<?= base_url('admin/status-laundry') ?>" class="search-filter-row">
     <input type="hidden" name="tab" value="<?= $e($tab) ?>">
     <div class="search-input-wrap">
         <i class="bi bi-search search-icon"></i>
@@ -469,7 +508,42 @@ $kurirList = $kurirList ?? [];
         // Inisial atau avatar pelanggan
         $namaPlg = (string) ($p['nama_pelanggan'] ?? 'Pelanggan');
         $inisialPlg = $namaPlg !== '' ? strtoupper(substr($namaPlg, 0, 1)) : 'P';
-        $fotoPlg = ! empty($p['foto_pelanggan']) ? base_url('uploads/foto/' . $p['foto_pelanggan']) : null;
+        $fotoPlg = url_foto_profil($p['foto_pelanggan'] ?? null);
+
+        // Format Tanggal & Jam Indonesia (Contoh: 03 Juni 2026 • 08.00)
+        $tglRaw      = $p['tanggal'] ?? $p['created_at'] ?? 'now';
+        $tglObj      = strtotime((string)$tglRaw);
+        $tglTeks     = date('d F Y', $tglObj);
+        $tglIndo     = strtr($tglTeks, $bulanIndo);
+        $jamIndo     = date('H.i', $tglObj);
+
+        $beratVal    = (float) ($p['berat'] ?? 1.0);
+        $totalHarga  = (float) ($p['total_bayar'] ?? 0);
+        if ($totalHarga <= 0) {
+            $flat = (float) ($p['harga_flat'] ?? 0);
+            $perKg = (float) ($p['harga_per_kg'] ?? 0);
+            $totalHarga = $flat > 0 ? $flat : ($perKg * $beratVal);
+        }
+
+        // Siapkan data JSON untuk modal detail
+        $dataJson = htmlspecialchars(json_encode([
+            'id_pesanan'        => $idPesanan,
+            'kode_pesanan'      => $kodePesanan,
+            'nama_pelanggan'    => $namaPlg,
+            'no_hp_pelanggan'   => (string) ($p['no_hp_pelanggan'] ?? '-'),
+            'nama_layanan'      => (string) ($p['nama_layanan'] ?? 'Laundry Reguler'),
+            'berat'             => $beratVal,
+            'total_harga'       => number_format($totalHarga, 0, ',', '.'),
+            'tanggal_indo'      => $tglIndo . ' • ' . $jamIndo,
+            'status_pesanan'    => $st,
+            'status_bayar'      => (string) ($p['status_bayar'] ?? 'belum_dibayar'),
+            'metode_bayar'      => (string) ($p['metode'] ?? 'Transfer Bank'),
+            'alamat_ambil'      => (string) ($p['alamat_pengambilan'] ?? '-'),
+            'alamat_antar'      => (string) ($p['alamat_pengantaran'] ?? '-'),
+            'catatan'           => (string) ($p['catatan'] ?? ''),
+            'id_kurir'          => (int) ($p['id_kurir'] ?? 0),
+            'nama_kurir'        => (string) ($p['nama_kurir'] ?? 'Belum Ditugaskan'),
+        ]), ENT_QUOTES, 'UTF-8');
         ?>
 
         <div class="order-card">
@@ -580,6 +654,9 @@ $kurirList = $kurirList ?? [];
                         <span class="fw-normal">Pesanan ini telah dibatalkan atau pembayaran ditolak oleh Admin. Status telah terkunci dan tidak dapat diubah lagi.</span>
                     </div>
                 </div>
+                <button type="button" class="btn-detail-order" onclick="bukaModalDetail(<?= $dataJson ?>)">
+                    <i class="bi bi-info-circle me-1"></i> Detail
+                </button>
             <?php elseif ($st === 'selesai'): ?>
                 <div class="alert alert-success py-2 px-3 fw-bold small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3">
                     <i class="bi bi-check-circle-fill fs-5"></i>
@@ -588,6 +665,9 @@ $kurirList = $kurirList ?? [];
                         <span class="fw-normal">Pesanan telah selesai dan pakaian telah diterima oleh pelanggan. Status telah final.</span>
                     </div>
                 </div>
+                <button type="button" class="btn-detail-order" onclick="bukaModalDetail(<?= $dataJson ?>)">
+                    <i class="bi bi-info-circle me-1"></i> Detail
+                </button>
             <?php elseif (($p['status_bayar'] ?? '') !== 'lunas'): ?>
                 <div class="alert alert-warning py-2 px-3 fw-bold small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3">
                     <i class="bi bi-clock-history fs-5"></i>
@@ -596,6 +676,9 @@ $kurirList = $kurirList ?? [];
                         <span class="fw-normal">Pembayaran belum berstatus Lunas. Silakan <a href="<?= base_url('admin/transaksi?q=' . urlencode($kodePesanan)) ?>" class="fw-bold text-decoration-underline text-dark">verifikasi pembayaran di menu Transaksi</a> terlebih dahulu sebelum memproses status laundry.</span>
                     </div>
                 </div>
+                <button type="button" class="btn-detail-order" onclick="bukaModalDetail(<?= $dataJson ?>)">
+                    <i class="bi bi-info-circle me-1"></i> Detail
+                </button>
             <?php else: ?>
                 <form action="<?= base_url('admin/pesanan/update-status/' . $idPesanan) ?>" method="post" class="form-ubah-wrap">
                     <?= csrf_field() ?>
@@ -625,10 +708,148 @@ $kurirList = $kurirList ?? [];
                         </div>
                     </div>
                     <button type="submit" class="btn-simpan-status">Simpan Perubahan</button>
+                    <button type="button" class="btn-detail-order" onclick="bukaModalDetail(<?= $dataJson ?>)">
+                        <i class="bi bi-info-circle me-1"></i> Detail
+                    </button>
                 </form>
             <?php endif; ?>
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODAL DETAIL PESANAN                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalDetailPesanan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: #033B59; color: #fff; padding: 14px 20px;">
+                <h6 class="modal-title fw-bold" style="margin: 0; font-size: 15px;">
+                    <i class="bi bi-info-circle me-2"></i>Rincian Pesanan
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body p-4" style="font-size: 13px;">
+                <!-- Ringkasan Pelanggan -->
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div>
+                        <div class="fw-bold fs-6 text-dark" id="detNamaPelanggan"></div>
+                        <div class="text-muted small" id="detNoHpPelanggan"></div>
+                    </div>
+                    <a id="detBtnWa" href="#" target="_blank" class="btn btn-sm btn-success fw-bold rounded-pill px-3" style="font-size: 12px;">
+                        <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                    </a>
+                </div>
+
+                <!-- Informasi Pesanan -->
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Kode Pesanan</span>
+                    <strong class="text-dark" id="detKodePesanan"></strong>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Waktu Transaksi</span>
+                    <span class="text-dark fw-bold" id="detTanggal"></span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Layanan &amp; Berat</span>
+                    <span class="text-dark fw-bold" id="detLayananBerat"></span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Total Pembayaran</span>
+                    <span class="text-success fw-bold fs-6" id="detTotalHarga"></span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom align-items-center">
+                    <span class="text-muted">Status Pembayaran</span>
+                    <span id="detStatusBayarBadge"></span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom align-items-center">
+                    <span class="text-muted">Status Laundry</span>
+                    <span id="detStatusPesananBadge"></span>
+                </div>
+                <div class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Kurir Penanggung Jawab</span>
+                    <span class="text-dark fw-bold" id="detNamaKurir"></span>
+                </div>
+
+                <!-- Alamat -->
+                <div class="mt-3">
+                    <div class="text-muted small fw-bold mb-1">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> Alamat Pengambilan:
+                    </div>
+                    <div class="p-2 rounded-2 bg-light text-dark small" id="detAlamatAmbil"></div>
+                </div>
+                <div class="mt-2">
+                    <div class="text-muted small fw-bold mb-1">
+                        <i class="bi bi-truck text-primary me-1"></i> Alamat Pengantaran:
+                    </div>
+                    <div class="p-2 rounded-2 bg-light text-dark small" id="detAlamatAntar"></div>
+                </div>
+
+                <!-- Catatan -->
+                <div class="mt-2" id="wrapDetCatatan" style="display: none;">
+                    <div class="text-muted small fw-bold mb-1">
+                        <i class="bi bi-chat-left-text me-1"></i> Catatan Khusus:
+                    </div>
+                    <div class="p-2 rounded-2 bg-warning-subtle text-dark small" id="detCatatan"></div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #f8f9fa; border-top: 1px solid #eee; display: flex; justify-content: flex-end; padding: 12px 20px;">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 px-3" data-bs-dismiss="modal">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function bukaModalDetail(data) {
+    document.getElementById('detNamaPelanggan').textContent = data.nama_pelanggan;
+    document.getElementById('detNoHpPelanggan').textContent = data.no_hp_pelanggan;
+    document.getElementById('detKodePesanan').textContent = data.kode_pesanan;
+    document.getElementById('detTanggal').textContent = data.tanggal_indo;
+    document.getElementById('detLayananBerat').textContent = data.nama_layanan + ' • ' + data.berat + ' Kg';
+    document.getElementById('detTotalHarga').textContent = 'Rp ' + data.total_harga;
+    document.getElementById('detAlamatAmbil').textContent = data.alamat_ambil;
+    document.getElementById('detAlamatAntar').textContent = data.alamat_antar;
+    document.getElementById('detNamaKurir').textContent = data.nama_kurir;
+
+    // Tombol WhatsApp
+    var waPhone = (data.no_hp_pelanggan || '').replace(/[^0-9]/g, '');
+    if (waPhone.startsWith('0')) waPhone = '62' + waPhone.substring(1);
+    var btnWa = document.getElementById('detBtnWa');
+    if (waPhone && waPhone.length > 5) {
+        btnWa.href = 'https://wa.me/' + waPhone + '?text=Halo%20' + encodeURIComponent(data.nama_pelanggan) + ',%20mengenai%20pesanan%20' + encodeURIComponent(data.kode_pesanan) + '%20di%20DigiWash...';
+        btnWa.style.display = 'inline-flex';
+    } else {
+        btnWa.style.display = 'none';
+    }
+
+    // Status Pembayaran Badge
+    var stBayarEl = document.getElementById('detStatusBayarBadge');
+    if (data.status_bayar === 'lunas') {
+        stBayarEl.innerHTML = '<span class="badge bg-success rounded-pill px-2 py-1"><i class="bi bi-check-circle me-1"></i> Lunas</span>';
+    } else {
+        stBayarEl.innerHTML = '<span class="badge bg-warning text-dark rounded-pill px-2 py-1"><i class="bi bi-hourglass-split me-1"></i> Belum Lunas</span>';
+    }
+
+    // Status Pesanan Badge
+    var stPsnEl = document.getElementById('detStatusPesananBadge');
+    var labelSt = (data.status_pesanan || '').toUpperCase();
+    stPsnEl.innerHTML = '<span class="badge bg-secondary rounded-pill px-2 py-1">' + labelSt + '</span>';
+
+    // Catatan
+    var wrapCatatan = document.getElementById('wrapDetCatatan');
+    if (data.catatan && data.catatan.trim() !== '') {
+        document.getElementById('detCatatan').textContent = data.catatan;
+        wrapCatatan.style.display = 'block';
+    } else {
+        wrapCatatan.style.display = 'none';
+    }
+
+    var bsModal = new bootstrap.Modal(document.getElementById('modalDetailPesanan'));
+    bsModal.show();
+}
+</script>
 
 <?= $this->endSection() ?>

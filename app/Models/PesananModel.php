@@ -144,6 +144,7 @@ class PesananModel extends Model
                 'd.id_kurir',
                 'k.nama AS nama_kurir',
                 'k.no_hp AS no_hp_kurir',
+                'k.foto AS foto_kurir',
             ])
             ->join('pelanggan pl',  'pl.id_pelanggan = p.id_pelanggan', 'left')
             ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')
@@ -218,8 +219,10 @@ class PesananModel extends Model
                 'pb.total_bayar',
                 'd.id_kurir',
                 'd.jenis_kendaraan',
+                'd.status_antar',
                 'k.nama AS nama_kurir',
                 'k.no_hp AS no_hp_kurir',
+                'k.foto AS foto_kurir',
             ])
             ->join('pelanggan pl',  'pl.id_pelanggan = p.id_pelanggan', 'left')
             ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')

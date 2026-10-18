@@ -12,6 +12,8 @@ $layanan  = (string) ($tugas['nama_layanan'] ?? 'Laundry Reguler');
 $berat    = (float)  ($tugas['berat'] ?? 1.0);
 $total    = (float)  ($tugas['total_bayar'] ?? 0);
 $metode   = (string) ($tugas['metode'] ?? 'Transfer');
+$fotoPlgUrl = url_foto_profil($tugas['foto_pelanggan'] ?? null);
+$inisialPlg = strtoupper(substr($namaPlg, 0, 1));
 
 // Format nomor WhatsApp (hapus karakter non-digit dan ganti awalan 0 ke 62)
 $noHpClean = preg_replace('/[^0-9]/', '', $noHpPlg);
@@ -35,23 +37,32 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
     margin-bottom: 8px;
 }
 .btn-back-krr {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #033B59;
     text-decoration: none;
-    color: #000;
-    font-size: 22px;
-    font-weight: 800;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: all 0.2s ease;
+}
+.btn-back-krr:hover {
+    background: #f1f5f9;
+    color: #033B59;
+    transform: translateX(-2px);
 }
 .detail-title {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     font-size: 18px;
-    font-weight: 800;
-    color: #000;
+    font-weight: 700;
+    color: #033B59;
     margin: 0;
     white-space: nowrap;
 }
@@ -60,73 +71,119 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
 .task-header-card {
     background: #ffffff;
     border-radius: 16px;
-    padding: 16px 18px;
+    padding: 18px 20px;
     margin-bottom: 14px;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 }
 .task-header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 .badge-tipe-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #93C5FD;
-    color: #000;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     padding: 5px 12px;
     border-radius: 999px;
     text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.badge-tipe-pill.badge-jemput {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+}
+.badge-tipe-pill.badge-antar {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
 }
 .task-code-lg {
-    font-size: 18px;
-    font-weight: 900;
-    color: #000;
+    font-size: 17px;
+    font-weight: 800;
+    color: #033B59;
+    letter-spacing: 0.5px;
 }
 .task-header-status {
     font-size: 13px;
-    font-weight: 600;
-    color: #475569;
+    font-weight: 500;
+    color: #64748b;
 }
 .task-header-status strong {
-    color: #0f172a;
+    color: #033B59;
+    font-weight: 700;
 }
 
 /* ── Section Card Umum ── */
 .detail-card {
     background: #ffffff;
     border-radius: 16px;
-    padding: 16px 18px;
+    padding: 18px 20px;
     margin-bottom: 14px;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 }
 .card-sec-title {
     font-size: 14px;
-    font-weight: 800;
-    color: #0f172a;
+    font-weight: 700;
+    color: #033B59;
     display: flex;
     align-items: center;
-    gap: 7px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.card-sec-title svg {
+    color: #033B59;
 }
 
 /* Info Pelanggan */
+.pelanggan-profile-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+.pelanggan-avatar-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    border: 2px solid #bae6fd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: #033B59;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(3, 59, 89, 0.08);
+}
+.pelanggan-avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.pelanggan-info-col {
+    flex: 1;
+    min-width: 0;
+}
 .pelanggan-name {
     font-size: 16px;
-    font-weight: 800;
-    color: #000;
-    margin-bottom: 4px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
 }
 .pelanggan-phone {
     font-size: 13px;
-    color: #475569;
-    margin-bottom: 12px;
+    color: #64748b;
+    margin-bottom: 0;
 }
 
 /* Quick Action Buttons (WA & Telp) */
@@ -143,16 +200,18 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
     gap: 6px;
     background: #25D366;
     color: #ffffff;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 9px 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 10px 12px;
     border-radius: 10px;
     text-decoration: none;
-    transition: background 0.2s;
+    box-shadow: 0 2px 6px rgba(37,211,102,0.25);
+    transition: all 0.2s;
 }
 .btn-action-wa:hover {
     background: #1eb956;
     color: #ffffff;
+    transform: translateY(-1px);
 }
 .btn-action-tel {
     display: flex;
@@ -161,61 +220,63 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
     gap: 6px;
     background: #033B59;
     color: #ffffff;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 9px 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 10px 12px;
     border-radius: 10px;
     text-decoration: none;
-    transition: background 0.2s;
+    box-shadow: 0 2px 6px rgba(3,59,89,0.25);
+    transition: all 0.2s;
 }
 .btn-action-tel:hover {
-    background: #022b42;
+    background: #022c44;
     color: #ffffff;
+    transform: translateY(-1px);
 }
 
 /* Alamat & Maps */
 .address-box {
-    background: #F8FAFC;
+    background: #f8fafc;
     border-radius: 12px;
     padding: 12px 14px;
-    border: 1px solid #E2E8F0;
-    margin-bottom: 10px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 12px;
 }
 .address-text {
     font-size: 13px;
-    font-weight: 600;
-    color: #0f172a;
-    line-height: 1.4;
-    margin-bottom: 8px;
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.5;
+    margin-bottom: 10px;
 }
 .btn-open-maps {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #EFF6FF;
-    color: #1D4ED8;
-    border: 1px solid #BFDBFE;
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
     border-radius: 8px;
-    padding: 6px 12px;
+    padding: 7px 14px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     text-decoration: none;
     transition: all 0.2s;
 }
 .btn-open-maps:hover {
-    background: #DBEAFE;
-    color: #1E40AF;
+    background: #bae6fd;
+    color: #0369a1;
 }
 
 /* Catatan Pelanggan */
 .note-box {
-    background: #FFFBEB;
-    border: 1px solid #FDE68A;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
     border-radius: 10px;
-    padding: 10px 12px;
+    padding: 10px 14px;
     font-size: 12px;
-    color: #92400E;
-    line-height: 1.4;
+    color: #92400e;
+    line-height: 1.5;
 }
 
 /* Rincian Cucian */
@@ -223,83 +284,84 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 0;
+    padding: 8px 0;
     font-size: 13px;
-    border-bottom: 1px dashed #E2E8F0;
+    border-bottom: 1px dashed #e2e8f0;
 }
 .rincian-row:last-child {
     border-bottom: none;
 }
 .rincian-label {
-    color: #64748B;
+    color: #64748b;
+    font-weight: 500;
 }
 .rincian-val {
     font-weight: 700;
-    color: #0F172A;
+    color: #033B59;
 }
 
 /* Status Bayar Bebas COD */
 .payment-lunas-box {
-    background: #DCFCE7;
-    border: 1px solid #86EFAC;
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-top: 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 .payment-lunas-title {
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 700;
     color: #15803d;
 }
 .payment-lunas-desc {
     font-size: 11px;
     color: #166534;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 .payment-warning-box {
-    background: #FEF3C7;
-    border: 1px solid #FCD34D;
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-top: 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 .payment-warning-title {
     font-size: 13px;
-    font-weight: 800;
-    color: #B45309;
+    font-weight: 700;
+    color: #b45309;
 }
 .payment-warning-desc {
     font-size: 11px;
-    color: #92400E;
-    margin-top: 1px;
+    color: #92400e;
+    margin-top: 2px;
 }
 
 .payment-danger-box {
-    background: #FEE2E2;
-    border: 1px solid #FCA5A5;
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-top: 10px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 .payment-danger-title {
     font-size: 13px;
-    font-weight: 800;
-    color: #B91C1C;
+    font-weight: 700;
+    color: #dc2626;
 }
 .payment-danger-desc {
     font-size: 11px;
-    color: #991B1B;
-    margin-top: 1px;
+    color: #b91c1c;
+    margin-top: 2px;
 }
 
 /* ── Action Section Bawah ── */
@@ -310,65 +372,73 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
 .btn-action-primary {
     display: block;
     width: 100%;
-    padding: 13px 16px;
+    padding: 13px 18px;
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 700;
     border-radius: 12px;
     text-align: center;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     margin-bottom: 10px;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 .btn-action-blue {
-    background: #0047AB;
+    background: #033B59;
     color: #ffffff;
+    box-shadow: 0 4px 14px rgba(3,59,89,0.25);
 }
 .btn-action-blue:hover {
-    background: #003685;
+    background: #022c44;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(3,59,89,0.3);
 }
 .btn-action-green {
     background: #019D13;
     color: #ffffff;
+    box-shadow: 0 4px 14px rgba(1,157,19,0.25);
 }
 .btn-action-green:hover {
     background: #018310;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(1,157,19,0.3);
 }
 
 .action-success-banner {
-    background: #DCFCE7;
-    border: 1.5px solid #22C55E;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
     border-radius: 12px;
-    padding: 14px 16px;
+    padding: 14px 18px;
     text-align: center;
     color: #15803d;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 13px;
+    line-height: 1.5;
 }
 
 .action-warning-banner {
-    background: #FFFBEB;
-    border: 1.5px solid #F59E0B;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
     border-radius: 12px;
-    padding: 14px 16px;
+    padding: 14px 18px;
     text-align: center;
-    color: #92400E;
-    font-weight: 700;
+    color: #92400e;
+    font-weight: 600;
     font-size: 13px;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .action-danger-banner {
-    background: #FEF2F2;
-    border: 1.5px solid #EF4444;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
     border-radius: 12px;
-    padding: 14px 16px;
+    padding: 14px 18px;
     text-align: center;
-    color: #991B1B;
-    font-weight: 700;
+    color: #b91c1c;
+    font-weight: 600;
     font-size: 13px;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 </style>
 
@@ -394,7 +464,7 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
 <!-- Kartu Header Tugas -->
 <div class="task-header-card">
     <div class="task-header-top">
-        <span class="badge-tipe-pill">
+        <span class="badge-tipe-pill <?= $isJemput ? 'badge-jemput' : 'badge-antar' ?>">
             <?php if ($isJemput): ?>
                 <i class="bi bi-box-seam-fill me-1"></i> PENJEMPUTAN
             <?php else: ?>
@@ -404,7 +474,7 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
         <span class="task-code-lg"><?= $e($kode) ?></span>
     </div>
     <div class="task-header-status">
-        Status Saat Ini: <strong><?= esc(ucwords(str_replace('_', ' ', $stPesanan))) ?></strong>
+        Status Saat Ini: <strong><?= ($stPesanan === 'dikonfirmasi' && ($statusAntar ?? '') === 'proses_antar') ? 'Kurir Menuju Lokasi (OTW Jemput)' : esc(ucwords(str_replace('_', ' ', $stPesanan))) ?></strong>
     </div>
 </div>
 
@@ -418,8 +488,20 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
         <span>Informasi Pelanggan</span>
     </div>
 
-    <div class="pelanggan-name"><?= $e($namaPlg) ?></div>
-    <div class="pelanggan-phone"><?= $e($noHpPlg !== '' ? $noHpPlg : '-') ?></div>
+    <!-- Profil Pelanggan (Foto & Nama) -->
+    <div class="pelanggan-profile-row">
+        <div class="pelanggan-avatar-box" title="Foto Pelanggan: <?= $e($namaPlg) ?>">
+            <?php if ($fotoPlgUrl): ?>
+                <img src="<?= $e($fotoPlgUrl) ?>" alt="<?= $e($namaPlg) ?>">
+            <?php else: ?>
+                <span><?= $e($inisialPlg ?: 'P') ?></span>
+            <?php endif; ?>
+        </div>
+        <div class="pelanggan-info-col">
+            <div class="pelanggan-name"><?= $e($namaPlg) ?></div>
+            <div class="pelanggan-phone"><i class="bi bi-telephone-fill me-1 text-muted"></i><?= $e($noHpPlg !== '' ? $noHpPlg : '-') ?></div>
+        </div>
+    </div>
 
     <!-- Quick Action WA & Telp -->
     <div class="quick-action-row">
@@ -479,7 +561,7 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
         <div class="payment-lunas-box">
             <div>
                 <div class="payment-lunas-title"><i class="bi bi-check-circle-fill me-1"></i> SUDAH LUNAS</div>
-                <div class="payment-lunas-desc">Pembayaran diverifikasi Admin. Bebas biaya COD.</div>
+                <div class="payment-lunas-desc">Pembayaran diverifikasi Admin.</div>
             </div>
             <div class="fw-bold fs-6 text-success text-end">
                 Rp <?= number_format($total, 0, ',', '.') ?>
@@ -526,27 +608,34 @@ $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($alama
         <?php if ($isJemput): ?>
             <!-- ── Alur Penjemputan ── -->
             <?php if (in_array($stPesanan, ['menunggu', 'dikonfirmasi'], true)): ?>
-                <!-- Tahap 1: Mulai Menjemput (OTW) -->
-                <form action="<?= base_url('kurir/tugas/update-aksi/' . $idPesanan) ?>" method="post"
-                      data-konfirmasi="Mulai perjalanan untuk menjemput cucian pelanggan sekarang?"
-                      data-judul="Mulai Penjemputan">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="aksi" value="otw_jemput">
-                    <button type="submit" class="btn-action-primary btn-action-blue">
-                        <i class="bi bi-geo-alt-fill me-1"></i> Mulai Menjemput (Saya OTW ke Lokasi)
-                    </button>
-                </form>
+                <?php if (($statusAntar ?? '') === 'proses_antar'): ?>
+                    <!-- Sedang OTW Menjemput -->
+                    <div class="alert alert-info py-2 px-3 mb-3 fw-bold small rounded-3" style="background: #E0F2FE; border: 1px solid #7DD3FC; color: #0369A1;">
+                        <i class="bi bi-geo-alt-fill me-1"></i> Anda sedang dalam perjalanan ke lokasi pelanggan untuk menjemput cucian.
+                    </div>
 
-                <!-- Tahap 2: Konfirmasi Cucian Sudah Diambil -->
-                <form action="<?= base_url('kurir/tugas/update-aksi/' . $idPesanan) ?>" method="post"
-                      data-konfirmasi="Pastikan cucian kotor sudah Anda terima dari pelanggan. Konfirmasi pengambilan?"
-                      data-judul="Konfirmasi Cucian Diambil">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="aksi" value="jemput_selesai">
-                    <button type="submit" class="btn-action-primary btn-action-green">
-                        <i class="bi bi-check-circle-fill me-1"></i> Konfirmasi Cucian Sudah Diambil
-                    </button>
-                </form>
+                    <!-- Tahap 2: Konfirmasi Cucian Sudah Diambil -->
+                    <form action="<?= base_url('kurir/tugas/update-aksi/' . $idPesanan) ?>" method="post"
+                          data-konfirmasi="Pastikan cucian kotor sudah Anda terima dari pelanggan. Konfirmasi pengambilan?"
+                          data-judul="Konfirmasi Cucian Diambil">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="aksi" value="jemput_selesai">
+                        <button type="submit" class="btn-action-primary btn-action-green">
+                            <i class="bi bi-check-circle-fill me-1"></i> Konfirmasi Cucian Sudah Diambil
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <!-- Tahap 1: Mulai Menjemput (OTW) -->
+                    <form action="<?= base_url('kurir/tugas/update-aksi/' . $idPesanan) ?>" method="post"
+                          data-konfirmasi="Mulai perjalanan untuk menjemput cucian pelanggan sekarang?"
+                          data-judul="Mulai Penjemputan">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="aksi" value="otw_jemput">
+                        <button type="submit" class="btn-action-primary btn-action-blue">
+                            <i class="bi bi-geo-alt-fill me-1"></i> Mulai Menjemput (Saya OTW ke Lokasi)
+                        </button>
+                    </form>
+                <?php endif; ?>
             <?php else: ?>
                 <div class="action-success-banner">
                     <i class="bi bi-check-circle-fill me-1 text-success"></i> Cucian telah berhasil dijemput dan dibawa ke outlet laundry DigiWash.

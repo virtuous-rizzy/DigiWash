@@ -19,9 +19,10 @@ if ($fromParam === 'notifikasi' || str_contains($referer, 'notifikasi')) {
 // Base timestamp untuk timeline
 $baseTime = ! empty($pesanan['tanggal']) ? strtotime((string)$pesanan['tanggal']) : (! empty($pesanan['created_at']) ? strtotime((string)$pesanan['created_at']) : time());
 
-// Judul header status utama di kartu tracking
+$statusBayar = (string) ($pesanan['status_bayar'] ?? 'belum_dibayar');
+
 $headerStatusMap = [
-    'menunggu'     => 'Menunggu Penjemputan',
+    'menunggu'     => 'Menunggu Konfirmasi',
     'dikonfirmasi' => 'Menunggu Penjemputan',
     'dijemput'     => 'Cucian Dijemput',
     'dicuci'       => 'Sedang Dicuci',
@@ -30,30 +31,46 @@ $headerStatusMap = [
     'selesai'      => 'Pesanan Selesai',
     'dibatalkan'   => 'Pesanan Dibatalkan',
 ];
-$headerStatusTitle = $headerStatusMap[$st] ?? 'Sedang Diproses';
+$statusAntarTracking = (string) ($pesanan['status_antar'] ?? 'menunggu_kurir');
 
-// Menentukan level aktif (1 sampai 8) sinkron dengan status admin:
-// 1 = Menunggu Penjemputan
-// 2 = Kurir Menuju Lokasi
+if ($statusBayar === 'gagal') {
+    $headerStatusTitle = 'Pembayaran Ditolak';
+} elseif ($statusBayar === 'belum_dibayar') {
+    $headerStatusTitle = 'Menunggu Pembayaran';
+} elseif ($statusBayar === 'menunggu_verifikasi') {
+    $headerStatusTitle = 'Verifikasi Pembayaran';
+} elseif ($st === 'dikonfirmasi' && $statusAntarTracking === 'proses_antar') {
+    $headerStatusTitle = 'Kurir Menuju Lokasi';
+} else {
+    $headerStatusTitle = $headerStatusMap[$st] ?? 'Sedang Diproses';
+}
+
+// Menentukan level aktif (1 sampai 7) sinkron dengan status pembayaran & status admin:
+// 1 = Menunggu Pembayaran (Belum bayar / Menunggu verifikasi admin)
+// 2 = Menunggu Penjemputan (Pembayaran disetujui, siap dijemput kurir)
 // 3 = Cucian Dijemput
 // 4 = Sedang Dicuci
 // 5 = Sedang Disetrika
-// 6 = Siap Dikirim
-// 7 = Dalam Pengiriman
-// 8 = Pesanan Selesai
-$activeStage = match ($st) {
-    'menunggu', 'dikonfirmasi' => 1,
-    'dijemput'                 => 2,
-    'dicuci'                   => 3,
-    'disetrika'                => 4,
-    'diantar'                  => 5,
-    'selesai'                  => 6,
-    default                    => 1,
-};
+// 6 = Sedang Diantar
+// 7 = Pesanan Selesai
+if ($statusBayar !== 'lunas') {
+    $activeStage = 1;
+} else {
+    $activeStage = match ($st) {
+        'menunggu', 'dikonfirmasi' => 2,
+        'dijemput'                 => 3,
+        'dicuci'                   => 4,
+        'disetrika'                => 5,
+        'diantar'                  => 6,
+        'selesai'                  => 7,
+        default                    => 2,
+    };
+}
 
 // Data Kurir (jika ada)
 $namaKurir = (string) ($pesanan['nama_kurir'] ?? '');
 $noHpKurir = (string) ($pesanan['no_hp_kurir'] ?? '');
+$fotoKurirUrl = url_foto_profil($pesanan['foto_kurir'] ?? null);
 $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ');
 ?>
 <!DOCTYPE html>
@@ -63,14 +80,14 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tracking Pesanan - DigiWash</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background: #F0EFEF;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -231,6 +248,14 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             color: #ffffff;
             box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.22);
         }
+        .timeline-step.done .step-icon-circle {
+            background: #033B59;
+            color: #ffffff;
+        }
+        .timeline-step.pending .step-icon-circle {
+            background: #F1F5F9;
+            color: #94A3B8;
+        }
         .step-dash-line {
             width: 2px;
             flex: 1;
@@ -294,6 +319,28 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             background: #708A9B;
             color: #ffffff;
         }
+        .badge-warning-custom {
+            background: #F59E0B;
+            color: #ffffff;
+        }
+        .btn-action-tracking-bayar {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #033B59;
+            color: #ffffff;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(3, 59, 89, 0.15);
+        }
+        .btn-action-tracking-bayar:hover {
+            background: #022c44;
+            color: #ffffff;
+        }
         .icon-pending-edit {
             color: #C084FC;
             font-size: 16px;
@@ -320,8 +367,8 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             z-index: 100;
         }
         .kurir-avatar-box {
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             background: #e2e8f0;
             display: flex;
@@ -329,6 +376,14 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             justify-content: center;
             font-size: 20px;
             flex-shrink: 0;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+        }
+        .kurir-avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
         .kurir-details { flex: 1; }
         .kurir-name-text {
@@ -461,15 +516,69 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             </svg>
         </div>
 
-        <!-- Timeline 6 Tahapan Sinkron Status Admin -->
+        <!-- Timeline 7 Tahapan Sinkron Status Pembayaran & Status Admin -->
         <div class="tracking-timeline">
 
-            <!-- 1. Menunggu Penjemputan (status: menunggu / dikonfirmasi) -->
+            <!-- 1. Menunggu Pembayaran (status_bayar: belum_dibayar / menunggu_verifikasi / lunas) -->
             <?php
-            $isDone1   = ($activeStage > 1);
+            $isDone1   = ($statusBayar === 'lunas');
             $isActive1 = ($activeStage === 1);
             ?>
             <div class="timeline-step <?= $isActive1 ? 'active' : ($isDone1 ? 'done' : 'pending') ?>">
+                <div class="timeline-left">
+                    <div class="step-icon-circle">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div class="step-dash-line"></div>
+                </div>
+                <div class="timeline-body">
+                    <div class="timeline-content">
+                        <div class="step-subtitle">Menunggu Pembayaran</div>
+                        <?php if ($statusBayar === 'gagal'): ?>
+                            <div class="step-main-title text-danger">Pembayaran ditolak oleh Admin. Silakan periksa kembali dan upload ulang bukti transfer.</div>
+                            <?php if (! empty($pesanan['id_pesanan'])): ?>
+                                <div class="mt-2">
+                                    <a href="<?= base_url('pesanan/upload-bukti/' . (int)$pesanan['id_pesanan']) ?>" class="btn-action-tracking-bayar" style="background:#dc2626;">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Upload Ulang Bukti
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                        <?php elseif ($statusBayar === 'belum_dibayar'): ?>
+                            <div class="step-main-title">Menunggu pembayaran tagihan laundry dari Anda</div>
+                            <div class="step-time-detail">Waktu pesanan: <?= date('H:i', $baseTime) ?></div>
+                            <?php if (! empty($pesanan['id_pesanan'])): ?>
+                                <div class="mt-2">
+                                    <a href="<?= base_url('pesanan/upload-bukti/' . (int)$pesanan['id_pesanan']) ?>" class="btn-action-tracking-bayar">
+                                        <i class="bi bi-upload me-1"></i> Upload Bukti Bayar
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                        <?php elseif ($statusBayar === 'menunggu_verifikasi'): ?>
+                            <div class="step-main-title">Bukti transfer terkirim, menunggu verifikasi & persetujuan Admin</div>
+                            <div class="step-time-detail">Status: Menunggu Persetujuan Admin</div>
+                        <?php else: ?>
+                            <div class="step-main-title">Pembayaran telah diverifikasi & disetujui (Lunas)</div>
+                            <div class="step-time-detail">Metode: <?= $e((string)($pesanan['metode'] ?? 'Transfer Bank')) ?> · Lunas</div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($isDone1): ?>
+                        <span class="step-badge badge-selesai">Selesai</span>
+                    <?php elseif ($statusBayar === 'gagal'): ?>
+                        <span class="step-badge" style="background:#dc2626; color:#fff;">Ditolak</span>
+                    <?php elseif ($statusBayar === 'menunggu_verifikasi'): ?>
+                        <span class="step-badge badge-proses">Verifikasi</span>
+                    <?php else: ?>
+                        <span class="step-badge badge-warning-custom">Belum Bayar</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- 2. Menunggu Penjemputan (status: menunggu / dikonfirmasi) -->
+            <?php
+            $isDone2   = ($activeStage > 2);
+            $isActive2 = ($activeStage === 2);
+            ?>
+            <div class="timeline-step <?= $isActive2 ? 'active' : ($isDone2 ? 'done' : 'pending') ?>">
                 <div class="timeline-left">
                     <div class="step-icon-circle">
                         <i class="bi bi-box-seam-fill"></i>
@@ -479,34 +588,18 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
                 <div class="timeline-body">
                     <div class="timeline-content">
                         <div class="step-subtitle">Menunggu Penjemputan</div>
-                        <div class="step-main-title">Pesanan dikonfirmasi, kurir akan segera menjemput pakaian Anda</div>
-                        <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime) ?></div>
-                    </div>
-                    <?php if ($isDone1): ?>
-                        <span class="step-badge badge-selesai">Selesai</span>
-                    <?php elseif ($isActive1): ?>
-                        <span class="step-badge badge-proses">Sedang Proses</span>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- 2. Cucian Dijemput (status: dijemput) -->
-            <?php
-            $isDone2   = ($activeStage > 2);
-            $isActive2 = ($activeStage === 2);
-            ?>
-            <div class="timeline-step <?= $isActive2 ? 'active' : ($isDone2 ? 'done' : 'pending') ?>">
-                <div class="timeline-left">
-                    <div class="step-icon-circle">
-                        <i class="bi bi-bicycle"></i>
-                    </div>
-                    <div class="step-dash-line"></div>
-                </div>
-                <div class="timeline-body">
-                    <div class="timeline-content">
-                        <div class="step-subtitle">Cucian Dijemput</div>
-                        <div class="step-main-title"><?= $activeStage < 2 ? 'Menunggu kurir menjemput pakaian' : 'Pakaian Anda sudah dijemput dan dikirim ke laundry' ?></div>
-                        <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 1800) ?></div>
+                        <div class="step-main-title">
+                            <?php if ($activeStage < 2): ?>
+                                Menunggu pembayaran disetujui sebelum penjemputan
+                            <?php elseif ($statusAntarTracking === 'proses_antar'): ?>
+                                Kurir sedang dalam perjalanan menuju lokasi Anda untuk menjemput pakaian
+                            <?php else: ?>
+                                Pembayaran disetujui, kurir akan segera menjemput pakaian Anda
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($activeStage >= 2): ?>
+                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 900) ?></div>
+                        <?php endif; ?>
                     </div>
                     <?php if ($isDone2): ?>
                         <span class="step-badge badge-selesai">Selesai</span>
@@ -518,7 +611,7 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
                 </div>
             </div>
 
-            <!-- 3. Sedang Dicuci (status: dicuci) -->
+            <!-- 3. Cucian Dijemput (status: dijemput) -->
             <?php
             $isDone3   = ($activeStage > 3);
             $isActive3 = ($activeStage === 3);
@@ -526,18 +619,16 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             <div class="timeline-step <?= $isActive3 ? 'active' : ($isDone3 ? 'done' : 'pending') ?>">
                 <div class="timeline-left">
                     <div class="step-icon-circle">
-                        <i class="bi bi-basket2-fill"></i>
+                        <i class="bi bi-bicycle"></i>
                     </div>
                     <div class="step-dash-line"></div>
                 </div>
                 <div class="timeline-body">
                     <div class="timeline-content">
-                        <div class="step-subtitle">Proses Cuci</div>
-                        <div class="step-main-title"><?= $activeStage < 3 ? 'Menunggu proses pencucian dimulai' : 'Pakaian Anda sedang dicuci bersih' ?></div>
-                        <?php if ($isActive3): ?>
-                            <div class="step-time-detail">Estimasi selesai: <?= $estimasiHari ?> hari</div>
-                        <?php elseif ($isDone3): ?>
-                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 7200) ?></div>
+                        <div class="step-subtitle">Cucian Dijemput</div>
+                        <div class="step-main-title"><?= $activeStage < 3 ? 'Menunggu kurir menjemput pakaian' : 'Pakaian Anda sudah dijemput dan dibawa ke laundry' ?></div>
+                        <?php if ($activeStage >= 3): ?>
+                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 1800) ?></div>
                         <?php endif; ?>
                     </div>
                     <?php if ($isDone3): ?>
@@ -550,7 +641,7 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
                 </div>
             </div>
 
-            <!-- 4. Sedang Disetrika (status: disetrika) -->
+            <!-- 4. Sedang Dicuci (status: dicuci) -->
             <?php
             $isDone4   = ($activeStage > 4);
             $isActive4 = ($activeStage === 4);
@@ -558,18 +649,18 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             <div class="timeline-step <?= $isActive4 ? 'active' : ($isDone4 ? 'done' : 'pending') ?>">
                 <div class="timeline-left">
                     <div class="step-icon-circle">
-                        <i class="bi bi-stars"></i>
+                        <i class="bi bi-basket2-fill"></i>
                     </div>
                     <div class="step-dash-line"></div>
                 </div>
                 <div class="timeline-body">
                     <div class="timeline-content">
-                        <div class="step-subtitle">Proses Setrika</div>
-                        <div class="step-main-title"><?= $activeStage < 4 ? 'Menunggu proses penyetrikaan' : 'Pakaian sedang disetrika & dirapikan' ?></div>
+                        <div class="step-subtitle">Proses Cuci</div>
+                        <div class="step-main-title"><?= $activeStage < 4 ? 'Menunggu proses pencucian dimulai' : 'Pakaian Anda sedang dicuci bersih' ?></div>
                         <?php if ($isActive4): ?>
-                            <div class="step-time-detail">Perkiraan selesai: Hari ini</div>
+                            <div class="step-time-detail">Estimasi selesai: <?= $estimasiHari ?> hari</div>
                         <?php elseif ($isDone4): ?>
-                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 10800) ?></div>
+                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 7200) ?></div>
                         <?php endif; ?>
                     </div>
                     <?php if ($isDone4): ?>
@@ -582,7 +673,7 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
                 </div>
             </div>
 
-            <!-- 5. Sedang Diantar (status: diantar) -->
+            <!-- 5. Sedang Disetrika (status: disetrika) -->
             <?php
             $isDone5   = ($activeStage > 5);
             $isActive5 = ($activeStage === 5);
@@ -590,18 +681,18 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
             <div class="timeline-step <?= $isActive5 ? 'active' : ($isDone5 ? 'done' : 'pending') ?>">
                 <div class="timeline-left">
                     <div class="step-icon-circle">
-                        <i class="bi bi-truck"></i>
+                        <i class="bi bi-stars"></i>
                     </div>
                     <div class="step-dash-line"></div>
                 </div>
                 <div class="timeline-body">
                     <div class="timeline-content">
-                        <div class="step-subtitle">Sedang Diantar</div>
-                        <div class="step-main-title"><?= $activeStage < 5 ? 'Menunggu pakaian siap dikirim' : 'Kurir sedang mengantar ke alamat Anda' ?></div>
-                        <?php if ($isActive5): ?>
-                            <div class="step-time-detail">Perkiraan tiba: Segera tiba</div>
+                        <div class="step-subtitle">Proses Setrika</div>
+                        <div class="step-main-title"><?= $activeStage < 5 ? 'Menunggu proses penyetrikaan' : 'Pakaian sedang disetrika & dirapikan' ?></div>
+                        <?php if ($isActive4): ?>
+                            <div class="step-time-detail">Perkiraan selesai: Hari ini</div>
                         <?php elseif ($isDone5): ?>
-                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 18000) ?></div>
+                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 10800) ?></div>
                         <?php endif; ?>
                     </div>
                     <?php if ($isDone5): ?>
@@ -614,11 +705,43 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
                 </div>
             </div>
 
-            <!-- 6. Pesanan Selesai (status: selesai) -->
+            <!-- 6. Sedang Diantar (status: diantar) -->
             <?php
-            $isDone6 = ($activeStage === 6);
+            $isDone6   = ($activeStage > 6);
+            $isActive6 = ($activeStage === 6);
             ?>
-            <div class="timeline-step <?= $isDone6 ? 'done' : 'pending' ?>">
+            <div class="timeline-step <?= $isActive6 ? 'active' : ($isDone6 ? 'done' : 'pending') ?>">
+                <div class="timeline-left">
+                    <div class="step-icon-circle">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div class="step-dash-line"></div>
+                </div>
+                <div class="timeline-body">
+                    <div class="timeline-content">
+                        <div class="step-subtitle">Sedang Diantar</div>
+                        <div class="step-main-title"><?= $activeStage < 6 ? 'Menunggu pakaian siap dikirim' : 'Kurir sedang mengantar pakaian ke alamat Anda' ?></div>
+                        <?php if ($isActive6): ?>
+                            <div class="step-time-detail">Perkiraan tiba: Segera tiba</div>
+                        <?php elseif ($isDone6): ?>
+                            <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 18000) ?></div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($isDone6): ?>
+                        <span class="step-badge badge-selesai">Selesai</span>
+                    <?php elseif ($isActive6): ?>
+                        <span class="step-badge badge-proses">Sedang Proses</span>
+                    <?php else: ?>
+                        <i class="bi bi-pencil icon-pending-edit"></i>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- 7. Pesanan Selesai (status: selesai) -->
+            <?php
+            $isDone7 = ($activeStage === 7);
+            ?>
+            <div class="timeline-step <?= $isDone7 ? 'done' : 'pending' ?>">
                 <div class="timeline-left">
                     <div class="step-icon-circle">
                         <i class="bi bi-check-circle-fill"></i>
@@ -627,12 +750,12 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
                 <div class="timeline-body">
                     <div class="timeline-content">
                         <div class="step-subtitle">Pesanan Selesai</div>
-                        <div class="step-main-title"><?= $isDone6 ? 'Pakaian telah diterima. Terima kasih!' : 'Menunggu konfirmasi penerimaan' ?></div>
-                        <?php if ($isDone6): ?>
+                        <div class="step-main-title"><?= $isDone7 ? 'Pakaian telah diterima. Terima kasih!' : 'Menunggu konfirmasi penerimaan pakaian' ?></div>
+                        <?php if ($isDone7): ?>
                             <div class="step-time-detail">Waktu: <?= date('H:i', $baseTime + 21600) ?></div>
                         <?php endif; ?>
                     </div>
-                    <?php if ($isDone6): ?>
+                    <?php if ($isDone7): ?>
                         <span class="step-badge badge-selesai">Selesai</span>
                     <?php else: ?>
                         <i class="bi bi-pencil icon-pending-edit"></i>
@@ -649,7 +772,13 @@ $kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ'
 <!-- Floating Kurir Card (Tampil jika ada kurir) -->
 <?php if (! empty($namaKurir)): ?>
 <div class="kurir-bottom-card">
-    <div class="kurir-avatar-box"><i class="bi bi-person-circle" style="font-size:28px;"></i></div>
+    <div class="kurir-avatar-box">
+        <?php if ($fotoKurirUrl): ?>
+            <img src="<?= $e($fotoKurirUrl) ?>" alt="<?= $e($namaKurir) ?>">
+        <?php else: ?>
+            <i class="bi bi-person-circle" style="font-size:28px; color: #64748b;"></i>
+        <?php endif; ?>
+    </div>
     <div class="kurir-details">
         <div class="kurir-name-text"><?= $e($namaKurir) ?></div>
         <div class="kurir-vehicle-text"><?= $e($kendaraanKurir) ?></div>

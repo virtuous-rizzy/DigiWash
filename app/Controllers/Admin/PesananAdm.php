@@ -20,96 +20,21 @@ class PesananAdm extends BaseController
     ];
 
     /**
-     * Halaman Memproses Pesanan (Sesuai Mockup)
+     * Halaman Memproses Pesanan dialihkan ke status-laundry (dijadikan satu)
      */
     public function index()
     {
-        $q      = trim((string) ($this->request->getGet('q') ?? ''));
-        $status = trim((string) ($this->request->getGet('status') ?? 'semua'));
-        $bayar  = trim((string) ($this->request->getGet('bayar') ?? 'semua'));
-
-        $model      = new PesananModel();
-        $kurirModel = new \App\Models\KurirModel();
-        $pesanan    = [];
-        $kurirList  = [];
-
-        try {
-            $builder = $model->db->table('pesanan p')
-                ->select([
-                    'p.id_pesanan',
-                    'p.id_pelanggan',
-                    'p.id_layanan',
-                    'p.tanggal',
-                    'p.berat',
-                    'p.alamat_pengambilan',
-                    'p.alamat_pengantaran',
-                    'p.status_pesanan',
-                    'p.catatan',
-                    'p.detail_satuan',
-                    'p.created_at',
-                    'pl.nama AS nama_pelanggan',
-                    'pl.no_hp AS no_hp_pelanggan',
-                    'pl.foto AS foto_pelanggan',
-                    'l.nama_layanan',
-                    'l.jenis_layanan',
-                    'l.harga_per_kg',
-                    'l.harga_flat',
-                    'l.estimasi_hari',
-                    'pb.status_bayar',
-                    'pb.metode',
-                    'pb.total_bayar',
-                    'd.id_kurir',
-                    'k.nama AS nama_kurir',
-                    'k.no_hp AS no_hp_kurir',
-                ])
-                ->join('pelanggan pl',  'pl.id_pelanggan = p.id_pelanggan', 'left')
-                ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')
-                ->join('pembayaran pb', 'pb.id_pesanan   = p.id_pesanan', 'left')
-                ->join('distribusi d',  'd.id_pesanan    = p.id_pesanan', 'left')
-                ->join('kurir k',       'k.id_kurir      = d.id_kurir', 'left');
-
-            // Filter status pesanan
-            if ($status !== '' && $status !== 'semua') {
-                if ($status === 'diproses') {
-                    $builder->whereIn('p.status_pesanan', ['menunggu', 'dikonfirmasi', 'dijemput', 'dicuci', 'disetrika']);
-                } else {
-                    $builder->where('p.status_pesanan', $status);
-                }
-            }
-
-            // Filter status bayar
-            if ($bayar !== '' && $bayar !== 'semua') {
-                if ($bayar === 'lunas') {
-                    $builder->where('pb.status_bayar', 'lunas');
-                } elseif ($bayar === 'belum_lunas') {
-                    $builder->where('pb.status_bayar !=', 'lunas');
-                }
-            }
-
-            // Search query (cari no. transaksi / ID / pelanggan / layanan)
-            if ($q !== '') {
-                $builder->groupStart()
-                    ->like('pl.nama', $q)
-                    ->orLike('p.id_pesanan', $q)
-                    ->orLike('l.nama_layanan', $q)
-                    ->orLike('pl.no_hp', $q)
-                    ->groupEnd();
-            }
-
-            $pesanan   = $builder->orderBy('p.id_pesanan', 'DESC')->get()->getResultArray();
-            $kurirList = $kurirModel->daftarKurirAktif();
-        } catch (\Throwable $th) {
-            log_message('error', 'Gagal memuat memproses pesanan admin: ' . $th->getMessage());
+        $tab = $this->request->getGet('tab');
+        $q   = $this->request->getGet('q');
+        $params = [];
+        if ($tab !== null && $tab !== '') {
+            $params['tab'] = $tab;
         }
-
-        return view('admin/pesanan_adm', [
-            'pesanan'      => $pesanan,
-            'q'            => $q,
-            'statusFilter' => $status,
-            'bayarFilter'  => $bayar,
-            'kurirList'    => $kurirList,
-            'aktif'        => 'pesanan',
-        ]);
+        if ($q !== null && $q !== '') {
+            $params['q'] = $q;
+        }
+        $url = base_url('admin/status-laundry') . (!empty($params) ? '?' . http_build_query($params) : '');
+        return redirect()->to($url);
     }
 
     /**
@@ -180,13 +105,13 @@ class PesananAdm extends BaseController
 
             // Proteksi 1: Pesanan yang sudah dibatalkan tidak boleh diubah
             if ($currentStatus === 'dibatalkan') {
-                return redirect()->to(base_url('admin/pesanan'))
+                return redirect()->to(base_url('admin/status-laundry'))
                     ->with('errors', ['Pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' sudah dibatalkan/ditolak dan tidak dapat diubah statusnya lagi.']);
             }
 
             // Proteksi 2: Pesanan yang sudah selesai tidak boleh diubah lagi
             if ($currentStatus === 'selesai') {
-                return redirect()->to(base_url('admin/pesanan'))
+                return redirect()->to(base_url('admin/status-laundry'))
                     ->with('errors', ['Pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' sudah berstatus Selesai dan tidak dapat diubah statusnya lagi.']);
             }
 
@@ -197,12 +122,12 @@ class PesananAdm extends BaseController
             $statusBayar = (string) ($pb['status_bayar'] ?? 'belum_dibayar');
 
             if ($statusBayar === 'gagal') {
-                return redirect()->to(base_url('admin/pesanan'))
+                return redirect()->to(base_url('admin/status-laundry'))
                     ->with('errors', ['Pembayaran pesanan ini telah ditolak. Pesanan tidak dapat diproses.']);
             }
 
             if ($statusBayar !== 'lunas') {
-                return redirect()->to(base_url('admin/pesanan'))
+                return redirect()->to(base_url('admin/status-laundry'))
                     ->with('errors', ['Pembayaran pesanan ini belum berstatus Lunas. Silakan verifikasi pembayaran di menu Transaksi terlebih dahulu.']);
             }
 
@@ -252,7 +177,7 @@ class PesananAdm extends BaseController
                 }
             }
 
-            return redirect()->to(base_url('admin/pesanan'))
+            return redirect()->to(base_url('admin/status-laundry'))
                 ->with('success', 'Status pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' berhasil diperbarui.');
         } catch (\Throwable $th) {
             log_message('error', 'Gagal update status pesanan: ' . $th->getMessage());

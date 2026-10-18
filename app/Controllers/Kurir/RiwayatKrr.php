@@ -60,11 +60,12 @@ class RiwayatKrr extends BaseController
 
                 $daftarRiwayat[] = [
                     'id_pesanan'     => $idPesanan,
-                    'kode'           => '#DW-' . (1000 + $idPesanan),
-                    'kode_psn'       => 'PSN-' . date('dmY', strtotime((string)$rd['tanggal'])) . '-' . str_pad((string)$idPesanan, 3, '0', STR_PAD_LEFT),
+                    'kode'           => 'PSN-' . date('dmY', strtotime((string)($rd['tanggal'] ?? 'now'))) . '-' . str_pad((string)$idPesanan, 3, '0', STR_PAD_LEFT),
+                    'kode_psn'       => 'PSN-' . date('dmY', strtotime((string)($rd['tanggal'] ?? 'now'))) . '-' . str_pad((string)$idPesanan, 3, '0', STR_PAD_LEFT),
                     'tipe'           => $tipe,
                     'is_jemput'      => $isJemput,
                     'nama'           => (string) ($rd['nama_pelanggan'] ?? 'Pelanggan'),
+                    'foto'           => (string) ($rd['foto_pelanggan'] ?? ''),
                     'no_hp'          => (string) ($rd['no_hp_pelanggan'] ?? ''),
                     'alamat'         => (string) $alamat,
                     'waktu'          => $waktuFormatted,
