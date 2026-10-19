@@ -34,6 +34,7 @@ class PesananModel extends Model
                 'l.harga_flat',
                 'l.jenis_layanan',
                 'pb.status_bayar',
+                'pb.bukti_bayar',
                 'pb.metode',
                 // Hitung total: prioritaskan total_bayar di tabel pembayaran, jika tidak ada hitung dari harga layanan
                 'IF(pb.total_bayar IS NOT NULL AND pb.total_bayar > 0, pb.total_bayar, IF(l.harga_flat > 0, l.harga_flat, l.harga_per_kg * p.berat)) AS total_harga',
@@ -65,6 +66,7 @@ class PesananModel extends Model
                 'l.harga_flat',
                 'l.jenis_layanan',
                 'pb.status_bayar',
+                'pb.bukti_bayar',
                 'pb.metode',
                 'IF(pb.total_bayar IS NOT NULL AND pb.total_bayar > 0, pb.total_bayar, IF(l.harga_flat > 0, l.harga_flat, l.harga_per_kg * p.berat)) AS total_harga',
             ])
@@ -88,7 +90,7 @@ class PesananModel extends Model
             ->select([
                 'p.*',
                 'l.nama_layanan', 'l.harga_per_kg', 'l.harga_flat', 'l.jenis_layanan', 'l.estimasi_hari',
-                'pb.id_pembayaran', 'pb.metode', 'pb.status_bayar',
+                'pb.id_pembayaran', 'pb.metode', 'pb.status_bayar', 'pb.bukti_bayar',
                 'IF(pb.total_bayar IS NOT NULL AND pb.total_bayar > 0, pb.total_bayar, IF(l.harga_flat > 0, l.harga_flat, l.harga_per_kg * p.berat)) AS total_harga',
             ])
             ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')
@@ -138,9 +140,11 @@ class PesananModel extends Model
                 'l.harga_per_kg',
                 'l.harga_flat',
                 'l.estimasi_hari',
+                'p.id_admin',
                 'pb.status_bayar',
                 'pb.metode',
                 'pb.total_bayar',
+                'pb.id_admin AS id_admin_bayar',
                 'd.id_kurir',
                 'k.nama AS nama_kurir',
                 'k.no_hp AS no_hp_kurir',
@@ -154,11 +158,46 @@ class PesananModel extends Model
 
         // Filter tab
         if ($tab === 'diproses') {
-            $builder->whereIn('p.status_pesanan', ['menunggu', 'dikonfirmasi', 'dijemput', 'dicuci', 'disetrika']);
+            $builder->whereIn('p.status_pesanan', ['menunggu', 'dikonfirmasi', 'dijemput', 'dicuci', 'disetrika'])
+                ->groupStart()
+                    ->where('pb.status_bayar !=', 'gagal')
+                    ->orWhere('pb.status_bayar IS NULL')
+                ->groupEnd();
         } elseif ($tab === 'diantar') {
             $builder->where('p.status_pesanan', 'diantar');
         } elseif ($tab === 'selesai') {
             $builder->where('p.status_pesanan', 'selesai');
+        } elseif ($tab === 'dibatalkan') {
+            $builder->groupStart()
+                ->like('p.catatan', 'dibatalkan')
+                ->orGroupStart()
+                    ->where('p.status_pesanan', 'dibatalkan')
+                    ->where('p.id_admin IS NULL')
+                    ->groupStart()
+                        ->where('pb.id_admin IS NULL')
+                        ->orWhere('pb.id_admin', 0)
+                    ->groupEnd()
+                ->groupEnd()
+            ->groupEnd()
+            ->groupStart()
+                ->notLike('p.catatan', 'ditolak')
+                ->orWhere('p.catatan IS NULL')
+            ->groupEnd();
+        } elseif ($tab === 'ditolak') {
+            $builder->groupStart()
+                ->like('p.catatan', 'ditolak')
+                ->orGroupStart()
+                    ->where('pb.status_bayar', 'gagal')
+                    ->groupStart()
+                        ->where('p.id_admin IS NOT NULL')
+                        ->orWhere('pb.id_admin IS NOT NULL')
+                    ->groupEnd()
+                    ->groupStart()
+                        ->notLike('p.catatan', 'dibatalkan oleh pelanggan')
+                        ->orWhere('p.catatan IS NULL')
+                    ->groupEnd()
+                ->groupEnd()
+            ->groupEnd();
         }
 
         // Search query
@@ -180,8 +219,13 @@ class PesananModel extends Model
     {
         $db = $this->db;
         $totalSemua = (int) $db->table('pesanan')->countAllResults();
-        $totalDiproses = (int) $db->table('pesanan')
-            ->whereIn('status_pesanan', ['menunggu', 'dikonfirmasi', 'dijemput', 'dicuci', 'disetrika'])
+        $totalDiproses = (int) $db->table('pesanan p')
+            ->join('pembayaran pb', 'pb.id_pesanan = p.id_pesanan', 'left')
+            ->whereIn('p.status_pesanan', ['menunggu', 'dikonfirmasi', 'dijemput', 'dicuci', 'disetrika'])
+            ->groupStart()
+                ->where('pb.status_bayar !=', 'gagal')
+                ->orWhere('pb.status_bayar IS NULL')
+            ->groupEnd()
             ->countAllResults();
         $totalDiantar = (int) $db->table('pesanan')
             ->where('status_pesanan', 'diantar')
@@ -189,12 +233,49 @@ class PesananModel extends Model
         $totalSelesai = (int) $db->table('pesanan')
             ->where('status_pesanan', 'selesai')
             ->countAllResults();
+        $totalDibatalkan = (int) $db->table('pesanan p')
+            ->join('pembayaran pb', 'pb.id_pesanan = p.id_pesanan', 'left')
+            ->groupStart()
+                ->like('p.catatan', 'dibatalkan')
+                ->orGroupStart()
+                    ->where('p.status_pesanan', 'dibatalkan')
+                    ->where('p.id_admin IS NULL')
+                    ->groupStart()
+                        ->where('pb.id_admin IS NULL')
+                        ->orWhere('pb.id_admin', 0)
+                    ->groupEnd()
+                ->groupEnd()
+            ->groupEnd()
+            ->groupStart()
+                ->notLike('p.catatan', 'ditolak')
+                ->orWhere('p.catatan IS NULL')
+            ->groupEnd()
+            ->countAllResults();
+        $totalDitolak = (int) $db->table('pesanan p')
+            ->join('pembayaran pb', 'pb.id_pesanan = p.id_pesanan', 'left')
+            ->groupStart()
+                ->like('p.catatan', 'ditolak')
+                ->orGroupStart()
+                    ->where('pb.status_bayar', 'gagal')
+                    ->groupStart()
+                        ->where('p.id_admin IS NOT NULL')
+                        ->orWhere('pb.id_admin IS NOT NULL')
+                    ->groupEnd()
+                    ->groupStart()
+                        ->notLike('p.catatan', 'dibatalkan oleh pelanggan')
+                        ->orWhere('p.catatan IS NULL')
+                    ->groupEnd()
+                ->groupEnd()
+            ->groupEnd()
+            ->countAllResults();
 
         return [
-            'semua'    => $totalSemua,
-            'diproses' => $totalDiproses,
-            'diantar'  => $totalDiantar,
-            'selesai'  => $totalSelesai,
+            'semua'      => $totalSemua,
+            'diproses'   => $totalDiproses,
+            'diantar'    => $totalDiantar,
+            'selesai'    => $totalSelesai,
+            'dibatalkan' => $totalDibatalkan,
+            'ditolak'    => $totalDitolak,
         ];
     }
 
@@ -215,6 +296,7 @@ class PesananModel extends Model
                 'l.harga_flat',
                 'l.estimasi_hari',
                 'pb.status_bayar',
+                'pb.bukti_bayar',
                 'pb.metode',
                 'pb.total_bayar',
                 'd.id_kurir',
@@ -237,6 +319,41 @@ class PesananModel extends Model
 
         $row = $builder->get()->getRowArray();
         return is_array($row) ? $row : null;
+    }
+
+    /**
+     * Ambil sejumlah pesanan terbaru untuk dashboard admin
+     */
+    public function pesananTerbaruAdmin(int $limit = 3): array
+    {
+        return $this->db->table('pesanan p')
+            ->select([
+                'p.id_pesanan',
+                'p.id_pelanggan',
+                'p.id_layanan',
+                'p.tanggal',
+                'p.berat',
+                'p.status_pesanan',
+                'p.catatan',
+                'p.detail_satuan',
+                'p.created_at',
+                'pl.nama AS nama_pelanggan',
+                'pl.foto AS foto_pelanggan',
+                'l.nama_layanan',
+                'l.jenis_layanan',
+                'l.harga_per_kg',
+                'l.harga_flat',
+                'pb.status_bayar',
+                'pb.total_bayar',
+                'IF(pb.total_bayar IS NOT NULL AND pb.total_bayar > 0, pb.total_bayar, IF(l.harga_flat > 0, l.harga_flat, l.harga_per_kg * p.berat)) AS total_harga',
+            ])
+            ->join('pelanggan pl',  'pl.id_pelanggan = p.id_pelanggan', 'left')
+            ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')
+            ->join('pembayaran pb', 'pb.id_pesanan   = p.id_pesanan', 'left')
+            ->orderBy('p.id_pesanan', 'DESC')
+            ->limit($limit)
+            ->get()
+            ->getResultArray();
     }
 }
 

@@ -169,6 +169,14 @@ $errors = is_array($errors) ? $errors : [];
         }
         .link-ganti-metode:hover { text-decoration: underline; }
 
+        .link-batal-transaksi {
+            display: inline-block; margin-top: 10px;
+            font-size: 13px; font-weight: 500; color: #dc2626;
+            background: none; border: none; cursor: pointer; text-decoration: none;
+            font-family: inherit;
+        }
+        .link-batal-transaksi:hover { text-decoration: underline; color: #b91c1c; }
+
         /* ===== Tablet & desktop ===== */
         @media (min-width: 768px) {
             body { padding: 0 24px 32px; }
@@ -215,7 +223,7 @@ $errors = is_array($errors) ? $errors : [];
 
     <!-- Header -->
     <div class="page-header">
-        <a href="<?= base_url('pesanan/pembayaran' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '')) ?>" class="btn-back" aria-label="Kembali">
+        <a href="<?= base_url('dashboard') ?>" class="btn-back" title="Kembali ke Beranda" aria-label="Kembali">
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
         </a>
         <h1 class="page-title">Upload Bukti Bayar</h1>
@@ -312,10 +320,25 @@ $errors = is_array($errors) ? $errors : [];
                     <span>Kirim Bukti Pembayaran</span>
                 </button>
 
-                <a href="<?= base_url('pesanan/pembayaran' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '')) ?>" class="link-ganti-metode">
+                <a href="<?= base_url('pesanan/pembayaran' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '') . '?from=upload-bukti') ?>" class="link-ganti-metode">
                     Ganti metode pembayaran
                 </a>
+
+                <?php if (!empty($id_pesanan_db)): ?>
+                    <div style="text-align: center;">
+                        <button type="button" class="link-batal-transaksi" onclick="konfirmasiBatalUpload()">
+                            <i class="bi bi-x-circle me-1"></i> Batalkan pesanan
+                        </button>
+                    </div>
+                <?php endif; ?>
             </form>
+
+            <?php if (!empty($id_pesanan_db)): ?>
+                <form action="<?= base_url('pesanan/batalkan/' . $id_pesanan_db) ?>" method="post" id="formBatalUpload" style="display:none;">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="id_pesanan" value="<?= $id_pesanan_db ?>">
+                </form>
+            <?php endif; ?>
         </div>
 
     </div>
@@ -414,29 +437,38 @@ $errors = is_array($errors) ? $errors : [];
 
         /* Salin nomor rekening */
         var btnSalin = document.getElementById('btnSalin');
-        btnSalin.addEventListener('click', function () {
-            var teks = document.getElementById('noRek').textContent.trim();
-            var label = btnSalin.querySelector('span');
+        if (btnSalin) {
+            btnSalin.addEventListener('click', function () {
+                var teks = document.getElementById('noRek').textContent.trim();
+                var label = btnSalin.querySelector('span');
 
-            function berhasil() {
-                label.textContent = 'Tersalin';
-                btnSalin.classList.add('ok');
-                setTimeout(function () {
-                    label.textContent = 'Salin';
-                    btnSalin.classList.remove('ok');
-                }, 1800);
-            }
+                function berhasil() {
+                    label.textContent = 'Tersalin';
+                    btnSalin.classList.add('ok');
+                    setTimeout(function () {
+                        label.textContent = 'Salin';
+                        btnSalin.classList.remove('ok');
+                    }, 1800);
+                }
 
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(teks).then(berhasil);
-            } else {
-                var t = document.createElement('textarea');
-                t.value = teks; document.body.appendChild(t); t.select();
-                try { document.execCommand('copy'); berhasil(); } catch (err) {}
-                document.body.removeChild(t);
-            }
-        });
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(teks).then(berhasil);
+                } else {
+                    var t = document.createElement('textarea');
+                    t.value = teks; document.body.appendChild(t); t.select();
+                    try { document.execCommand('copy'); berhasil(); } catch (err) {}
+                    document.body.removeChild(t);
+                }
+            });
+        }
     })();
+
+    function konfirmasiBatalUpload() {
+        if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini sebelum melakukan pembayaran?')) {
+            var f = document.getElementById('formBatalUpload');
+            if (f) f.submit();
+        }
+    }
 </script>
 </body>
 

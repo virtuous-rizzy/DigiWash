@@ -330,30 +330,37 @@ class Pesanan extends BaseController
         $session   = session();
         $idPesanan = (int) ($id ?? $this->request->getGet('id_pesanan') ?? $session->get('pesanan_id_db') ?? 0);
 
+        $metodeTerpilih = '';
         if ($idPesanan > 0) {
             $detail = $this->muatDataPesanan($idPesanan);
             if ($detail) {
+                // Jika pesanan sudah dibatalkan, jangan boleh bayar
+                if (($detail['status_pesanan'] ?? '') === 'dibatalkan') {
+                    return redirect()->to(base_url('pesanan/riwayat'))
+                        ->with('errors', ['Pesanan ini telah dibatalkan dan tidak dapat dilakukan pembayaran.']);
+                }
+
                 // Jika pesanan sudah lunas atau menunggu verifikasi, arahkan langsung ke tracking
                 $stBayar = strtolower((string) ($detail['status_bayar'] ?? ''));
                 if (in_array($stBayar, ['lunas', 'menunggu_verifikasi'], true)) {
                     return redirect()->to(base_url('pesanan/tracking/' . $idPesanan));
                 }
 
-                // Jika metode pembayaran sudah dipilih sebelumnya (bukan "Belum Dipilih") dan valid di REKENING,
-                // langsung alihkan ke upload bukti!
-                $metode = (string) ($detail['metode'] ?? '');
-                if (array_key_exists($metode, self::REKENING)) {
-                    return redirect()->to(base_url('pesanan/upload-bukti/' . $idPesanan));
-                }
+                $metodeTerpilih = (string) ($detail['metode'] ?? '');
             }
+        }
+
+        if ($metodeTerpilih === '' || $metodeTerpilih === 'Belum Dipilih') {
+            $metodeTerpilih = (string) ($session->get('pesanan_metode_bayar') ?? '');
         }
 
         $idDb = (int) ($session->get('pesanan_id_db') ?? $idPesanan);
         $data = [
-            'id_pesanan_db' => $idDb,
-            'id_pesanan'    => $session->get('pesanan_id_pesanan') ?? ('PSN-' . date('Ymd') . '-001'),
-            'total'         => $session->get('pesanan_total') ?? 0,
-            'layanan'       => $session->get('pesanan_layanan') ?? '-',
+            'id_pesanan_db'   => $idDb,
+            'id_pesanan'      => $session->get('pesanan_id_pesanan') ?? ('PSN-' . date('Ymd') . '-001'),
+            'total'           => $session->get('pesanan_total') ?? 0,
+            'layanan'         => $session->get('pesanan_layanan') ?? '-',
+            'metode_terpilih' => $metodeTerpilih,
         ];
         return view('Pesanan/pembayaran', $data);
     }
@@ -366,7 +373,11 @@ class Pesanan extends BaseController
         $session   = session();
         $idPesanan = (int) ($id ?? $this->request->getPost('id_pesanan') ?? $session->get('pesanan_id_db') ?? 0);
         if ($idPesanan > 0) {
-            $this->muatDataPesanan($idPesanan);
+            $detail = $this->muatDataPesanan($idPesanan);
+            if ($detail && ($detail['status_pesanan'] ?? '') === 'dibatalkan') {
+                return redirect()->to(base_url('pesanan/riwayat'))
+                    ->with('errors', ['Pesanan ini telah dibatalkan dan tidak dapat diproses lagi.']);
+            }
         }
 
         $metode = (string) $this->request->getPost('metode_bayar');
@@ -377,7 +388,10 @@ class Pesanan extends BaseController
                 ->with('errors', ['Pilih metode pembayaran yang tersedia.']);
         }
 
-        if ($metode !== (string) $session->get('pesanan_metode_bayar')) {
+        $metodeLama    = (string) $session->get('pesanan_metode_bayar');
+        $metodeBerubah = ($metode !== $metodeLama);
+
+        if ($metodeBerubah) {
             $this->hapusBuktiTersimpan();
         }
 
@@ -401,7 +415,11 @@ class Pesanan extends BaseController
 
         if ($idPembayaranDb > 0) {
             try {
-                $pembayaranModel->update($idPembayaranDb, ['metode' => $metode]);
+                $updateData = ['metode' => $metode];
+                if ($metodeBerubah) {
+                    $updateData['bukti_bayar'] = null;
+                }
+                $pembayaranModel->update($idPembayaranDb, $updateData);
             } catch (\Throwable $th) {
             }
         }
@@ -420,6 +438,10 @@ class Pesanan extends BaseController
         if ($idPesanan > 0) {
             $detail = $this->muatDataPesanan($idPesanan);
             if ($detail) {
+                if (($detail['status_pesanan'] ?? '') === 'dibatalkan') {
+                    return redirect()->to(base_url('pesanan/riwayat'))
+                        ->with('errors', ['Pesanan ini telah dibatalkan dan tidak dapat mengunggah bukti pembayaran.']);
+                }
                 $stBayar = strtolower((string) ($detail['status_bayar'] ?? ''));
                 if (in_array($stBayar, ['lunas', 'menunggu_verifikasi'], true)) {
                     return redirect()->to(base_url('pesanan/tracking/' . $idPesanan));
@@ -458,7 +480,11 @@ class Pesanan extends BaseController
         $session   = session();
         $idPesanan = (int) ($id ?? $this->request->getPost('id_pesanan') ?? $session->get('pesanan_id_db') ?? 0);
         if ($idPesanan > 0) {
-            $this->muatDataPesanan($idPesanan);
+            $detail = $this->muatDataPesanan($idPesanan);
+            if ($detail && ($detail['status_pesanan'] ?? '') === 'dibatalkan') {
+                return redirect()->to(base_url('pesanan/riwayat'))
+                    ->with('errors', ['Pesanan ini telah dibatalkan dan tidak dapat mengunggah bukti pembayaran.']);
+            }
         }
 
         if ($session->get('pesanan_total') === null && $idPesanan <= 0) {
@@ -585,7 +611,11 @@ class Pesanan extends BaseController
         $idPesanan = (int) ($id ?? $this->request->getGet('id_pesanan') ?? $session->get('pesanan_id_db') ?? 0);
 
         if ($idPesanan > 0) {
-            $this->muatDataPesanan($idPesanan);
+            $detail = $this->muatDataPesanan($idPesanan);
+            if ($detail && ($detail['status_pesanan'] ?? '') === 'dibatalkan') {
+                return redirect()->to(base_url('pesanan/riwayat'))
+                    ->with('errors', ['Pesanan ini telah dibatalkan.']);
+            }
         }
 
         if ($session->get('pesanan_total') === null && $idPesanan <= 0) {
@@ -724,6 +754,126 @@ class Pesanan extends BaseController
             'selesai'    => array_values($selesai),
             'dibatalkan' => array_values($dibatalkan),
         ]);
+    }
+
+    /**
+     * Batalkan pesanan oleh pelanggan
+     * Hanya pesanan dengan status 'menunggu' atau 'dikonfirmasi' (belum diproses pengerjaan) yang dapat dibatalkan.
+     */
+    public function batalkanPesanan($id = null)
+    {
+        $idPelanggan = $this->getIdPelanggan();
+        $idPesanan   = (int) ($id ?? $this->request->getPost('id_pesanan') ?? 0);
+
+        if ($idPesanan <= 0) {
+            return redirect()->to(base_url('pesanan/riwayat'))
+                ->with('errors', ['ID pesanan tidak valid.']);
+        }
+
+        $pesananModel = new PesananModel();
+        $pesanan = $pesananModel->where('id_pesanan', $idPesanan)
+                                ->where('id_pelanggan', $idPelanggan)
+                                ->first();
+
+        if (! $pesanan) {
+            return redirect()->to(base_url('pesanan/riwayat'))
+                ->with('errors', ['Pesanan tidak ditemukan atau bukan milik akun Anda.']);
+        }
+
+        $stPesanan = (string) ($pesanan['status_pesanan'] ?? '');
+        if (! in_array($stPesanan, ['menunggu', 'dikonfirmasi'], true)) {
+            return redirect()->to(base_url('pesanan/riwayat'))
+                ->with('errors', ['Pesanan ini tidak dapat dibatalkan karena sudah dalam penanganan kurir / proses pengerjaan laundry.']);
+        }
+
+        // Proteksi: Hanya bisa dibatalkan jika BELUM upload bukti bayar
+        $pembayaranModel = new PembayaranModel();
+        $pb = $pembayaranModel->where('id_pesanan', $idPesanan)->first();
+        if ($pb) {
+            $stBayar    = strtolower((string) ($pb['status_bayar'] ?? ''));
+            $buktiBayar = (string) ($pb['bukti_bayar'] ?? '');
+            if (! empty($buktiBayar) || in_array($stBayar, ['menunggu_verifikasi', 'lunas'], true)) {
+                return redirect()->to(base_url('pesanan/riwayat'))
+                    ->with('errors', ['Pesanan tidak dapat dibatalkan karena Anda sudah mengunggah bukti pembayaran.']);
+            }
+        }
+
+        $alasan = trim((string) ($this->request->getPost('alasan') ?? ''));
+        $catatanBatal = $alasan !== '' ? ' [Dibatalkan pelanggan: ' . $alasan . ']' : ' [Dibatalkan oleh pelanggan]';
+        $catatanAkhir = trim(($pesanan['catatan'] ?? '') . $catatanBatal);
+
+        try {
+            $db = \Config\Database::connect();
+            $db->transStart();
+
+            // 1. Update status_pesanan menjadi 'dibatalkan'
+            $pesananModel->update($idPesanan, [
+                'status_pesanan' => 'dibatalkan',
+                'catatan'        => $catatanAkhir,
+            ]);
+
+            // 2. Update status_bayar di tabel pembayaran menjadi 'gagal'
+            $db->table('pembayaran')->where('id_pesanan', $idPesanan)->update([
+                'status_bayar' => 'gagal',
+            ]);
+
+            // 3. Jika sudah ada record di tabel distribusi, reset kurir
+            $dist = $db->table('distribusi')->where('id_pesanan', $idPesanan)->get()->getRowArray();
+            if ($dist) {
+                $db->table('distribusi')->where('id_pesanan', $idPesanan)->update([
+                    'status_antar' => 'menunggu_kurir',
+                ]);
+                if (! empty($dist['id_kurir'])) {
+                    $db->table('kurir')->where('id_kurir', (int) $dist['id_kurir'])->update([
+                        'status' => 'tersedia',
+                    ]);
+                }
+            }
+
+            // 4. Hapus file bukti transfer jika ada
+            $pb = $db->table('pembayaran')->where('id_pesanan', $idPesanan)->get()->getRowArray();
+            if ($pb && ! empty($pb['bukti_bayar'])) {
+                $path = FCPATH . self::DIR_BUKTI . '/' . basename($pb['bukti_bayar']);
+                if (is_file($path)) {
+                    @unlink($path);
+                }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return redirect()->to(base_url('pesanan/riwayat'))
+                    ->with('errors', ['Gagal membatalkan pesanan. Terjadi kesalahan pada database.']);
+            }
+
+            // Bersihkan session jika pesanan aktif adalah yang dibatalkan
+            if ((int) session()->get('pesanan_id_db') === $idPesanan) {
+                session()->remove([
+                    'pesanan_id_db',
+                    'pembayaran_id_db',
+                    'pesanan_id_pesanan',
+                    'pesanan_id_bayar',
+                    'pesanan_id_layanan',
+                    'pesanan_layanan',
+                    'pesanan_berat',
+                    'pesanan_total',
+                    'pesanan_alamat',
+                    'pesanan_tanggal',
+                    'pesanan_catatan',
+                    'pesanan_detail_satuan',
+                    'pesanan_metode_bayar',
+                    'pesanan_bukti',
+                ]);
+            }
+
+            $kodePesanan = 'PSN-' . date('dmY', strtotime((string)($pesanan['tanggal'] ?? 'now'))) . '-' . str_pad((string)$idPesanan, 3, '0', STR_PAD_LEFT);
+            return redirect()->to(base_url('pesanan/riwayat'))
+                ->with('success', 'Pesanan ' . $kodePesanan . ' berhasil dibatalkan.');
+        } catch (\Throwable $th) {
+            log_message('error', 'Gagal membatalkan pesanan: ' . $th->getMessage());
+            return redirect()->to(base_url('pesanan/riwayat'))
+                ->with('errors', ['Terjadi kesalahan saat membatalkan pesanan: ' . $th->getMessage()]);
+        }
     }
 
     /**

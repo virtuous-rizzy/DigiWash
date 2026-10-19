@@ -5,6 +5,7 @@
 /** @var array $ulasan */
 /** @var string $status_aktif */
 /** @var string|null $keyword */
+/** @var int $jml_semua */
 /** @var int $jml_belum */
 /** @var int $jml_proses */
 /** @var int $jml_selesai */
@@ -70,6 +71,13 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
 
 <!-- Filter Tabs -->
 <div class="filter-tabs">
+    <a href="?status=Semua<?= $keyword ? '&keyword='.$e($keyword) : '' ?>"
+       class="tab-pill <?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'active' : '' ?>">
+        Semua
+        <span class="<?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'badge-count' : 'badge-inactive' ?>">
+            <?= $jml_semua ?? 0 ?>
+        </span>
+    </a>
     <a href="?status=Belum ditindaklanjuti<?= $keyword ? '&keyword='.$e($keyword) : '' ?>"
        class="tab-pill <?= $status_aktif == 'Belum ditindaklanjuti' ? 'active' : '' ?>">
         Belum ditindaklanjuti
@@ -108,14 +116,21 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
     <div class="ulasan-card">
         <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
             <!-- User info -->
+            <?php
+            $fotoUrl       = url_foto_profil($row['foto'] ?? null);
+            $namaPelanggan = (string)($row['nama'] ?? 'Pelanggan');
+            $inisial       = strtoupper(substr(trim($namaPelanggan), 0, 2));
+            ?>
             <div style="display:flex; align-items:center; gap:10px;">
-                <?php if (!empty($row['foto'])): ?>
-                    <img src="<?= base_url('uploads/'.$row['foto']) ?>" class="avatar-sm" alt="">
+                <?php if ($fotoUrl): ?>
+                    <img src="<?= $e($fotoUrl) ?>" class="avatar-sm" alt="<?= $e($namaPelanggan) ?>"
+                         onerror="this.style.display='none'; if(this.nextElementSibling){ this.nextElementSibling.style.display='flex'; }">
+                    <div class="avatar-sm" style="display:none;"><?= $e($inisial) ?></div>
                 <?php else: ?>
-                    <div class="avatar-sm"><?= strtoupper(substr($row['nama'], 0, 2)) ?></div>
+                    <div class="avatar-sm"><?= $e($inisial) ?></div>
                 <?php endif; ?>
                 <div>
-                    <div style="font-weight:600; font-size:13px; color:#1b2a3a;"><?= $e($row['nama']) ?></div>
+                    <div style="font-weight:600; font-size:13px; color:#1b2a3a;"><?= $e($namaPelanggan) ?></div>
                     <div style="font-size:11px; color:#99aaaa;"><?= date('d M Y - H:i', strtotime($row['tanggal'] ?? $row['created_at'] ?? 'now')) ?></div>
                 </div>
             </div>
@@ -135,12 +150,11 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
         <!-- Pesan -->
         <p style="font-size:13px; color:#1b2a3a; margin:0 0 8px; line-height:1.4;"><?= $e($row['isi_pesan'] ?? $row['pesan'] ?? '') ?></p>
 
-        <div style="font-size:11px; color:#99aaaa; margin-bottom:10px; display:flex; justify-content:space-between;">
-            <span>Pesanan: <?= $e($row['no_pesanan'] ?? '-') ?></span>
-            <?php if (!empty($row['nama_admin'])): ?>
+        <?php if (!empty($row['nama_admin'])): ?>
+            <div style="font-size:11px; margin-bottom:10px; text-align:right;">
                 <span style="color:#033B59; font-weight:600;"><i class="bi bi-person-check-fill me-1"></i>Ditangani: <?= $e($row['nama_admin']) ?></span>
-            <?php endif; ?>
-        </div>
+            </div>
+        <?php endif; ?>
 
         <!-- Ubah Status (Admin only) -->
         <?php $idKritik = $row['id_kritik_saran'] ?? $row['id_kritik'] ?? 0; ?>
@@ -157,7 +171,7 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
 <?php else: ?>
     <div class="panel kosong" style="text-align:center; padding:30px;">
         <div style="font-size:36px; margin-bottom:8px;">🔍</div>
-        <p style="color:#99aaaa;">Tidak ada data <?= $e($status_aktif) ?> yang ditemukan.</p>
+        <p style="color:#99aaaa;">Tidak ada data kritik &amp; saran <?= ($status_aktif && strtolower($status_aktif) !== 'semua') ? 'dengan status ' . $e($status_aktif) : '' ?> yang ditemukan.</p>
     </div>
 <?php endif; ?>
 

@@ -55,7 +55,24 @@ class PembayaranModel extends Model
             ->join('pelanggan pl', 'pl.id_pelanggan = ps.id_pelanggan', 'left')
             ->join('layanan l',    'l.id_layanan = ps.id_layanan', 'left');
 
-        if (! empty($status) && $status !== 'semua') {
+        if ($status === 'dibatalkan') {
+            $builder->groupStart()
+                ->like('ps.catatan', 'dibatalkan')
+                ->orGroupStart()
+                    ->whereIn('ps.status_pesanan', ['dibatalkan'])
+                    ->where('pb.id_admin IS NULL')
+                ->groupEnd()
+            ->groupEnd();
+        } elseif ($status === 'ditolak') {
+            $builder->where('pb.status_bayar', 'gagal')
+                ->groupStart()
+                    ->where('pb.id_admin IS NOT NULL')
+                    ->orLike('ps.catatan', 'ditolak')
+                ->groupEnd()
+                ->notLike('ps.catatan', 'dibatalkan');
+        } elseif ($status === 'gagal') {
+            $builder->where('pb.status_bayar', 'gagal');
+        } elseif (! empty($status) && $status !== 'semua') {
             $builder->where('pb.status_bayar', $status);
         }
 
@@ -134,12 +151,31 @@ class PembayaranModel extends Model
         ]);
 
         if (! empty($transaksi['id_pesanan'])) {
+            $idPesananInt = (int) $transaksi['id_pesanan'];
+            $currentPsn = $this->db->table('pesanan')->where('id_pesanan', $idPesananInt)->get()->getRowArray();
+            $catatanPsn = trim((string)($currentPsn['catatan'] ?? ''));
+            if (! str_contains(strtolower($catatanPsn), 'ditolak')) {
+                $catatanPsn = trim($catatanPsn . ' [Ditolak oleh Admin]');
+            }
+
             $this->db->table('pesanan')
-                ->where('id_pesanan', (int) $transaksi['id_pesanan'])
+                ->where('id_pesanan', $idPesananInt)
                 ->update([
                     'status_pesanan' => 'dibatalkan',
                     'id_admin'       => $idAdmin,
+                    'catatan'        => $catatanPsn,
                 ]);
+
+            $dist = $this->db->table('distribusi')->where('id_pesanan', $idPesananInt)->get()->getRowArray();
+            if ($dist) {
+                if (! empty($dist['id_kurir'])) {
+                    $this->db->table('kurir')->where('id_kurir', (int) $dist['id_kurir'])->update(['status' => 'tersedia']);
+                }
+                $this->db->table('distribusi')->where('id_pesanan', $idPesananInt)->update([
+                    'id_kurir'     => null,
+                    'status_antar' => 'menunggu_kurir',
+                ]);
+            }
         }
 
         return true;

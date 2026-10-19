@@ -27,25 +27,40 @@ class TransaksiAdm extends BaseController
         }
 
         // Hitung statistik transaksi
-        $totalMenunggu = 0;
-        $totalLunas    = 0;
-        $totalDitolak  = 0;
+        $totalMenunggu   = 0;
+        $totalLunas      = 0;
+        $totalDitolak    = 0;
+        $totalDibatalkan = 0;
+        $totalSemua      = 0;
 
         try {
             $db = \Config\Database::connect();
-            $counts = $db->table('pembayaran')
-                ->select("status_bayar, COUNT(*) as jml")
-                ->groupBy('status_bayar')
+            $totalSemua = (int) $db->table('pembayaran')->countAllResults();
+
+            $totalMenunggu = (int) $db->table('pembayaran')
+                ->where('status_bayar', 'menunggu_verifikasi')
+                ->countAllResults();
+
+            $totalLunas = (int) $db->table('pembayaran')
+                ->where('status_bayar', 'lunas')
+                ->countAllResults();
+
+            $allGagalOrBatal = $db->table('pembayaran pb')
+                ->select('pb.status_bayar, pb.id_admin, ps.status_pesanan, ps.catatan')
+                ->join('pesanan ps', 'ps.id_pesanan = pb.id_pesanan', 'left')
+                ->groupStart()
+                    ->where('pb.status_bayar', 'gagal')
+                    ->orWhere('ps.status_pesanan', 'dibatalkan')
+                ->groupEnd()
                 ->get()
                 ->getResultArray();
 
-            foreach ($counts as $c) {
-                if ($c['status_bayar'] === 'menunggu_verifikasi') {
-                    $totalMenunggu = (int) $c['jml'];
-                } elseif ($c['status_bayar'] === 'lunas') {
-                    $totalLunas = (int) $c['jml'];
-                } elseif ($c['status_bayar'] === 'gagal') {
-                    $totalDitolak = (int) $c['jml'];
+            foreach ($allGagalOrBatal as $r) {
+                $cLower = strtolower((string)($r['catatan'] ?? ''));
+                if (str_contains($cLower, 'dibatalkan') || ($r['status_pesanan'] === 'dibatalkan' && empty($r['id_admin']) && !str_contains($cLower, 'ditolak'))) {
+                    $totalDibatalkan++;
+                } else {
+                    $totalDitolak++;
                 }
             }
         } catch (\Throwable $th) {
@@ -98,14 +113,15 @@ class TransaksiAdm extends BaseController
         }
 
         $data = [
-            'transaksi'     => $transaksi,
-            'statusFilter'  => $statusFilter,
-            'keyword'       => $keyword,
-            'totalMenunggu' => $totalMenunggu,
-            'totalLunas'    => $totalLunas,
-            'totalDitolak'  => $totalDitolak,
-            'totalSemua'    => count($transaksi),
-            'aktif'         => 'transaksi',
+            'transaksi'       => $transaksi,
+            'statusFilter'    => $statusFilter,
+            'keyword'         => $keyword,
+            'totalMenunggu'   => $totalMenunggu,
+            'totalLunas'      => $totalLunas,
+            'totalDitolak'    => $totalDitolak,
+            'totalDibatalkan' => $totalDibatalkan,
+            'totalSemua'      => $totalSemua > 0 ? $totalSemua : count($transaksi),
+            'aktif'           => 'transaksi',
         ];
 
         return view('admin/transaksi_adm', $data);

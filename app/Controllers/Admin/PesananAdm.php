@@ -43,7 +43,7 @@ class PesananAdm extends BaseController
     public function statusLaundry()
     {
         $tab = (string) ($this->request->getGet('tab') ?? 'semua');
-        if (! in_array($tab, ['semua', 'diproses', 'diantar', 'selesai'], true)) {
+        if (! in_array($tab, ['semua', 'diproses', 'diantar', 'selesai', 'dibatalkan', 'ditolak'], true)) {
             $tab = 'semua';
         }
 
@@ -53,10 +53,12 @@ class PesananAdm extends BaseController
         $kurirModel = new \App\Models\KurirModel();
         $pesanan    = [];
         $counts     = [
-            'semua'    => 0,
-            'diproses' => 0,
-            'diantar'  => 0,
-            'selesai'  => 0,
+            'semua'      => 0,
+            'diproses'   => 0,
+            'diantar'    => 0,
+            'selesai'    => 0,
+            'dibatalkan' => 0,
+            'ditolak'    => 0,
         ];
         $kurirList  = [];
 
@@ -131,16 +133,24 @@ class PesananAdm extends BaseController
                     ->with('errors', ['Pembayaran pesanan ini belum berstatus Lunas. Silakan verifikasi pembayaran di menu Transaksi terlebih dahulu.']);
             }
 
-            $model->update($idPesanan, [
-                'status_pesanan' => $status,
-                'id_admin'       => $idAdmin,
-            ]);
-
-            // Jika admin membatalkan pesanan, sinkronkan juga ke tabel pembayaran
             if ($status === 'dibatalkan') {
+                $catatanLama = trim((string)($pesanan['catatan'] ?? ''));
+                if (! str_contains(strtolower($catatanLama), 'dibatalkan') && ! str_contains(strtolower($catatanLama), 'ditolak')) {
+                    $catatanLama = trim($catatanLama . ' [Dibatalkan oleh Admin]');
+                }
+                $model->update($idPesanan, [
+                    'status_pesanan' => $status,
+                    'id_admin'       => $idAdmin,
+                    'catatan'        => $catatanLama,
+                ]);
                 $db->table('pembayaran')->where('id_pesanan', $idPesanan)->update([
                     'status_bayar' => 'gagal',
                     'id_admin'     => $idAdmin,
+                ]);
+            } else {
+                $model->update($idPesanan, [
+                    'status_pesanan' => $status,
+                    'id_admin'       => $idAdmin,
                 ]);
             }
 

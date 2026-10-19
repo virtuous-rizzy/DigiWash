@@ -130,5 +130,7 @@ $routes->group('pesanan', ['filter' => 'role:pelanggan', 'namespace' => 'App\Con
     $routes->post('simpan-bukti', 'Pesanan::simpanBukti');
     $routes->post('simpan-bukti/(:num)', 'Pesanan::simpanBukti/$1');
     $routes->get('riwayat', 'Pesanan::riwayatPesanan');
+    $routes->post('batalkan', 'Pesanan::batalkanPesanan');
+    $routes->post('batalkan/(:num)', 'Pesanan::batalkanPesanan/$1');
     $routes->get('notifikasi', 'Pesanan::notifikasi');
 });

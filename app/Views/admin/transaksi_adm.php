@@ -317,6 +317,24 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
     background: #FFEBEE;
     color: #C62828;
 }
+.status-batal {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.trx-cancel-note {
+    font-size: 11px;
+    font-weight: 500;
+    color: #991B1B;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 6px;
+    max-width: 100%;
+    word-break: break-word;
+}
 
 /* Card Actions (Footer) */
 .card-actions-row {
@@ -380,6 +398,21 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
     font-size: 12px;
     font-weight: 600;
     cursor: default;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-batal-static {
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: 1px solid #FCA5A5;
+    background: #FEF2F2;
+    color: #991B1B;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: default;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* ── Empty State ── */
@@ -467,8 +500,15 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
         <span class="chip-badge"><?= (int) ($totalLunas ?? 0) ?></span>
     </a>
 
-    <a href="<?= base_url('admin/transaksi?status=gagal' . ($keyword !== '' ? '&q=' . urlencode($keyword) : '')) ?>"
-       class="chip-btn <?= ($statusFilter === 'gagal') ? 'active' : '' ?>">
+    <a href="<?= base_url('admin/transaksi?status=dibatalkan' . ($keyword !== '' ? '&q=' . urlencode($keyword) : '')) ?>"
+       class="chip-btn <?= ($statusFilter === 'dibatalkan') ? 'active' : '' ?>">
+        <i class="bi bi-slash-circle text-danger"></i>
+        Dibatalkan
+        <span class="chip-badge"><?= (int) ($totalDibatalkan ?? 0) ?></span>
+    </a>
+
+    <a href="<?= base_url('admin/transaksi?status=ditolak' . ($keyword !== '' ? '&q=' . urlencode($keyword) : '')) ?>"
+       class="chip-btn <?= ($statusFilter === 'ditolak' || $statusFilter === 'gagal') ? 'active' : '' ?>">
         <i class="bi bi-x-circle text-danger"></i>
         Ditolak
         <span class="chip-badge"><?= (int) ($totalDitolak ?? 0) ?></span>
@@ -483,7 +523,7 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
             <i class="bi bi-inbox empty-icon"></i>
             <div class="empty-title">Tidak Ada Transaksi</div>
             <div class="empty-desc">
-                <?= !empty($keyword) ? 'Tidak ditemukan transaksi dengan kata kunci tersebut.' : 'Belum ada pesanan yang perlu diverifikasi.' ?>
+                <?= !empty($keyword) ? 'Tidak ditemukan transaksi dengan kata kunci tersebut.' : 'Belum ada transaksi pada filter ini.' ?>
             </div>
         </div>
     <?php else: ?>
@@ -501,6 +541,13 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
             $statusBayar  = (string) ($t['status_bayar'] ?? 'menunggu_verifikasi');
             $metodeBayar  = (string) ($t['metode'] ?? 'Bank BCA');
             $buktiBayar   = !empty($t['bukti_bayar']) ? base_url('uploads/bukti/' . $t['bukti_bayar']) : null;
+            $catatanPsn   = (string) ($t['catatan'] ?? '');
+            $stPesanan    = (string) ($t['status_pesanan'] ?? '');
+            $idAdminTrx   = $t['id_admin'] ?? null;
+
+            // Cek apakah transaksi dibatalkan oleh pelanggan vs ditolak admin
+            $catatanLower = strtolower($catatanPsn);
+            $isBatalPelanggan = str_contains($catatanLower, 'dibatalkan') || ($stPesanan === 'dibatalkan' && empty($idAdminTrx) && !str_contains($catatanLower, 'ditolak'));
         ?>
             <div class="transaksi-card" id="trx-card-<?= (int)$t['id_pembayaran'] ?>">
 
@@ -536,6 +583,11 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
                                     </a>
                                 <?php endif; ?>
                             </div>
+                            <?php if (!empty($catatanPsn) && ($isBatalPelanggan || str_contains($catatanLower, 'ditolak'))): ?>
+                                <div class="trx-cancel-note">
+                                    <i class="bi bi-info-circle me-1"></i><?= esc($catatanPsn) ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -545,8 +597,10 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
                             <span class="status-badge status-menunggu">Menunggu Verifikasi</span>
                         <?php elseif ($statusBayar === 'lunas'): ?>
                             <span class="status-badge status-lunas"><i class="bi bi-check2-circle me-1"></i>Lunas</span>
+                        <?php elseif ($isBatalPelanggan): ?>
+                            <span class="status-badge status-batal"><i class="bi bi-slash-circle me-1"></i>Dibatalkan</span>
                         <?php else: ?>
-                            <span class="status-badge status-gagal">Ditolak</span>
+                            <span class="status-badge status-gagal"><i class="bi bi-x-circle me-1"></i>Ditolak</span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -582,6 +636,9 @@ $totalSemua    = (int) ($totalSemua ?? count($transaksi));
 
                     <?php elseif ($statusBayar === 'lunas'): ?>
                         <span class="btn-lunas-static"><i class="bi bi-check-circle-fill me-1"></i>Lunas (Dikonfirmasi)</span>
+
+                    <?php elseif ($isBatalPelanggan): ?>
+                        <span class="btn-batal-static"><i class="bi bi-slash-circle me-1"></i>Dibatalkan</span>
 
                     <?php else: ?>
                         <span class="btn-ditolak-static"><i class="bi bi-x-circle me-1"></i>Ditolak</span>

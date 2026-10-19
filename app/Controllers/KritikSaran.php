@@ -67,7 +67,6 @@ class KritikSaran extends BaseController
         $this->kritikModel->save([
             'id_pelanggan' => $id_pengirim,
             'id_admin'     => null, // Belum ditindaklanjuti oleh admin
-            'no_pesanan'   => '#INV-' . date('dmy') . '-' . sprintf('%03d', rand(1, 999)),
             'rating'       => $this->request->getPost('rating') ?? 5,
             'isi_pesan'    => $pesanInput,
             'jenis'        => $this->request->getPost('jenis') ?? 'Saran',
@@ -93,17 +92,22 @@ class KritikSaran extends BaseController
     {
         $role = session()->get('role');
 
-        $status_aktif = $this->request->getGet('status') ?? 'Belum ditindaklanjuti';
+        $status_aktif = (string) ($this->request->getGet('status') ?? 'Semua');
+        if ($status_aktif === '') {
+            $status_aktif = 'Semua';
+        }
         $keyword = $this->request->getGet('keyword');
+        $db = \Config\Database::connect();
 
         // Pelanggan: hanya riwayat sendiri
         if ($role === 'pelanggan') {
             $id_pelanggan = session()->get('id_pelanggan');
             $data = [
                 'ulasan'      => $this->kritikModel->getKritikByPelanggan($id_pelanggan, $status_aktif, $keyword),
-                'jml_belum'   => $this->kritikModel->where('id_pelanggan', $id_pelanggan)->where('status', 'Belum ditindaklanjuti')->countAllResults(),
-                'jml_proses'  => $this->kritikModel->where('id_pelanggan', $id_pelanggan)->where('status', 'Dalam Proses')->countAllResults(),
-                'jml_selesai' => $this->kritikModel->where('id_pelanggan', $id_pelanggan)->where('status', 'Selesai')->countAllResults(),
+                'jml_semua'   => (int) $db->table('kritik_saran')->where('id_pelanggan', $id_pelanggan)->countAllResults(),
+                'jml_belum'   => (int) $db->table('kritik_saran')->where('id_pelanggan', $id_pelanggan)->where('status', 'Belum ditindaklanjuti')->countAllResults(),
+                'jml_proses'  => (int) $db->table('kritik_saran')->where('id_pelanggan', $id_pelanggan)->where('status', 'Dalam Proses')->countAllResults(),
+                'jml_selesai' => (int) $db->table('kritik_saran')->where('id_pelanggan', $id_pelanggan)->where('status', 'Selesai')->countAllResults(),
                 'status_aktif'=> $status_aktif,
                 'keyword'     => $keyword
             ];
@@ -114,9 +118,10 @@ class KritikSaran extends BaseController
         if ($role === 'kurir') {
             $data = [
                 'ulasan'      => $this->kritikModel->getKritikDenganPelanggan($status_aktif, $keyword),
-                'jml_belum'   => $this->kritikModel->where('status', 'Belum ditindaklanjuti')->countAllResults(),
-                'jml_proses'  => $this->kritikModel->where('status', 'Dalam Proses')->countAllResults(),
-                'jml_selesai' => $this->kritikModel->where('status', 'Selesai')->countAllResults(),
+                'jml_semua'   => (int) $db->table('kritik_saran')->countAllResults(),
+                'jml_belum'   => (int) $db->table('kritik_saran')->where('status', 'Belum ditindaklanjuti')->countAllResults(),
+                'jml_proses'  => (int) $db->table('kritik_saran')->where('status', 'Dalam Proses')->countAllResults(),
+                'jml_selesai' => (int) $db->table('kritik_saran')->where('status', 'Selesai')->countAllResults(),
                 'status_aktif'=> $status_aktif,
                 'keyword'     => $keyword
             ];
@@ -126,9 +131,10 @@ class KritikSaran extends BaseController
         // Admin: lihat semua + bisa menindaklanjuti
         $data = [
             'ulasan'      => $this->kritikModel->getKritikDenganPelanggan($status_aktif, $keyword),
-            'jml_belum'   => $this->kritikModel->where('status', 'Belum ditindaklanjuti')->countAllResults(),
-            'jml_proses'  => $this->kritikModel->where('status', 'Dalam Proses')->countAllResults(),
-            'jml_selesai' => $this->kritikModel->where('status', 'Selesai')->countAllResults(),
+            'jml_semua'   => (int) $db->table('kritik_saran')->countAllResults(),
+            'jml_belum'   => (int) $db->table('kritik_saran')->where('status', 'Belum ditindaklanjuti')->countAllResults(),
+            'jml_proses'  => (int) $db->table('kritik_saran')->where('status', 'Dalam Proses')->countAllResults(),
+            'jml_selesai' => (int) $db->table('kritik_saran')->where('status', 'Selesai')->countAllResults(),
             'status_aktif'=> $status_aktif,
             'keyword'     => $keyword
         ];

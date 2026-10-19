@@ -94,6 +94,14 @@
 
         <!-- Filter Tabs yang bisa di-scroll / swipe (flex-nowrap) -->
         <div class="filter-tabs mb-3 d-flex gap-2 flex-nowrap">
+            <a href="?status=Semua<?= $keyword ? '&keyword='.$keyword : '' ?>" 
+               class="tab-pill <?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'active' : '' ?>">
+                Semua 
+                <span class="<?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'badge-count' : 'badge-inactive' ?>">
+                    <?= isset($jml_semua) ? $jml_semua : 0 ?>
+                </span>
+            </a>
+
             <a href="?status=Belum ditindaklanjuti<?= $keyword ? '&keyword='.$keyword : '' ?>" 
                class="tab-pill <?= $status_aktif == 'Belum ditindaklanjuti' ? 'active' : '' ?>">
                 Belum ditindaklanjuti 
@@ -138,16 +146,25 @@
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <!-- User Info -->
+                        <?php
+                        $fotoUrl       = url_foto_profil($row['foto'] ?? null);
+                        $namaPelanggan = (string)($row['nama'] ?? 'Pelanggan');
+                        $inisial       = strtoupper(substr(trim($namaPelanggan), 0, 2));
+                        ?>
                         <div class="d-flex align-items-center gap-2">
-                            <?php if($row['foto']): ?>
-                                <img src="<?= base_url('uploads/'.$row['foto']) ?>" class="avatar">
+                            <?php if($fotoUrl): ?>
+                                <img src="<?= esc($fotoUrl) ?>" class="avatar" alt="<?= esc($namaPelanggan) ?>"
+                                     onerror="this.style.display='none'; if(this.nextElementSibling){ this.nextElementSibling.style.display='flex'; }">
+                                <div class="avatar bg-secondary" style="display:none;">
+                                    <?= esc($inisial) ?>
+                                </div>
                             <?php else: ?>
                                 <div class="avatar bg-secondary">
-                                    <?= strtoupper(substr($row['nama'], 0, 2)) ?>
+                                    <?= esc($inisial) ?>
                                 </div>
                             <?php endif; ?>
                             <div>
-                                <div class="fw-bold text-dark-custom" style="font-size: 14px;"><?= esc($row['nama']) ?></div>
+                                <div class="fw-bold text-dark-custom" style="font-size: 14px;"><?= esc($namaPelanggan) ?></div>
                                 <div class="text-muted-custom" style="font-size: 12px;"><?= date('d M Y - H:i', strtotime($row['tanggal'] ?? $row['created_at'] ?? 'now')) ?></div>
                             </div>
                         </div>
@@ -170,9 +187,7 @@
                         <?= esc($row['isi_pesan'] ?? $row['pesan'] ?? '') ?>
                     </p>
                     
-                    <div class="text-muted-custom" style="font-size: 11px;">
-                        Pesanan : <?= esc($row['no_pesanan'] ?? '-') ?>
-                    </div>
+
                 </div>
             </div>
             

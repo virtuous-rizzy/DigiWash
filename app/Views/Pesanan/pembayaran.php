@@ -116,20 +116,18 @@
 
     <!-- Header -->
     <div class="page-header">
-        <?php
-        $from       = (string) (request()->getGet('from') ?? '');
-        $referer    = (string) ($_SERVER['HTTP_REFERER'] ?? '');
-        if ($from === 'notifikasi' || str_contains($referer, 'notifikasi')) {
-            $backUrl = base_url('pesanan/notifikasi');
-        } elseif (str_contains($referer, 'riwayat') || str_contains($referer, 'pesanan/riwayat') || $from === 'riwayat') {
-            $backUrl = base_url('pesanan/riwayat');
-        } else {
-            $backUrl = base_url('pesanan/ringkasan');
-        }
-        ?>
-        <a href="<?= $backUrl ?>" class="btn-back">&#8592;</a>
+        <?php $metode_terpilih = (string) ($metode_terpilih ?? ''); ?>
+        <a href="<?= base_url('dashboard') ?>" class="btn-back" title="Kembali ke Beranda" aria-label="Kembali">&#8592;</a>
         <span class="page-title">Pembayaran</span>
     </div>
+
+    <?php if (session()->getFlashdata('errors')): ?>
+        <div class="alert alert-danger mx-4 mb-3" style="font-size: 13px; border-radius: 8px;">
+            <?php foreach ((array) session()->getFlashdata('errors') as $err): ?>
+                <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Order Summary -->
     <div class="order-summary-card">
@@ -164,8 +162,9 @@
             </div>
             <div class="method-group-body" id="body-bank">
 
-                <label class="method-option" for="pay_bca">
+                <label class="method-option <?= ($metode_terpilih === 'Bank BCA') ? 'selected' : '' ?>" for="pay_bca">
                     <input type="radio" id="pay_bca" name="metode_bayar" value="Bank BCA"
+                        <?= ($metode_terpilih === 'Bank BCA') ? 'checked' : '' ?>
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-bca">BCA</span>
                     <div>
@@ -174,8 +173,9 @@
                     </div>
                 </label>
 
-                <label class="method-option" for="pay_bri">
+                <label class="method-option <?= ($metode_terpilih === 'Bank BRI') ? 'selected' : '' ?>" for="pay_bri">
                     <input type="radio" id="pay_bri" name="metode_bayar" value="Bank BRI"
+                        <?= ($metode_terpilih === 'Bank BRI') ? 'checked' : '' ?>
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-bri">BRI</span>
                     <div>
@@ -184,8 +184,9 @@
                     </div>
                 </label>
 
-                <label class="method-option" for="pay_bni">
+                <label class="method-option <?= ($metode_terpilih === 'Bank BNI') ? 'selected' : '' ?>" for="pay_bni">
                     <input type="radio" id="pay_bni" name="metode_bayar" value="Bank BNI"
+                        <?= ($metode_terpilih === 'Bank BNI') ? 'checked' : '' ?>
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-bni">BNI</span>
                     <div>
@@ -194,8 +195,9 @@
                     </div>
                 </label>
 
-                <label class="method-option" for="pay_mandiri">
+                <label class="method-option <?= ($metode_terpilih === 'Bank Mandiri') ? 'selected' : '' ?>" for="pay_mandiri">
                     <input type="radio" id="pay_mandiri" name="metode_bayar" value="Bank Mandiri"
+                        <?= ($metode_terpilih === 'Bank Mandiri') ? 'checked' : '' ?>
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-mandiri">MDR</span>
                     <div>
@@ -215,8 +217,9 @@
             </div>
             <div class="method-group-body" id="body-ewallet">
 
-                <label class="method-option" for="pay_dana">
+                <label class="method-option <?= ($metode_terpilih === 'DANA') ? 'selected' : '' ?>" for="pay_dana">
                     <input type="radio" id="pay_dana" name="metode_bayar" value="DANA"
+                        <?= ($metode_terpilih === 'DANA') ? 'checked' : '' ?>
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-dana" style="font-size:9px;">DANA</span>
                     <div>
@@ -225,8 +228,9 @@
                     </div>
                 </label>
 
-                <label class="method-option" for="pay_gopay">
+                <label class="method-option <?= ($metode_terpilih === 'GoPay') ? 'selected' : '' ?>" for="pay_gopay">
                     <input type="radio" id="pay_gopay" name="metode_bayar" value="GoPay"
+                        <?= ($metode_terpilih === 'GoPay') ? 'checked' : '' ?>
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-gopay">GP</span>
                     <div>
@@ -235,8 +239,9 @@
                     </div>
                 </label>
 
-                <label class="method-option" for="pay_spay">
+                <label class="method-option <?= ($metode_terpilih === 'ShopeePay') ? 'selected' : '' ?>" for="pay_spay">
                     <input type="radio" id="pay_spay" name="metode_bayar" value="ShopeePay"
+                        <?= ($metode_terpilih === 'ShopeePay') ? 'checked' : '' ?>
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-spay" style="font-size:9px;">SPAY</span>
                     <div>
@@ -250,7 +255,7 @@
 
         <!-- Pay button -->
         <button type="submit" class="btn-bayar" id="btnBayar" onclick="return validasiMetode()">
-            Bayar Sekarang →
+            <?= (!empty($metode_terpilih) && $metode_terpilih !== 'Belum Dipilih') ? 'Simpan & Lanjutkan →' : 'Bayar Sekarang →' ?>
         </button>
 
     </form>

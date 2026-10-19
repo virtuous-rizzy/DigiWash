@@ -10,7 +10,6 @@ class KritikSaranModel extends Model
     protected $allowedFields    = [
         'id_pelanggan',
         'id_admin',
-        'no_pesanan',
         'rating',
         'isi_pesan',
         'jenis',
@@ -26,14 +25,14 @@ class KritikSaranModel extends Model
     /**
      * Ambil semua kritik beserta data pelanggan & admin penindak lanjut (untuk Admin & Kurir)
      */
-    public function getKritikDenganPelanggan($status = 'Belum ditindaklanjuti', $keyword = null)
+    public function getKritikDenganPelanggan($status = 'Semua', $keyword = null)
     {
         $builder = $this->select('kritik_saran.*, pelanggan.nama, pelanggan.foto, admin.nama AS nama_admin')
-                        ->join('pelanggan', 'pelanggan.id_pelanggan = kritik_saran.id_pelanggan')
+                        ->join('pelanggan', 'pelanggan.id_pelanggan = kritik_saran.id_pelanggan', 'left')
                         ->join('admin', 'admin.id_admin = kritik_saran.id_admin', 'left');
         
-        // Filter berdasarkan Status (Belum ditindaklanjuti, Dalam Proses, Selesai)
-        if ($status) {
+        // Filter berdasarkan Status jika bukan 'Semua'
+        if ($status && strtolower($status) !== 'semua') {
             $builder->where('kritik_saran.status', $status);
         }
 
@@ -42,7 +41,6 @@ class KritikSaranModel extends Model
             $builder->groupStart()
                     ->like('pelanggan.nama', $keyword)
                     ->orLike('kritik_saran.isi_pesan', $keyword)
-                    ->orLike('kritik_saran.no_pesanan', $keyword)
                     ->orLike('kritik_saran.jenis', $keyword)
                     ->groupEnd();
         }
@@ -59,14 +57,14 @@ class KritikSaranModel extends Model
                         ->join('admin', 'admin.id_admin = kritik_saran.id_admin', 'left')
                         ->where('kritik_saran.id_pelanggan', $id_pelanggan);
 
-        if ($status) {
+        // Filter berdasarkan Status jika bukan 'Semua'
+        if ($status && strtolower($status) !== 'semua') {
             $builder->where('kritik_saran.status', $status);
         }
 
         if ($keyword) {
             $builder->groupStart()
                     ->like('kritik_saran.isi_pesan', $keyword)
-                    ->orLike('kritik_saran.no_pesanan', $keyword)
                     ->orLike('kritik_saran.jenis', $keyword)
                     ->groupEnd();
         }

@@ -104,7 +104,6 @@ CREATE TABLE `kritik_saran` (
   `id_kritik_saran` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_pelanggan` int(10) unsigned NOT NULL,
   `id_admin` int(10) unsigned DEFAULT NULL,
-  `no_pesanan` varchar(50) DEFAULT NULL,
   `rating` tinyint(3) unsigned DEFAULT 5,
   `isi_pesan` text NOT NULL,
   `jenis` varchar(20) DEFAULT 'Saran',
@@ -126,7 +125,7 @@ CREATE TABLE `kritik_saran` (
 
 LOCK TABLES `kritik_saran` WRITE;
 /*!40000 ALTER TABLE `kritik_saran` DISABLE KEYS */;
-INSERT INTO `kritik_saran` VALUES (1,2,1,'#INV-181026-836',4,'Saya ingin pakaian saya diantar kurir nya sama abang yugo','Saran','Selesai',NULL,NULL,'2026-10-17 20:54:58');
+INSERT INTO `kritik_saran` VALUES (1,2,1,4,'Saya ingin pakaian saya diantar kurir nya sama abang yugo','Saran','Selesai',NULL,NULL,'2026-10-17 20:54:58');
 /*!40000 ALTER TABLE `kritik_saran` ENABLE KEYS */;
 UNLOCK TABLES;
 

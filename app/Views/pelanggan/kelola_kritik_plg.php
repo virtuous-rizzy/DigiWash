@@ -55,6 +55,13 @@ $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 
 <!-- Filter Tabs -->
 <div class="filter-tabs">
+    <a href="?status=Semua<?= $keyword ? '&keyword='.$e($keyword) : '' ?>"
+       class="tab-pill <?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'active' : '' ?>">
+        Semua
+        <span class="<?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'badge-count' : 'badge-inactive' ?>">
+            <?= $jml_semua ?? 0 ?>
+        </span>
+    </a>
     <a href="?status=Belum ditindaklanjuti<?= $keyword ? '&keyword='.$e($keyword) : '' ?>"
        class="tab-pill <?= $status_aktif == 'Belum ditindaklanjuti' ? 'active' : '' ?>">
         Belum
@@ -104,9 +111,8 @@ $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 
         <p style="font-size:13px; color:#1b2a3a; margin:0 0 6px; line-height:1.4;"><?= $e($row['isi_pesan'] ?? $row['pesan'] ?? '') ?></p>
 
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:#99aaaa;">
-            <span>Pesanan: <?= $e($row['no_pesanan'] ?? '-') ?></span>
-            <span><?= date('d M Y', strtotime($row['tanggal'] ?? $row['created_at'] ?? 'now')) ?></span>
+        <div style="font-size:11px; color:#99aaaa;">
+            <span><i class="bi bi-calendar-event me-1"></i><?= date('d M Y', strtotime($row['tanggal'] ?? $row['created_at'] ?? 'now')) ?></span>
         </div>
 
         <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">

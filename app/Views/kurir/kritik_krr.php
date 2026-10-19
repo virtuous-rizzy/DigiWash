@@ -103,9 +103,8 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
         <?php endif; ?>
     </div>
     <p style="font-size:13px; color:#1b2a3a; margin:0 0 6px; line-height:1.4;"><?= $e($row['isi_pesan'] ?? $row['pesan'] ?? '') ?></p>
-    <div style="display:flex; justify-content:space-between; font-size:11px; color:#99aaaa;">
-        <span>Pesanan: <?= $e($row['no_pesanan'] ?? '-') ?></span>
-        <span><?= date('d M Y', strtotime($row['tanggal'] ?? $row['created_at'] ?? 'now')) ?></span>
+    <div style="font-size:11px; color:#99aaaa;">
+        <span><i class="bi bi-calendar-event me-1"></i><?= date('d M Y', strtotime($row['tanggal'] ?? $row['created_at'] ?? 'now')) ?></span>
     </div>
     <div style="margin-top:6px;">
         <?php

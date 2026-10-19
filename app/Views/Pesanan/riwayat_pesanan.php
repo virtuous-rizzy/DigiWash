@@ -60,19 +60,24 @@ $kartuPesanan = static function (array $p, int $idx) use ($badgeClass, $labelSta
     $badge         = $badgeClass($status);
     $label         = $labelStatus($status);
     $harga         = $formatRupiah($total);
-    $isAntar       = ($status === 'diantar');
-    $sudahBayar    = in_array($statusBayar, ['lunas', 'menunggu_verifikasi'], true);
-    $idPesanan     = (int)$p['id_pesanan'];
+    $isAntar          = ($status === 'diantar');
+    $isBatal          = ($status === 'dibatalkan');
+    $sudahBayar       = in_array($statusBayar, ['lunas', 'menunggu_verifikasi'], true);
+    $sudahUploadBukti = ! empty($p['bukti_bayar']) || $sudahBayar;
+    $idPesanan        = (int)$p['id_pesanan'];
+    $bisaBatal        = ! $isBatal && ! $sudahUploadBukti && in_array($status, ['menunggu', 'dikonfirmasi'], true);
 
-    // Tentukan href: tracking jika sudah bayar, jika belum bayar arahkan langsung ke upload-bukti jika metode sudah dipilih atau ke pembayaran
+    // Tentukan href: jika dibatalkan atau sudah bayar ke tracking, jika belum bayar ke upload/pembayaran
     $metodeDipilih = (string)($p['metode'] ?? '');
-    $href = $sudahBayar
-        ? base_url('pesanan/tracking/' . $idPesanan)
-        : ($metodeDipilih !== '' && $metodeDipilih !== 'Belum Dipilih'
+    if ($isBatal || $sudahBayar) {
+        $href = base_url('pesanan/tracking/' . $idPesanan);
+    } else {
+        $href = ($metodeDipilih !== '' && $metodeDipilih !== 'Belum Dipilih')
             ? base_url('pesanan/upload-bukti/' . $idPesanan)
-            : base_url('pesanan/pembayaran/' . $idPesanan));
+            : base_url('pesanan/pembayaran/' . $idPesanan);
+    }
     ?>
-    <a class="pesanan-card" href="<?= $e($href) ?>" id="card-<?= $e($status) ?>-<?= $idx ?>">
+    <div class="pesanan-card" id="card-<?= $e($status) ?>-<?= $idx ?>" onclick="if(!event.target.closest('.card-action-btn')){ window.location.href='<?= $e($href) ?>'; }">
         <div class="card-top">
             <span class="order-id"><?= $e($nomorPesanan) ?></span>
             <span class="badge-status <?= $e($badge) ?>"><?= $e($label) ?></span>
@@ -82,17 +87,50 @@ $kartuPesanan = static function (array $p, int $idx) use ($badgeClass, $labelSta
         <div class="card-divider"></div>
         <div class="card-bottom">
             <span class="card-berat"><?= $e($berat) ?></span>
-            <?php if (!$sudahBayar): ?>
-                <span class="card-keterangan" style="color:#E65100;font-weight:600;font-size:13px">
-                    ⚠ <?= ($metodeDipilih !== '' && $metodeDipilih !== 'Belum Dipilih') ? 'Upload Bukti Bayar →' : 'Bayar Sekarang →' ?>
-                </span>
-            <?php elseif ($isAntar): ?>
+            <?php if ($isAntar): ?>
                 <span class="card-keterangan">Menunggu Penjemputan</span>
             <?php else: ?>
                 <span class="card-harga"><?= $e($harga) ?></span>
             <?php endif; ?>
         </div>
-    </a>
+
+        <?php if ($isBatal): ?>
+            <div class="card-actions-divider"></div>
+            <div class="card-actions">
+                <span class="badge-dibatalkan-info" style="font-size: 12px; color: #dc2626; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="bi bi-x-circle-fill"></i> Pesanan Dibatalkan
+                </span>
+                <a href="<?= $e($href) ?>" class="btn-action-detail card-action-btn" onclick="event.stopPropagation();">
+                    Detail &rarr;
+                </a>
+            </div>
+        <?php elseif ($bisaBatal || !$sudahBayar): ?>
+            <div class="card-actions-divider"></div>
+            <div class="card-actions">
+                <?php if ($bisaBatal): ?>
+                    <form action="<?= base_url('pesanan/batalkan/' . $idPesanan) ?>" method="post"
+                          data-konfirmasi="Apakah Anda yakin ingin membatalkan pesanan <?= $e($nomorPesanan) ?> ini? Pesanan yang dibatalkan tidak dapat diproses lagi."
+                          class="form-batal-card card-action-btn d-inline-block m-0">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="id_pesanan" value="<?= $idPesanan ?>">
+                        <button type="submit" class="btn-action-batal" onclick="event.stopPropagation();">
+                            <i class="bi bi-x-circle me-1"></i> Batalkan
+                        </button>
+                    </form>
+                <?php endif; ?>
+
+                <?php if (!$sudahBayar): ?>
+                    <a href="<?= $e($href) ?>" class="btn-action-bayar card-action-btn" onclick="event.stopPropagation();">
+                        <i class="bi bi-wallet2 me-1"></i> <?= ($metodeDipilih !== '' && $metodeDipilih !== 'Belum Dipilih') ? 'Upload Bukti' : 'Bayar' ?> &rarr;
+                    </a>
+                <?php else: ?>
+                    <a href="<?= $e($href) ?>" class="btn-action-detail card-action-btn" onclick="event.stopPropagation();">
+                        Detail &rarr;
+                    </a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
     <?php
 };
 
@@ -309,6 +347,78 @@ $emptyState = static function (string $icon, string $judul, string $sub, string 
         color: #033B59;
     }
 
+    /* ── Card Action Buttons ─────────────────────────────── */
+    .card-actions-divider {
+        height: 1px;
+        background: #f1f5f9;
+        margin: 12px 0 10px;
+    }
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .btn-action-batal {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #dc2626;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        font-family: inherit;
+    }
+    .btn-action-batal:hover {
+        background: #dc2626;
+        color: #ffffff;
+        border-color: #dc2626;
+    }
+    .btn-action-bayar {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #ffffff;
+        background: #033B59;
+        border: 1px solid #033B59;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.18s ease;
+        font-family: inherit;
+    }
+    .btn-action-bayar:hover {
+        background: #022c44;
+        color: #ffffff;
+    }
+    .btn-action-detail {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #033B59;
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.18s ease;
+        font-family: inherit;
+    }
+    .btn-action-detail:hover {
+        background: #033B59;
+        color: #ffffff;
+    }
+
     /* ── Empty State ─────────────────────────────────────── */
     .empty-state {
         display: none;
@@ -336,6 +446,25 @@ $emptyState = static function (string $icon, string $judul, string $sub, string 
     </a>
     <h3>Riwayat Pesanan</h3>
 </div>
+
+<?php if (session()->getFlashdata('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show py-2 px-3 mb-3 small rounded-3 d-flex align-items-center justify-content-between" role="alert" style="font-size:13px;">
+        <div><i class="bi bi-check-circle-fill me-2"></i><?= esc((string) session()->getFlashdata('success')) ?></div>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('errors')): ?>
+    <div class="alert alert-danger alert-dismissible fade show py-2 px-3 mb-3 small rounded-3" role="alert" style="font-size:13px;">
+        <div class="d-flex align-items-center gap-2 mb-1 fw-bold">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Perhatian:</span>
+        </div>
+        <?php foreach ((array) session()->getFlashdata('errors') as $err): ?>
+            <div><?= esc((string) $err) ?></div>
+        <?php endforeach; ?>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
 
 <!-- Tab Filter -->
 <div class="tab-bar-wrap" id="riwayat-tab-wrap">
@@ -455,6 +584,17 @@ $emptyState = static function (string $icon, string $judul, string $sub, string 
         window.addEventListener('load', checkScroll);
         window.addEventListener('resize', checkScroll);
     }
+
+    /* ── 4. Konfirmasi Pembatalan Pesanan ───────────────────── */
+    document.addEventListener('submit', function (e) {
+        var form = e.target.closest('.form-batal-card');
+        if (form) {
+            var msg = form.getAttribute('data-konfirmasi') || 'Apakah Anda yakin ingin membatalkan pesanan ini?';
+            if (!confirm(msg)) {
+                e.preventDefault();
+            }
+        }
+    });
 })();
 </script>
 <?= $this->endSection() ?>

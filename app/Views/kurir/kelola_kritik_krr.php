@@ -59,6 +59,13 @@ $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 
 <!-- Filter Tabs -->
 <div class="filter-tabs">
+    <a href="?status=Semua<?= $keyword ? '&keyword='.$e($keyword) : '' ?>"
+       class="tab-pill <?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'active' : '' ?>">
+        Semua
+        <span class="<?= ($status_aktif == 'Semua' || $status_aktif == '') ? 'badge-count' : 'badge-inactive' ?>">
+            <?= $jml_semua ?? 0 ?>
+        </span>
+    </a>
     <a href="?status=Belum ditindaklanjuti<?= $keyword ? '&keyword='.$e($keyword) : '' ?>"
        class="tab-pill <?= $status_aktif == 'Belum ditindaklanjuti' ? 'active' : '' ?>">
         Belum
@@ -96,14 +103,21 @@ $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
     <?php foreach ($ulasan as $row): ?>
     <div class="ulasan-card">
         <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
+            <?php
+            $fotoUrl       = url_foto_profil($row['foto'] ?? null);
+            $namaPelanggan = (string)($row['nama'] ?? 'Pelanggan');
+            $inisial       = strtoupper(substr(trim($namaPelanggan), 0, 2));
+            ?>
             <div style="display:flex; align-items:center; gap:10px;">
-                <?php if (!empty($row['foto'])): ?>
-                    <img src="<?= base_url('uploads/'.$row['foto']) ?>" class="avatar-sm" alt="">
+                <?php if ($fotoUrl): ?>
+                    <img src="<?= $e($fotoUrl) ?>" class="avatar-sm" alt="<?= $e($namaPelanggan) ?>"
+                         onerror="this.style.display='none'; if(this.nextElementSibling){ this.nextElementSibling.style.display='flex'; }">
+                    <div class="avatar-sm" style="display:none;"><?= $e($inisial) ?></div>
                 <?php else: ?>
-                    <div class="avatar-sm"><?= strtoupper(substr($row['nama'], 0, 2)) ?></div>
+                    <div class="avatar-sm"><?= $e($inisial) ?></div>
                 <?php endif; ?>
                 <div>
-                    <div style="font-weight:600; font-size:13px; color:#1b2a3a;"><?= $e($row['nama']) ?></div>
+                    <div style="font-weight:600; font-size:13px; color:#1b2a3a;"><?= $e($namaPelanggan) ?></div>
                     <div style="font-size:11px; color:#99aaaa;"><?= date('d M Y - H:i', strtotime($row['tanggal'] ?? $row['created_at'] ?? 'now')) ?></div>
                 </div>
             </div>
@@ -120,8 +134,7 @@ $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 
         <p style="font-size:13px; color:#1b2a3a; margin:0 0 6px; line-height:1.4;"><?= $e($row['isi_pesan'] ?? $row['pesan'] ?? '') ?></p>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#99aaaa;">
-            <span>Pesanan: <?= $e($row['no_pesanan'] ?? '-') ?></span>
+        <div style="display:flex; justify-content:flex-end; align-items:center; font-size:11px;">
             <?php
             $statusColor = match($row['status'] ?? '') {
                 'Selesai'       => '#176b3a',
