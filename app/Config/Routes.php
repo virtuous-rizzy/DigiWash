@@ -82,6 +82,11 @@ $routes->group('admin', ['filter' => 'role:admin'], static function ($routes) {
 
     $routes->get('kelola-kritik', 'KritikSaran::kelola');
     $routes->post('kelola-kritik/update-status/(:num)', 'KritikSaran::updateStatus/$1');
+
+    $routes->get('kelola-layanan', 'Admin\LayananAdm::index');
+    $routes->post('kelola-layanan/simpan', 'Admin\LayananAdm::simpan');
+    $routes->post('kelola-layanan/status/(:num)', 'Admin\LayananAdm::toggleStatus/$1');
+    $routes->post('kelola-layanan/hapus/(:num)', 'Admin\LayananAdm::hapus/$1');
 });
 
 // ==========================================

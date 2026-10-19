@@ -28,6 +28,10 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         <span class="ikon-besar"><i class="bi bi-chat-dots-fill" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Kritik &amp; Saran</strong><small>Baca dan tanggapi masukan pelanggan</small></span>
     </a>
+    <a class="admin-card" href="<?= base_url('admin/kelola-layanan') ?>">
+        <span class="ikon-besar"><i class="bi bi-list-check" style="color: #033B59; font-size: 32px;"></i></span>
+        <span><strong>Kelola Layanan</strong><small>Tambah, edit, atau hapus layanan laundry</small></span>
+    </a>
 </div>
 
 <p class="subjudul">Pengelolaan</p>
@@ -48,6 +52,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         justify-content: space-between;
         margin: 28px 0 14px;
     }
+
     .pesanan-terbaru-title {
         font-size: 19px;
         font-weight: 800;
@@ -56,6 +61,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         font-family: inherit;
         letter-spacing: -0.2px;
     }
+
     .pesanan-terbaru-link {
         font-size: 14px;
         font-weight: 600;
@@ -63,6 +69,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         text-decoration: none;
         transition: all 0.18s ease;
     }
+
     .pesanan-terbaru-link:hover {
         color: #02263a;
         text-decoration: underline;
@@ -74,6 +81,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         gap: 12px;
         margin-bottom: 24px;
     }
+
     .latest-order-card {
         background: #ffffff;
         border: 1.5px solid #000000;
@@ -87,6 +95,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         cursor: pointer;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
+
     .latest-order-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
@@ -106,11 +115,13 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         margin-top: 2px;
     }
+
     .order-avatar-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
+
     .avatar-fallback {
         color: #ffffff;
         font-weight: 700;
@@ -138,6 +149,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         gap: 10px;
         width: 100%;
     }
+
     .order-customer-name {
         font-size: 15px;
         font-weight: 700;
@@ -149,6 +161,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         flex: 1;
         min-width: 0;
     }
+
     .order-price-val {
         font-size: 15px;
         font-weight: 800;
@@ -181,6 +194,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         padding-top: 6px;
         border-top: 1px dashed #e2e8f0;
     }
+
     .order-footer-left {
         display: flex;
         align-items: center;
@@ -200,26 +214,32 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         text-align: center;
         white-space: nowrap;
     }
+
     .pill-baru {
         background: #dbeafe;
         color: #1d4ed8;
     }
+
     .pill-diterima {
         background: #dcfce7;
         color: #15803d;
     }
+
     .pill-diproses {
         background: #fef9c3;
         color: #854d0e;
     }
+
     .pill-diantar {
         background: #ede9fe;
         color: #7c3aed;
     }
+
     .pill-selesai {
         background: #d1fae5;
         color: #047857;
     }
+
     .pill-batal {
         background: #fee2e2;
         color: #b91c1c;
@@ -255,27 +275,34 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
             gap: 10px;
             border-radius: 16px;
         }
+
         .order-avatar-box {
             width: 42px;
             height: 42px;
         }
+
         .order-customer-name {
             font-size: 14px;
         }
+
         .order-price-val {
             font-size: 14px;
         }
+
         .order-row-service {
             font-size: 12px;
         }
+
         .order-status-pill {
             padding: 2px 9px;
             font-size: 11px;
         }
+
         .order-weight-badge {
             font-size: 11px;
             padding: 2px 7px;
         }
+
         .order-time-badge {
             font-size: 11.5px;
         }
@@ -291,19 +318,19 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
 <?php
 $pesananTerbaru = (array) ($pesananTerbaru ?? []);
 ?>
-<?php if (! empty($pesananTerbaru)): ?>
+<?php if (!empty($pesananTerbaru)): ?>
     <div class="pesanan-terbaru-list">
         <?php foreach ($pesananTerbaru as $p): ?>
             <?php
-            $namaPlg       = (string) ($p['nama_pelanggan'] ?? 'Pelanggan');
-            $inisialPlg    = $namaPlg !== '' ? strtoupper(substr($namaPlg, 0, 1)) : 'P';
-            $fotoPlg       = url_foto_profil($p['foto_pelanggan'] ?? null);
-            $layananNama   = (string) ($p['nama_layanan'] ?? 'Laundry Reguler');
-            $isSatuan      = (strtolower((string)($p['jenis_layanan'] ?? '')) === 'satuan' || str_contains(strtolower($layananNama), 'satuan'));
-            
+            $namaPlg = (string) ($p['nama_pelanggan'] ?? 'Pelanggan');
+            $inisialPlg = $namaPlg !== '' ? strtoupper(substr($namaPlg, 0, 1)) : 'P';
+            $fotoPlg = url_foto_profil($p['foto_pelanggan'] ?? null);
+            $layananNama = (string) ($p['nama_layanan'] ?? 'Laundry Reguler');
+            $isSatuan = (strtolower((string) ($p['jenis_layanan'] ?? '')) === 'satuan' || str_contains(strtolower($layananNama), 'satuan'));
+
             if ($isSatuan) {
                 $itemCount = 0;
-                if (! empty($p['detail_satuan'])) {
+                if (!empty($p['detail_satuan'])) {
                     $decoded = json_decode((string) $p['detail_satuan'], true);
                     if (is_array($decoded)) {
                         foreach ($decoded as $it) {
@@ -317,35 +344,35 @@ $pesananTerbaru = (array) ($pesananTerbaru ?? []);
                 $qtyText = ($itemCount > 0 ? $itemCount : 1) . ' item';
             } else {
                 $beratNum = (float) ($p['berat'] ?? 1.0);
-                $qtyText  = (fmod($beratNum, 1.0) == 0.0 ? number_format($beratNum, 0) : number_format($beratNum, 1, ',', '.')) . ' Kg';
+                $qtyText = (fmod($beratNum, 1.0) == 0.0 ? number_format($beratNum, 0) : number_format($beratNum, 1, ',', '.')) . ' Kg';
             }
 
             $st = strtolower((string) ($p['status_pesanan'] ?? 'menunggu'));
             $badgeClass = match ($st) {
-                'menunggu'                         => 'pill-baru',
-                'dikonfirmasi'                     => 'pill-diterima',
+                'menunggu' => 'pill-baru',
+                'dikonfirmasi' => 'pill-diterima',
                 'dijemput', 'dicuci', 'disetrika' => 'pill-diproses',
-                'diantar'                          => 'pill-diantar',
-                'selesai'                          => 'pill-selesai',
-                'dibatalkan'                       => 'pill-batal',
-                default                            => 'pill-baru',
+                'diantar' => 'pill-diantar',
+                'selesai' => 'pill-selesai',
+                'dibatalkan' => 'pill-batal',
+                default => 'pill-baru',
             };
             $statusLabel = match ($st) {
-                'menunggu'                         => 'Baru',
-                'dikonfirmasi'                     => 'Diterima',
+                'menunggu' => 'Baru',
+                'dikonfirmasi' => 'Diterima',
                 'dijemput', 'dicuci', 'disetrika' => 'Diproses',
-                'diantar'                          => 'Diantar',
-                'selesai'                          => 'Selesai',
-                'dibatalkan'                       => 'Batal',
-                default                            => ucfirst($st),
+                'diantar' => 'Diantar',
+                'selesai' => 'Selesai',
+                'dibatalkan' => 'Batal',
+                default => ucfirst($st),
             };
 
-            $tglRaw   = $p['tanggal'] ?? $p['created_at'] ?? 'now';
-            $jamText  = date('H:i', strtotime((string) $tglRaw));
+            $tglRaw = $p['tanggal'] ?? $p['created_at'] ?? 'now';
+            $jamText = date('H:i', strtotime((string) $tglRaw));
             $totalNom = (float) ($p['total_harga'] ?? 0);
             if ($totalNom <= 0) {
-                $flat     = (float) ($p['harga_flat'] ?? 0);
-                $perKg    = (float) ($p['harga_per_kg'] ?? 0);
+                $flat = (float) ($p['harga_flat'] ?? 0);
+                $perKg = (float) ($p['harga_per_kg'] ?? 0);
                 $beratVal = (float) ($p['berat'] ?? 1.0);
                 $totalNom = $flat > 0 ? $flat : ($perKg * $beratVal);
             }
@@ -355,7 +382,7 @@ $pesananTerbaru = (array) ($pesananTerbaru ?? []);
                 <div class="order-avatar-box">
                     <?php if ($fotoPlg): ?>
                         <img src="<?= $e($fotoPlg) ?>" class="order-avatar-img" alt="<?= $e($namaPlg) ?>"
-                             onerror="this.style.display='none'; if(this.nextElementSibling){ this.nextElementSibling.style.display='flex'; }">
+                            onerror="this.style.display='none'; if(this.nextElementSibling){ this.nextElementSibling.style.display='flex'; }">
                         <span class="avatar-fallback" style="display:none;"><?= $e($inisialPlg) ?></span>
                     <?php else: ?>
                         <span class="avatar-fallback"><?= $e($inisialPlg) ?></span>
@@ -389,7 +416,8 @@ $pesananTerbaru = (array) ($pesananTerbaru ?? []);
         <?php endforeach; ?>
     </div>
 <?php else: ?>
-    <div class="panel kosong" style="text-align: center; padding: 24px; background: #fff; border: 1.5px solid #000; border-radius: 18px; margin-bottom: 24px;">
+    <div class="panel kosong"
+        style="text-align: center; padding: 24px; background: #fff; border: 1.5px solid #000; border-radius: 18px; margin-bottom: 24px;">
         <i class="bi bi-inbox text-muted" style="font-size: 32px;"></i>
         <p class="text-muted small mt-2 mb-0">Belum ada pesanan terbaru.</p>
     </div>

@@ -666,15 +666,9 @@ $bulanIndo = [
                     <div class="mb-3">
                         <label class="form-label fw-bold text-dark small">Status Laundry Baru:</label>
                         <select name="status_pesanan" id="selectStatusPesanan" class="form-select form-select-sm py-2" required>
-                            <option value="menunggu">Menunggu</option>
-                            <option value="dikonfirmasi">Dikonfirmasi (Siap Dijemput)</option>
-                            <option value="dijemput">Dijemput Kurir</option>
-                            <option value="dicuci">Sedang Dicuci</option>
-                            <option value="disetrika">Sedang Disetrika</option>
-                            <option value="diantar">Sedang Diantar Kurir</option>
-                            <option value="selesai">Selesai (Terkirim &amp; Diterima)</option>
-                            <option value="dibatalkan">Batalkan Pesanan</option>
+                            <!-- Diisi dinamis via JavaScript sesuai statusSaatIni -->
                         </select>
+                        <div id="helpTextStatusPesanan" class="small text-muted mt-1" style="font-size: 11px;"></div>
                     </div>
 
                     <div class="mb-3">
@@ -823,7 +817,35 @@ function bukaModalProses(idPsn, kodePsn, namaPlg, statusSaatIni, idKurirSaatIni)
     document.getElementById('modalProsesPelanggan').textContent = 'Pelanggan: ' + namaPlg;
 
     var selectStatus = document.getElementById('selectStatusPesanan');
-    selectStatus.value = statusSaatIni;
+    selectStatus.innerHTML = '';
+    var helpText = document.getElementById('helpTextStatusPesanan');
+    var btnSubmit = form.querySelector('button[type="submit"]');
+
+    if (statusSaatIni === 'menunggu' || statusSaatIni === 'dikonfirmasi') {
+        selectStatus.innerHTML = '<option value="dikonfirmasi" selected>Menunggu Penjemputan Kurir (Terkunci)</option><option value="dibatalkan">Batalkan Pesanan</option>';
+        if (helpText) helpText.textContent = 'Cucian belum tiba di outlet. Admin baru dapat memproses cuci setelah kurir selesai menjemput dan mengantar cucian ke outlet (status Dijemput).';
+        if (btnSubmit) btnSubmit.disabled = false;
+    } else if (statusSaatIni === 'dijemput') {
+        selectStatus.innerHTML = '<option value="dijemput" selected>Cucian Tiba di Outlet</option><option value="dicuci">Mulai Proses Cuci</option><option value="dibatalkan">Batalkan Pesanan</option>';
+        if (helpText) helpText.textContent = 'Cucian telah tiba di outlet. Anda dapat mulai memproses pencucian.';
+        if (btnSubmit) btnSubmit.disabled = false;
+    } else if (statusSaatIni === 'dicuci') {
+        selectStatus.innerHTML = '<option value="dicuci" selected>Sedang Proses Cuci</option><option value="disetrika">Lanjut Proses Setrika (Siap Diantar)</option><option value="dibatalkan">Batalkan Pesanan</option>';
+        if (helpText) helpText.textContent = 'Cucian sedang dicuci. Pilih Proses Setrika jika pencucian telah selesai.';
+        if (btnSubmit) btnSubmit.disabled = false;
+    } else if (statusSaatIni === 'disetrika') {
+        selectStatus.innerHTML = '<option value="disetrika" selected>Proses Setrika Selesai (Siap Diantar)</option><option value="diantar">Serahkan ke Kurir (Sedang Diantar)</option><option value="dibatalkan">Batalkan Pesanan</option>';
+        if (helpText) helpText.textContent = 'Pakaian telah disetrika rapi dan siap diantarkan oleh kurir.';
+        if (btnSubmit) btnSubmit.disabled = false;
+    } else if (statusSaatIni === 'diantar') {
+        selectStatus.innerHTML = '<option value="diantar" selected>Sedang Diantar Kurir</option>';
+        if (helpText) helpText.textContent = 'Pakaian sedang diantar oleh Kurir ke pelanggan. Status Selesai hanya dapat diselesaikan oleh Kurir setelah pakaian diterima pelanggan.';
+        if (btnSubmit) btnSubmit.disabled = true;
+    } else {
+        selectStatus.innerHTML = '<option value="' + statusSaatIni + '" selected>' + statusSaatIni.toUpperCase() + '</option>';
+        if (helpText) helpText.textContent = 'Status pesanan telah final.';
+        if (btnSubmit) btnSubmit.disabled = true;
+    }
 
     var selectKurir = document.getElementById('selectKurirPesanan');
     selectKurir.value = idKurirSaatIni || '';

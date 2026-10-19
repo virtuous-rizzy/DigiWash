@@ -91,11 +91,23 @@ class Pesanan extends BaseController
             $jenisLayanan = $this->request->getPost('layanan') ?? $jenisLayanan;
         }
 
+        $idReq = (int) ($this->request->getGet('id') ?? $this->request->getPost('id_layanan') ?? 0);
         $layananModel = new LayananModel();
         try {
-            $layananDb = $layananModel->cariByIdOrNama($jenisLayanan);
+            if ($idReq > 0) {
+                $layananDb = $layananModel->find($idReq);
+            }
+            if (empty($layananDb)) {
+                $layananDb = $layananModel->cariByIdOrNama($jenisLayanan);
+            }
         } catch (\Throwable $th) {
             $layananDb = null;
+        }
+
+        // Jika layanan yang dipilih dinonaktifkan, kembalikan ke halaman pilih layanan
+        if ($layananDb && (int) ($layananDb['is_active'] ?? 1) === 0) {
+            return redirect()->to(base_url('pesanan/pilih-layanan'))
+                ->with('errors', ['Layanan ' . ($layananDb['nama_layanan'] ?? '') . ' sedang tidak tersedia atau dinonaktifkan. Silakan pilih layanan lain.']);
         }
 
         $idLayanan = $layananDb ? (int) $layananDb['id_layanan'] : 1;
@@ -705,7 +717,7 @@ class Pesanan extends BaseController
                 'estimasi_hari'      => 2,
                 'nama_kurir'         => 'Andi Kurniawan',
                 'no_hp_kurir'        => '081200000020',
-                'jenis_kendaraan'    => 'Motor · Honda Beat',
+                'jenis_kendaraan'    => 'Kurir DigiWash',
             ];
         }
 

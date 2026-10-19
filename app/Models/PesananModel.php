@@ -300,7 +300,6 @@ class PesananModel extends Model
                 'pb.metode',
                 'pb.total_bayar',
                 'd.id_kurir',
-                'd.jenis_kendaraan',
                 'd.status_antar',
                 'k.nama AS nama_kurir',
                 'k.no_hp AS no_hp_kurir',

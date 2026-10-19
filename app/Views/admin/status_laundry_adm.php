@@ -619,14 +619,14 @@ $bulanIndo = [
 
         // Pemetaan label status terkini
         $statusLabelMap = [
-            'menunggu' => 'Menunggu Kurir',
-            'dikonfirmasi' => 'Menunggu Kurir',
-            'dijemput' => 'Cucian Dijemput',
+            'menunggu' => 'Menunggu Kurir Menjemput',
+            'dikonfirmasi' => 'Menunggu Kurir Menjemput',
+            'dijemput' => 'Cucian Tiba di Outlet (Dijemput Kurir)',
             'dicuci' => 'Proses Cuci',
-            'disetrika' => 'Proses Setrika',
-            'diantar' => 'Sedang Diantar',
-            'selesai' => 'Selesai',
-            'dibatalkan' => 'Dibatalkan',
+            'disetrika' => 'Proses Setrika (Siap Diantar)',
+            'diantar' => 'Sedang Diantar Kurir ke Pelanggan',
+            'selesai' => 'Pesanan Selesai',
+            'dibatalkan' => 'Pesanan Dibatalkan',
         ];
 
         if ($isBatalPelanggan) {
@@ -771,12 +771,18 @@ $bulanIndo = [
             <div class="stepper-container">
                 <div class="stepper-line"></div>
 
-                <!-- 1. Menunggu Kurir -->
+                <!-- 1. Menunggu Kurir / Cucian Dijemput -->
                 <div class="step-item">
-                    <div class="step-circle <?= $levelStepper >= 1 ? 'active' : 'inactive' ?>" title="Menunggu Kurir">
-                        <i class="bi bi-box-seam-fill"></i>
+                    <div class="step-circle <?= $levelStepper >= 1 ? 'active' : 'inactive' ?>" title="<?= in_array($st, ['menunggu', 'dikonfirmasi'], true) ? 'Menunggu Kurir' : 'Cucian Tiba di Outlet' ?>">
+                        <?php if ($st === 'dijemput' || $levelStepper >= 2): ?>
+                            <i class="bi bi-check-lg"></i>
+                        <?php else: ?>
+                            <i class="bi bi-box-seam-fill"></i>
+                        <?php endif; ?>
                     </div>
-                    <span class="step-label <?= $levelStepper >= 1 ? 'active' : '' ?>">Menunggu kurir</span>
+                    <span class="step-label <?= $levelStepper >= 1 ? 'active' : '' ?>">
+                        <?= in_array($st, ['menunggu', 'dikonfirmasi'], true) ? 'Menunggu kurir' : 'Cucian dijemput' ?>
+                    </span>
                 </div>
 
                 <!-- 2. Proses Cuci -->
@@ -891,12 +897,36 @@ $bulanIndo = [
                 <button type="button" class="btn-detail-order" onclick="bukaModalDetail(<?= $dataJson ?>)">
                     <i class="bi bi-info-circle me-1"></i> Detail
                 </button>
-            <?php else: ?>
-                <form action="<?= base_url('admin/pesanan/update-status/' . $idPesanan) ?>" method="post" class="form-ubah-wrap">
+            <?php elseif ($st === 'diantar'): ?>
+                <!-- Status Sedang Diantar: Hanya Kurir yang menyelesaikan pengantaran -->
+                <div class="alert alert-primary py-2 px-3 fw-bold small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3"
+                    style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF;">
+                    <i class="bi bi-truck fs-5" style="color: #2563EB;"></i>
+                    <div style="color: #1E40AF;">
+                        <strong style="color: #1E3A8A;">Sedang Diantar oleh Kurir</strong><br>
+                        <span class="fw-normal" style="color: #1E40AF;">
+                            Pakaian sedang dalam perjalanan diantar oleh kurir ke alamat pelanggan. Status <strong>Selesai</strong> hanya dapat dikonfirmasi oleh Kurir setelah pakaian berhasil diterima oleh pelanggan.
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-detail-order" onclick="bukaModalDetail(<?= $dataJson ?>)">
+                    <i class="bi bi-info-circle me-1"></i> Detail
+                </button>
+            <?php elseif (in_array($st, ['menunggu', 'dikonfirmasi'], true)): ?>
+                <!-- Status Menunggu Penjemputan Kurir: Admin belum bisa mengubah status proses cucian -->
+                <div class="alert alert-info py-2 px-3 small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3"
+                    style="background: #F0F9FF; border: 1px solid #BAE6FD; color: #0369A1;">
+                    <i class="bi bi-hourglass-split fs-5 text-primary flex-shrink-0"></i>
+                    <div style="color: #0369A1; font-size: 12.5px;">
+                        <strong style="color: #075985;">Menunggu Kurir Mengantar Cucian ke Outlet</strong><br>
+                        <span>Cucian masih berada di tangan pelanggan. Admin baru dapat mengubah status proses cucian setelah kurir selesai menjemput dan mengantar cucian ke outlet laundry (status <strong>Dijemput</strong>).</span>
+                    </div>
+                </div>
+                <form action="<?= base_url('admin/pesanan/update-status/' . $idPesanan) ?>" method="post" class="form-ubah-wrap mt-2">
                     <?= csrf_field() ?>
                     <div class="row g-2 mb-2">
                         <div class="col-12 col-sm-6">
-                            <label class="form-ubah-label">Tugaskan Kurir</label>
+                            <label class="form-ubah-label">Tugaskan Kurir Penjemput</label>
                             <select name="id_kurir" class="status-dropdown">
                                 <option value="">-- Bebas Diambil Kurir --</option>
                                 <?php foreach ($kurirList as $k): ?>
@@ -909,13 +939,56 @@ $bulanIndo = [
                         <div class="col-12 col-sm-6">
                             <label class="form-ubah-label">Status Laundry</label>
                             <select name="status_pesanan" class="status-dropdown" required>
-                                <option value="dikonfirmasi" <?= in_array($st, ['menunggu', 'dikonfirmasi'], true) ? 'selected' : '' ?>>Menunggu Kurir (Dikonfirmasi)</option>
-                                <option value="dijemput" <?= $st === 'dijemput' ? 'selected' : '' ?>>Cucian Dijemput</option>
-                                <option value="dicuci" <?= $st === 'dicuci' ? 'selected' : '' ?>>Proses Cuci</option>
-                                <option value="disetrika" <?= $st === 'disetrika' ? 'selected' : '' ?>>Proses Setrika</option>
-                                <option value="diantar" <?= $st === 'diantar' ? 'selected' : '' ?>>Sedang Diantar</option>
-                                <option value="selesai" <?= $st === 'selesai' ? 'selected' : '' ?>>Selesai</option>
-                                <option value="dibatalkan" <?= $st === 'dibatalkan' ? 'selected' : '' ?>>Batalkan Pesanan</option>
+                                <option value="dikonfirmasi" selected>Menunggu Penjemputan Kurir (Terkunci)</option>
+                                <option value="dibatalkan">Batalkan Pesanan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-simpan-status">Simpan Penugasan Kurir</button>
+                    <button type="button" class="btn-detail-order" onclick="bukaModalDetail(<?= $dataJson ?>)">
+                        <i class="bi bi-info-circle me-1"></i> Detail
+                    </button>
+                </form>
+            <?php else: ?>
+                <!-- Kurir sudah selesai mengantar cucian ke outlet (status dijemput, dicuci, disetrika) -->
+                <?php if ($st === 'dijemput'): ?>
+                    <div class="alert alert-success py-2 px-3 small rounded-3 mb-0 d-flex align-items-center gap-2 mt-3"
+                        style="background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534;">
+                        <i class="bi bi-box2-fill fs-5 text-success flex-shrink-0"></i>
+                        <div style="color: #166534; font-size: 12.5px;">
+                            <strong style="color: #14532D;">Cucian Telah Tiba di Outlet</strong><br>
+                            <span>Kurir telah selesai menjemput dan mengantar cucian ke outlet laundry. Anda dapat memulai proses pencucian sekarang.</span>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                <form action="<?= base_url('admin/pesanan/update-status/' . $idPesanan) ?>" method="post" class="form-ubah-wrap mt-2">
+                    <?= csrf_field() ?>
+                    <div class="row g-2 mb-2">
+                        <div class="col-12 col-sm-6">
+                            <label class="form-ubah-label">Kurir Penanggung Jawab</label>
+                            <select name="id_kurir" class="status-dropdown">
+                                <option value="">-- Bebas Diambil Kurir --</option>
+                                <?php foreach ($kurirList as $k): ?>
+                                    <option value="<?= (int) $k['id_kurir'] ?>" <?= ((int) ($p['id_kurir'] ?? 0) === (int) $k['id_kurir']) ? 'selected' : '' ?>>
+                                        <?= $e($k['nama']) ?> (<?= ucfirst($k['status']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-ubah-label">Status Laundry</label>
+                            <select name="status_pesanan" class="status-dropdown" required>
+                                <?php if ($st === 'dijemput'): ?>
+                                    <option value="dijemput" selected>Cucian Tiba di Outlet</option>
+                                    <option value="dicuci">Mulai Proses Cuci</option>
+                                <?php elseif ($st === 'dicuci'): ?>
+                                    <option value="dicuci" selected>Sedang Proses Cuci</option>
+                                    <option value="disetrika">Lanjut Proses Setrika (Siap Diantar)</option>
+                                <?php elseif ($st === 'disetrika'): ?>
+                                    <option value="disetrika" selected>Proses Setrika Selesai (Siap Diantar)</option>
+                                    <option value="diantar">Serahkan ke Kurir (Sedang Diantar)</option>
+                                <?php endif; ?>
+                                <option value="dibatalkan">Batalkan Pesanan</option>
                             </select>
                         </div>
                     </div>

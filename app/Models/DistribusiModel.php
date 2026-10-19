@@ -10,7 +10,7 @@ class DistribusiModel extends Model
     protected $primaryKey    = 'id_distribusi';
     protected $returnType    = 'array';
     protected $allowedFields = [
-        'id_pesanan', 'id_kurir', 'jenis_kendaraan', 'biaya', 'status_antar',
+        'id_pesanan', 'id_kurir', 'status_antar',
     ];
 
     /** Ambil info distribusi dengan relasi kurir dan pesanan */

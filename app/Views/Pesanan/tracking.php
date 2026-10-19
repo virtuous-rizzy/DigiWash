@@ -75,7 +75,7 @@ if ($st === 'dibatalkan' || $statusBayar === 'gagal') {
 $namaKurir = ($st === 'dibatalkan' || $statusBayar === 'gagal') ? '' : (string) ($pesanan['nama_kurir'] ?? '');
 $noHpKurir = (string) ($pesanan['no_hp_kurir'] ?? '');
 $fotoKurirUrl = url_foto_profil($pesanan['foto_kurir'] ?? null);
-$kendaraanKurir = (string) ($pesanan['jenis_kendaraan'] ?? 'Motor · B 1234 XYZ');
+$kendaraanKurir = !empty($pesanan['jenis_kendaraan']) ? (string) $pesanan['jenis_kendaraan'] : 'Kurir DigiWash';
 ?>
 <!DOCTYPE html>
 <html lang="id">

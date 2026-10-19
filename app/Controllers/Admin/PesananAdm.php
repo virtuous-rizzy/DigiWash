@@ -15,7 +15,6 @@ class PesananAdm extends BaseController
         'dicuci',
         'disetrika',
         'diantar',
-        'selesai',
         'dibatalkan',
     ];
 
@@ -87,6 +86,12 @@ class PesananAdm extends BaseController
     {
         $status = (string) $this->request->getPost('status_pesanan');
 
+        // Proteksi 1: Admin dilarang menyelesaikan pesanan (Hanya kurir yang menyelesaikan pengantaran)
+        if ($status === 'selesai') {
+            return redirect()->to(base_url('admin/status-laundry'))
+                ->with('errors', ['Status "Selesai" tidak dapat diatur oleh Admin. Status ini hanya dapat diselesaikan oleh Kurir setelah pengantaran pakaian ke pelanggan berhasil.']);
+        }
+
         if (! in_array($status, self::STATUS_VALID, true)) {
             return redirect()->back()->with('errors', ['Status laundry yang dipilih tidak valid.']);
         }
@@ -105,13 +110,13 @@ class PesananAdm extends BaseController
 
             $currentStatus = (string) ($pesanan['status_pesanan'] ?? 'menunggu');
 
-            // Proteksi 1: Pesanan yang sudah dibatalkan tidak boleh diubah
+            // Proteksi 2: Pesanan yang sudah dibatalkan tidak boleh diubah
             if ($currentStatus === 'dibatalkan') {
                 return redirect()->to(base_url('admin/status-laundry'))
                     ->with('errors', ['Pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' sudah dibatalkan/ditolak dan tidak dapat diubah statusnya lagi.']);
             }
 
-            // Proteksi 2: Pesanan yang sudah selesai tidak boleh diubah lagi
+            // Proteksi 3: Pesanan yang sudah selesai tidak boleh diubah lagi
             if ($currentStatus === 'selesai') {
                 return redirect()->to(base_url('admin/status-laundry'))
                     ->with('errors', ['Pesanan PSN-' . str_pad((string)$idPesanan, 4, '0', STR_PAD_LEFT) . ' sudah berstatus Selesai dan tidak dapat diubah statusnya lagi.']);
@@ -119,7 +124,7 @@ class PesananAdm extends BaseController
 
             $db = \Config\Database::connect();
 
-            // Proteksi 3: Pengecekan status pembayaran
+            // Proteksi 4: Pengecekan status pembayaran
             $pb = $db->table('pembayaran')->where('id_pesanan', $idPesanan)->get()->getRowArray();
             $statusBayar = (string) ($pb['status_bayar'] ?? 'belum_dibayar');
 
@@ -131,6 +136,30 @@ class PesananAdm extends BaseController
             if ($statusBayar !== 'lunas') {
                 return redirect()->to(base_url('admin/status-laundry'))
                     ->with('errors', ['Pembayaran pesanan ini belum berstatus Lunas. Silakan verifikasi pembayaran di menu Transaksi terlebih dahulu.']);
+            }
+
+            // Proteksi 5: Batasi admin baru bisa mengubah status proses cucian ketika kurir sudah selesai mengantar cucian ke admin
+            if (in_array($currentStatus, ['menunggu', 'dikonfirmasi'], true)) {
+                if (! in_array($status, ['menunggu', 'dikonfirmasi', 'dibatalkan'], true)) {
+                    return redirect()->to(base_url('admin/status-laundry'))
+                        ->with('errors', ['Admin baru dapat mengubah status proses cucian setelah Kurir selesai menjemput dan mengantarkan cucian ke outlet laundry (status Cucian Dijemput).']);
+                }
+            }
+
+            // Proteksi 6: Pesanan yang sedang diantar kurir tidak dapat diubah statusnya oleh admin
+            if ($currentStatus === 'diantar') {
+                if ($status !== 'diantar' && $status !== 'dibatalkan') {
+                    return redirect()->to(base_url('admin/status-laundry'))
+                        ->with('errors', ['Pakaian sedang dalam perjalanan diantar oleh Kurir ke alamat pelanggan. Status Selesai hanya dapat diselesaikan oleh Kurir setelah menyerahkan pakaian ke pelanggan.']);
+                }
+            }
+
+            // Proteksi 7: Cucian yang sudah berada di outlet tidak dapat dimundurkan ke status menunggu penjemputan
+            if (in_array($currentStatus, ['dijemput', 'dicuci', 'disetrika'], true)) {
+                if (in_array($status, ['menunggu', 'dikonfirmasi'], true)) {
+                    return redirect()->to(base_url('admin/status-laundry'))
+                        ->with('errors', ['Cucian sudah berada di outlet laundry dan tidak dapat dikembalikan ke status menunggu penjemputan kurir.']);
+                }
             }
 
             if ($status === 'dibatalkan') {
@@ -158,31 +187,34 @@ class PesananAdm extends BaseController
             $dist = $db->table('distribusi')->where('id_pesanan', $idPesanan)->get()->getRowArray();
             $statusAntar = match ($status) {
                 'diantar' => 'proses_antar',
-                'selesai' => 'terkirim',
                 default   => 'menunggu_kurir',
             };
 
             if ($dist) {
-                $updateDist = ['status_antar' => $statusAntar];
+                $updateDist = [];
+                if ($status === 'diantar') {
+                    $updateDist['status_antar'] = 'proses_antar';
+                }
                 if ($idKurir !== null) {
                     $updateDist['id_kurir'] = $idKurir;
                 }
-                $db->table('distribusi')->where('id_pesanan', $idPesanan)->update($updateDist);
+                if (! empty($updateDist)) {
+                    $db->table('distribusi')->where('id_pesanan', $idPesanan)->update($updateDist);
+                }
             } else {
                 $db->table('distribusi')->insert([
                     'id_pesanan'   => $idPesanan,
                     'id_kurir'     => $idKurir,
                     'status_antar' => $statusAntar,
-                    'biaya'        => 0,
                 ]);
             }
 
             // Update status ketersediaan kurir jika ada kurir yang ditugaskan
             $targetKurirId = $idKurir ?? ($dist['id_kurir'] ?? null);
             if ($targetKurirId) {
-                if ($status === 'diantar' || $status === 'dijemput') {
+                if ($status === 'diantar') {
                     $db->table('kurir')->where('id_kurir', $targetKurirId)->update(['status' => 'bertugas']);
-                } elseif ($status === 'selesai' || $status === 'dibatalkan') {
+                } elseif (in_array($status, ['dibatalkan', 'dijemput', 'dicuci', 'disetrika'], true)) {
                     $db->table('kurir')->where('id_kurir', $targetKurirId)->update(['status' => 'tersedia']);
                 }
             }
@@ -195,3 +227,4 @@ class PesananAdm extends BaseController
         }
     }
 }
+

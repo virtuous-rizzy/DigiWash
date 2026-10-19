@@ -188,8 +188,9 @@ class TugasKrr extends BaseController
                     'id_kurir'     => $idKurir,
                     'status_antar' => 'menunggu_kurir',
                 ]);
+                $db->table('kurir')->where('id_kurir', $idKurir)->update(['status' => 'tersedia']);
                 return redirect()->to(base_url('kurir/tugas/detail/' . $idPesanan))
-                    ->with('success', 'Cucian berhasil diambil! Status pesanan kini berubah menjadi "Dijemput".');
+                    ->with('success', 'Cucian berhasil diambil dan diantar ke outlet! Status pesanan kini berubah menjadi "Dijemput".');
             }
 
             if ($aksi === 'otw_antar') {
