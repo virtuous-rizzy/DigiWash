@@ -13,7 +13,11 @@ abstract class BaseController extends Controller
      * Helper yang otomatis dimuat di semua controller.
      * Letaknya di dalam class, di luar fungsi.
      */
+<<<<<<< HEAD
     protected $helpers = ['url', 'form'];
+=======
+    protected $helpers = ['url', 'form', 'foto'];
+>>>>>>> origin/digiwash-semoga-final
 
     /**
      * @return void

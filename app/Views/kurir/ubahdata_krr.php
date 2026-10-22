@@ -7,7 +7,11 @@ $kurir = (array) ($kurir ?? []);
 ?>
 
 <div class="judul-halaman">
+<<<<<<< HEAD
     <a href="<?= base_url('kurir/akun/data') ?>" class="kembali">&larr;</a>
+=======
+    <a href="<?= base_url('kurir/akun/data') ?>" class="kembali"><i class="bi bi-arrow-left"></i></a>
+>>>>>>> origin/digiwash-semoga-final
     <h3>Ubah Data Pribadi</h3>
 </div>
 

@@ -22,9 +22,18 @@ class DashboardPlg extends BaseController
         $statusCuci  = $terbaru ? ucfirst(str_replace('_', ' ', $terbaru['status_pesanan'])) : '-';
         $statusBayar = $terbaru ? ucfirst($terbaru['status_bayar'] ?? 'Belum Bayar') : '-';
 
+<<<<<<< HEAD
         $data = [
             'nama'         => session()->get('nama'),
             'pesananAktif' => $pesananAktif,
+=======
+        $totalPesanan = count($semua);
+
+        $data = [
+            'nama'         => session()->get('nama'),
+            'pesananAktif' => $pesananAktif,
+            'totalPesanan' => $totalPesanan,
+>>>>>>> origin/digiwash-semoga-final
             'statusCuci'   => $statusCuci,
             'statusBayar'  => $statusBayar,
         ];

@@ -27,6 +27,7 @@ class TransaksiAdm extends BaseController
         }
 
         // Hitung statistik transaksi
+<<<<<<< HEAD
         $totalMenunggu = 0;
         $totalLunas    = 0;
         $totalDitolak  = 0;
@@ -46,6 +47,42 @@ class TransaksiAdm extends BaseController
                     $totalLunas = (int) $c['jml'];
                 } elseif ($c['status_bayar'] === 'gagal') {
                     $totalDitolak = (int) $c['jml'];
+=======
+        $totalMenunggu   = 0;
+        $totalLunas      = 0;
+        $totalDitolak    = 0;
+        $totalDibatalkan = 0;
+        $totalSemua      = 0;
+
+        try {
+            $db = \Config\Database::connect();
+            $totalSemua = (int) $db->table('pembayaran')->countAllResults();
+
+            $totalMenunggu = (int) $db->table('pembayaran')
+                ->where('status_bayar', 'menunggu_verifikasi')
+                ->countAllResults();
+
+            $totalLunas = (int) $db->table('pembayaran')
+                ->where('status_bayar', 'lunas')
+                ->countAllResults();
+
+            $allGagalOrBatal = $db->table('pembayaran pb')
+                ->select('pb.status_bayar, pb.id_admin, ps.status_pesanan, ps.catatan')
+                ->join('pesanan ps', 'ps.id_pesanan = pb.id_pesanan', 'left')
+                ->groupStart()
+                    ->where('pb.status_bayar', 'gagal')
+                    ->orWhere('ps.status_pesanan', 'dibatalkan')
+                ->groupEnd()
+                ->get()
+                ->getResultArray();
+
+            foreach ($allGagalOrBatal as $r) {
+                $cLower = strtolower((string)($r['catatan'] ?? ''));
+                if (str_contains($cLower, 'dibatalkan') || ($r['status_pesanan'] === 'dibatalkan' && empty($r['id_admin']) && !str_contains($cLower, 'ditolak'))) {
+                    $totalDibatalkan++;
+                } else {
+                    $totalDitolak++;
+>>>>>>> origin/digiwash-semoga-final
                 }
             }
         } catch (\Throwable $th) {
@@ -98,6 +135,7 @@ class TransaksiAdm extends BaseController
         }
 
         $data = [
+<<<<<<< HEAD
             'transaksi'     => $transaksi,
             'statusFilter'  => $statusFilter,
             'keyword'       => $keyword,
@@ -106,6 +144,17 @@ class TransaksiAdm extends BaseController
             'totalDitolak'  => $totalDitolak,
             'totalSemua'    => count($transaksi),
             'aktif'         => 'transaksi',
+=======
+            'transaksi'       => $transaksi,
+            'statusFilter'    => $statusFilter,
+            'keyword'         => $keyword,
+            'totalMenunggu'   => $totalMenunggu,
+            'totalLunas'      => $totalLunas,
+            'totalDitolak'    => $totalDitolak,
+            'totalDibatalkan' => $totalDibatalkan,
+            'totalSemua'      => $totalSemua > 0 ? $totalSemua : count($transaksi),
+            'aktif'           => 'transaksi',
+>>>>>>> origin/digiwash-semoga-final
         ];
 
         return view('admin/transaksi_adm', $data);
@@ -116,6 +165,7 @@ class TransaksiAdm extends BaseController
      */
     public function verifikasi(int $idPembayaran)
     {
+<<<<<<< HEAD
         $idAdmin = (int) (session()->get('id_admin') ?? 1);
         $model   = new PembayaranModel();
 
@@ -127,6 +177,37 @@ class TransaksiAdm extends BaseController
             }
         } catch (\Throwable $th) {
             log_message('error', 'Verifikasi gagal: ' . $th->getMessage());
+=======
+        $idAdmin = (int) (session()->get('id_admin') ?? session()->get('user_id') ?? 1);
+        $model   = new PembayaranModel();
+
+        try {
+            $transaksi = $model->find($idPembayaran);
+            if (! $transaksi) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' tidak ditemukan.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'lunas') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' sudah berstatus Lunas dan tidak dapat diubah lagi.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'gagal') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' sudah ditolak dan tidak dapat diverifikasi lagi.']);
+            }
+
+            $berhasil = $model->verifikasiTransaksi($idPembayaran, $idAdmin);
+            if ($berhasil) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('success', 'Transaksi #' . $idPembayaran . ' berhasil diverifikasi dan ditandai Lunas.');
+            }
+        } catch (\Throwable $th) {
+            log_message('error', 'Verifikasi gagal: ' . $th->getMessage());
+            return redirect()->to(base_url('admin/transaksi'))
+                ->with('errors', ['Terjadi kesalahan saat memverifikasi transaksi: ' . $th->getMessage()]);
+>>>>>>> origin/digiwash-semoga-final
         }
 
         return redirect()->to(base_url('admin/transaksi'))
@@ -138,6 +219,7 @@ class TransaksiAdm extends BaseController
      */
     public function tolak(int $idPembayaran)
     {
+<<<<<<< HEAD
         $idAdmin = (int) (session()->get('id_admin') ?? 1);
         $model   = new PembayaranModel();
 
@@ -149,6 +231,37 @@ class TransaksiAdm extends BaseController
             }
         } catch (\Throwable $th) {
             log_message('error', 'Tolak gagal: ' . $th->getMessage());
+=======
+        $idAdmin = (int) (session()->get('id_admin') ?? session()->get('user_id') ?? 1);
+        $model   = new PembayaranModel();
+
+        try {
+            $transaksi = $model->find($idPembayaran);
+            if (! $transaksi) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' tidak ditemukan.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'gagal') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' sudah berstatus Ditolak dan tidak dapat diubah lagi.']);
+            }
+
+            if ($transaksi['status_bayar'] === 'lunas') {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('errors', ['Transaksi #' . $idPembayaran . ' yang sudah berstatus Lunas tidak dapat ditolak.']);
+            }
+
+            $berhasil = $model->tolakTransaksi($idPembayaran, $idAdmin);
+            if ($berhasil) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('success', 'Transaksi #' . $idPembayaran . ' berhasil ditolak.');
+            }
+        } catch (\Throwable $th) {
+            log_message('error', 'Tolak gagal: ' . $th->getMessage());
+            return redirect()->to(base_url('admin/transaksi'))
+                ->with('errors', ['Terjadi kesalahan saat menolak transaksi: ' . $th->getMessage()]);
+>>>>>>> origin/digiwash-semoga-final
         }
 
         return redirect()->to(base_url('admin/transaksi'))

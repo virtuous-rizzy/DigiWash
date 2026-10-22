@@ -7,9 +7,31 @@ $e          = static fn(string $teks): string => htmlspecialchars($teks, ENT_QUO
 $inisial    = $nama !== '' ? strtoupper(substr($nama, 0, 1)) : '?';
 $fotoHeader = foto_profil();
 
+<<<<<<< HEAD
 // Menu aktif ditentukan dari segmen pertama URL
 // contoh: /dashboard -> 'dashboard', /pesanan/pilih-layanan -> 'pesanan', /profil/data -> 'profil'
 $segmen = (string) service('uri')->getSegment(1);
+=======
+$idPelanggan = (int) (session()->get('id_pelanggan') ?? session()->get('user_id') ?? 0);
+$pesananAktif = 0;
+$totalPesanan = 0;
+$adaPesanan = false;
+if ($idPelanggan > 0) {
+    try {
+        $pModel = new \App\Models\PesananModel();
+        $pesananAktif = $pModel->jumlahAktif($idPelanggan);
+        $totalPesanan = (int) $pModel->where('id_pelanggan', $idPelanggan)->countAllResults();
+        $adaPesanan = ($pesananAktif > 0 || $totalPesanan > 0);
+    } catch (\Throwable $th) {
+        $adaPesanan = false;
+    }
+}
+
+// Menu aktif ditentukan dari segmen pertama URL
+// contoh: /dashboard -> 'dashboard', /pesanan/riwayat -> 'pesanan', /profil/data -> 'profil'
+$segmen = (string) service('uri')->getSegment(1);
+$segmen2 = (string) service('uri')->getSegment(2);
+>>>>>>> origin/digiwash-semoga-final
 
 $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
     return in_array($segmen, $daftarSegmen, true) ? ' class="active" aria-current="page"' : '';
@@ -22,16 +44,75 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Digiwash - <?= $e($judul) ?></title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+=======
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
+>>>>>>> origin/digiwash-semoga-final
 
     <style>
          .bi { line-height: 1; vertical-align: -0.125em; }
         .logo .bi { margin-right: 6px; }
+<<<<<<< HEAD
         /* Menu yang sedang dibuka: warna abu */
         .bottom-nav a.active,
         .bottom-nav a.active span {
             color: #8A8A8A;
+=======
+
+        .bottom-nav a {
+            color: #033B59;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .bottom-nav a span {
+            color: #033B59;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .bottom-nav a.active span {
+            background: #8fe0e8;
+            border-radius: 50%;
+            padding: 4px 8px;
+            color: #033B59;
+        }
+        @media (min-width: 900px) {
+            .bottom-nav a {
+                flex-direction: row;
+            }
+            .dash-wrap .bottom-nav a.active {
+                background: #8fe0e8;
+                color: #033B59;
+            }
+            .dash-wrap .bottom-nav a.active span {
+                background: none;
+                padding: 0;
+            }
+        }
+
+        .notif-badge-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444 !important;
+            border-radius: 50% !important;
+            border: 1.5px solid #fff;
+            display: inline-block;
+            padding: 0 !important;
+>>>>>>> origin/digiwash-semoga-final
         }
     </style>
 </head>
@@ -45,8 +126,23 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
 
                 <nav class="bottom-nav">
                     <a href="<?= base_url('dashboard') ?>"<?= $menuAktif(['dashboard', '']) ?>><span><i class="bi bi-house-door-fill"></i></span>Beranda</a>
+<<<<<<< HEAD
                     <a href="<?= base_url('pesanan/pilih-layanan') ?>"<?= $menuAktif(['pesanan']) ?>><span><i class="bi bi-basket2-fill"></i></span>Pesanan</a>
                     <a href="#" data-soon><span><i class="bi bi-bell-fill"></i></span>Notifikasi</a>
+=======
+                    <a href="<?= base_url('pesanan/riwayat') ?>"<?= ($segmen === 'pesanan' && $segmen2 !== 'notifikasi') ? ' class="active" aria-current="page"' : '' ?>><span><i class="bi bi-receipt"></i></span>Pesanan</a>
+                    <?php if ($adaPesanan || ($segmen === 'pesanan' && $segmen2 === 'notifikasi')): ?>
+                    <a href="<?= base_url('pesanan/notifikasi') ?>"<?= ($segmen === 'pesanan' && $segmen2 === 'notifikasi') ? ' class="active" aria-current="page"' : '' ?>>
+                        <span style="position:relative">
+                            <i class="bi bi-bell-fill"></i>
+                            <?php if ($pesananAktif > 0): ?>
+                                <span class="notif-badge-dot"></span>
+                            <?php endif; ?>
+                        </span>
+                        Notifikasi
+                    </a>
+                    <?php endif; ?>
+>>>>>>> origin/digiwash-semoga-final
                     <a href="<?= base_url('profil') ?>"<?= $menuAktif(['profil']) ?>><span><i class="bi bi-person-fill"></i></span>Akun</a>
                 </nav>
                 <div class="avatar" style="overflow:hidden">
@@ -67,6 +163,39 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<<<<<<< HEAD
+=======
+    <!-- Modal Konfirmasi Pelanggan (Sesuai Gaya Modal Admin) -->
+    <div class="modal fade" id="modalKonfirmasiPlg" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+            <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <div class="modal-header" style="background: #033B59; color: #fff; padding: 14px 20px;">
+                    <h6 class="modal-title fw-bold" id="modalKonfirmasiPlgTitle" style="margin: 0; font-size: 15px;">
+                        <i class="bi bi-question-circle me-2"></i>Konfirmasi
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div id="modalKonfirmasiPlgIcon" class="mb-3">
+                        <i class="bi bi-exclamation-circle text-warning" style="font-size: 48px;"></i>
+                    </div>
+                    <p id="modalKonfirmasiPlgPesan" style="font-size: 14px; color: #333; line-height: 1.5; margin: 0; font-weight: 500;"></p>
+                </div>
+                <div class="modal-footer" style="background: #f8f9fa; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; padding: 12px 20px;">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 px-3" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="button" id="btnKonfirmasiPlgSubmit" class="btn btn-sm btn-primary rounded-3 px-3 fw-bold" style="background: #033B59; border-color: #033B59;">
+                        Ya, Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> origin/digiwash-semoga-final
     <script>
         (function() {
             var toast = document.getElementById('toast'),
@@ -86,17 +215,87 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
                     tampilkan('Fitur segera hadir');
                 });
             });
+<<<<<<< HEAD
             document.querySelectorAll('a[data-konfirmasi]').forEach(function(el) {
                 el.addEventListener('click', function(ev) {
                     if (!confirm(el.getAttribute('data-konfirmasi'))) ev.preventDefault();
                 });
             });
+=======
+>>>>>>> origin/digiwash-semoga-final
             document.querySelectorAll('[data-toggle-pw]').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var input = document.getElementById(btn.getAttribute('data-toggle-pw'));
                     input.type = input.type === 'password' ? 'text' : 'password';
                 });
             });
+<<<<<<< HEAD
+=======
+
+            var targetAction = null;
+            var modalEl = document.getElementById('modalKonfirmasiPlg');
+            var bsModal = (typeof bootstrap !== 'undefined' && bootstrap.Modal) ? new bootstrap.Modal(modalEl) : null;
+
+            function bukaModalKonfirmasi(pesan, aksi, isDanger, judul) {
+                document.getElementById('modalKonfirmasiPlgPesan').textContent = pesan;
+                document.getElementById('modalKonfirmasiPlgTitle').innerHTML = '<i class="bi ' + (isDanger ? 'bi-exclamation-triangle-fill' : 'bi-question-circle-fill') + ' me-2"></i>' + (judul || 'Konfirmasi');
+                
+                var iconEl = document.getElementById('modalKonfirmasiPlgIcon');
+                iconEl.innerHTML = '<i class="bi ' + (isDanger ? 'bi-exclamation-triangle-fill' : 'bi-question-circle-fill') + '" style="font-size: 46px; color: ' + (isDanger ? '#E53935' : '#033B59') + ';"></i>';
+                
+                var btnSubmit = document.getElementById('btnKonfirmasiPlgSubmit');
+                var isLogout = (judul && judul.toLowerCase().includes('logout'));
+                if (isDanger) {
+                    btnSubmit.className = 'btn btn-sm btn-danger rounded-3 px-3 fw-bold';
+                    btnSubmit.style.background = '#E53935';
+                    btnSubmit.style.borderColor = '#E53935';
+                    btnSubmit.textContent = isLogout ? 'Ya, Keluar' : 'Ya, Lanjutkan';
+                } else {
+                    btnSubmit.className = 'btn btn-sm btn-primary rounded-3 px-3 fw-bold';
+                    btnSubmit.style.background = '#033B59';
+                    btnSubmit.style.borderColor = '#033B59';
+                    btnSubmit.textContent = 'Ya, Lanjutkan';
+                }
+
+                targetAction = aksi;
+                if (bsModal) {
+                    bsModal.show();
+                } else {
+                    if (confirm(pesan)) aksi();
+                }
+            }
+
+            document.getElementById('btnKonfirmasiPlgSubmit').addEventListener('click', function () {
+                if (bsModal) bsModal.hide();
+                if (typeof targetAction === 'function') {
+                    targetAction();
+                }
+            });
+
+            document.querySelectorAll('a[data-konfirmasi]').forEach(function (el) {
+                el.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    var pesan = el.getAttribute('data-konfirmasi');
+                    var isLogout = el.classList.contains('btn-logout') || el.href.includes('keluar');
+                    bukaModalKonfirmasi(pesan, function () {
+                        window.location.href = el.href;
+                    }, isLogout, isLogout ? 'Konfirmasi Logout' : 'Konfirmasi Tindakan');
+                });
+            });
+
+            document.querySelectorAll('form[data-konfirmasi]').forEach(function (f) {
+                f.addEventListener('submit', function (ev) {
+                    if (f.dataset.confirmed === 'true') return;
+                    ev.preventDefault();
+                    var pesan = f.getAttribute('data-konfirmasi');
+                    var isDanger = pesan.toLowerCase().includes('hapus') || pesan.toLowerCase().includes('batal');
+                    bukaModalKonfirmasi(pesan, function () {
+                        f.dataset.confirmed = 'true';
+                        f.submit();
+                    }, isDanger, isDanger ? 'Konfirmasi Tindakan' : 'Konfirmasi');
+                });
+            });
+>>>>>>> origin/digiwash-semoga-final
         })();
     </script>
 </body>

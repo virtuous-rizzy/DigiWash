@@ -15,9 +15,58 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Digiwash Admin</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
+=======
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
+    <style>
+        .bi { line-height: 1; vertical-align: -0.125em; }
+        .logo .bi { margin-right: 6px; }
+
+        .bottom-nav a {
+            color: #033B59;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .bottom-nav a span {
+            color: #033B59;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            position: relative;
+        }
+        .bottom-nav a.active span {
+            background: #8fe0e8;
+            border-radius: 50%;
+            padding: 4px 8px;
+            color: #033B59;
+        }
+        @media (min-width: 900px) {
+            .bottom-nav a {
+                flex-direction: row;
+            }
+            .dash-wrap .bottom-nav a.active {
+                background: #8fe0e8;
+                color: #033B59;
+            }
+            .dash-wrap .bottom-nav a.active span {
+                background: none;
+                padding: 0;
+            }
+        }
+    </style>
+>>>>>>> origin/digiwash-semoga-final
 </head>
 <body>
 <div class="dash-wrap">
@@ -28,7 +77,11 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
 
             <nav class="bottom-nav">
                 <a href="<?= base_url('admin/dashboard') ?>" class="<?= $aktif === 'beranda' ? 'active' : '' ?>"><span><i class="bi bi-house-door-fill"></i></span>Beranda</a>
+<<<<<<< HEAD
                 <a href="#" data-soon><span><i class="bi bi-box-seam-fill"></i></span>Pesanan</a>
+=======
+                <a href="<?= base_url('admin/status-laundry') ?>" class="<?= $aktif === 'pesanan' ? 'active' : '' ?>"><span><i class="bi bi-box-seam-fill"></i></span>Pesanan</a>
+>>>>>>> origin/digiwash-semoga-final
                 <a href="<?= base_url('admin/transaksi') ?>" class="<?= $aktif === 'transaksi' ? 'active' : '' ?>"><span><i class="bi bi-currency-dollar"></i></span>Transaksi</a>
                 <a href="<?= base_url('admin/akun') ?>" class="<?= $aktif === 'akun' ? 'active' : '' ?>"><span><i class="bi bi-person-fill"></i></span>Akun</a>
             </nav>
@@ -110,14 +163,26 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
         iconEl.innerHTML = '<i class="bi ' + (isDanger ? 'bi-exclamation-triangle-fill' : 'bi-question-circle-fill') + '" style="font-size: 46px; color: ' + (isDanger ? '#E53935' : '#033B59') + ';"></i>';
         
         var btnSubmit = document.getElementById('btnKonfirmasiAdminSubmit');
+<<<<<<< HEAD
+=======
+        var isLogout = (judul && judul.toLowerCase().includes('logout'));
+>>>>>>> origin/digiwash-semoga-final
         if (isDanger) {
             btnSubmit.className = 'btn btn-sm btn-danger rounded-3 px-3 fw-bold';
             btnSubmit.style.background = '#E53935';
             btnSubmit.style.borderColor = '#E53935';
+<<<<<<< HEAD
+=======
+            btnSubmit.textContent = isLogout ? 'Ya, Keluar' : 'Ya, Lanjutkan';
+>>>>>>> origin/digiwash-semoga-final
         } else {
             btnSubmit.className = 'btn btn-sm btn-primary rounded-3 px-3 fw-bold';
             btnSubmit.style.background = '#033B59';
             btnSubmit.style.borderColor = '#033B59';
+<<<<<<< HEAD
+=======
+            btnSubmit.textContent = 'Ya, Lanjutkan';
+>>>>>>> origin/digiwash-semoga-final
         }
 
         targetAction = aksi;

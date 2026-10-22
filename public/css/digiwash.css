@@ -1,5 +1,18 @@
+<<<<<<< HEAD
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Roboto',Arial,sans-serif;background:#e5e5e5;display:flex;justify-content:center;color:#1b2a3a}
+=======
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&display=swap');
+
+:root {
+    --bs-body-font-family: 'Poppins', sans-serif;
+    --bs-font-sans-serif: 'Poppins', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;background:#e5e5e5;display:flex;justify-content:center;color:#1b2a3a}
+button,input,select,textarea{font-family:'Poppins',sans-serif}
+>>>>>>> origin/digiwash-semoga-final
 .phone{position:relative;width:100%;max-width:390px;min-height:100vh;background:#fff;overflow:hidden}
 
 /* tombol */
@@ -55,8 +68,13 @@ body{font-family:'Roboto',Arial,sans-serif;background:#e5e5e5;display:flex;justi
 .menu-item{width:70px;border:1.5px solid #000;border-radius:8px;padding:8px 2px;text-align:center;font-size:7px;font-weight:700;text-decoration:none;color:#000}
 .menu-item span{display:block;font-size:22px;margin-bottom:4px}
 .bottom-nav{position:fixed;bottom:0;width:100%;max-width:390px;background:#fff;border-top:1px solid #ddd;display:flex;justify-content:space-around;padding:8px 0}
+<<<<<<< HEAD
 .bottom-nav a{text-decoration:none;color:#000;font-size:10px;font-weight:700;text-align:center}
 .bottom-nav a span{display:block;font-size:20px}
+=======
+.bottom-nav a{text-decoration:none;color:#000;font-size:10px;font-weight:700;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.bottom-nav a span{display:inline-flex;align-items:center;justify-content:center;font-size:20px;position:relative}
+>>>>>>> origin/digiwash-semoga-final
 .bottom-nav a.active span{background:#8fe0e8;border-radius:50%;padding:2px 6px}
 
 /* ===== Tampilan laptop / desktop (>= 900px) ===== */
@@ -144,8 +162,13 @@ body{font-family:'Roboto',Arial,sans-serif;background:#e5e5e5;display:flex;justi
 
     /* navbar pindah ke atas */
     .dash-wrap .bottom-nav{position:static;transform:none;order:2;flex:1;max-width:none;width:auto;background:transparent;border-top:0;justify-content:center;gap:12px;padding:0}
+<<<<<<< HEAD
     .dash-wrap .bottom-nav a{display:flex;align-items:center;gap:8px;font-size:14px;padding:8px 16px;border-radius:999px}
     .dash-wrap .bottom-nav a span{display:inline;font-size:18px}
+=======
+    .dash-wrap .bottom-nav a{display:flex;flex-direction:row;align-items:center;gap:8px;font-size:14px;padding:8px 16px;border-radius:999px}
+    .dash-wrap .bottom-nav a span{display:inline-flex;font-size:18px}
+>>>>>>> origin/digiwash-semoga-final
     .dash-wrap .bottom-nav a.active{background:#8fe0e8}
     .dash-wrap .bottom-nav a.active span{background:none;padding:0}
     .dash-wrap .bottom-nav a:not(.active):hover{background:#e9e2f5}

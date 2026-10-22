@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pembayaran - DigiWash</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+>>>>>>> origin/digiwash-semoga-final
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
         body {
             background: #E7E7E7;
+<<<<<<< HEAD
             font-family: 'Roboto', sans-serif;
+=======
+            font-family: 'Poppins', sans-serif;
+>>>>>>> origin/digiwash-semoga-final
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -116,10 +124,26 @@
 
     <!-- Header -->
     <div class="page-header">
+<<<<<<< HEAD
         <a href="<?= base_url('pesanan/ringkasan') ?>" class="btn-back">&#8592;</a>
         <span class="page-title">Pembayaran</span>
     </div>
 
+=======
+        <?php $metode_terpilih = (string) ($metode_terpilih ?? ''); ?>
+        <a href="<?= base_url('dashboard') ?>" class="btn-back" title="Kembali ke Beranda" aria-label="Kembali">&#8592;</a>
+        <span class="page-title">Pembayaran</span>
+    </div>
+
+    <?php if (session()->getFlashdata('errors')): ?>
+        <div class="alert alert-danger mx-4 mb-3" style="font-size: 13px; border-radius: 8px;">
+            <?php foreach ((array) session()->getFlashdata('errors') as $err): ?>
+                <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+>>>>>>> origin/digiwash-semoga-final
     <!-- Order Summary -->
     <div class="order-summary-card">
         <div class="d-flex justify-content-between align-items-center">
@@ -141,8 +165,14 @@
     <span class="section-title">Pilih Metode Pembayaran</span>
 
     <!-- ── Form POST ke proses-pembayaran ── -->
+<<<<<<< HEAD
     <form action="<?= base_url('pesanan/proses-pembayaran') ?>" method="post" id="formBayar">
         <?= csrf_field() ?>
+=======
+    <form action="<?= base_url('pesanan/proses-pembayaran' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '')) ?>" method="post" id="formBayar">
+        <?= csrf_field() ?>
+        <input type="hidden" name="id_pesanan" value="<?= esc((string) ($id_pesanan_db ?? '')) ?>">
+>>>>>>> origin/digiwash-semoga-final
 
         <!-- Transfer Bank -->
         <div class="method-group">
@@ -152,8 +182,14 @@
             </div>
             <div class="method-group-body" id="body-bank">
 
+<<<<<<< HEAD
                 <label class="method-option" for="pay_bca">
                     <input type="radio" id="pay_bca" name="metode_bayar" value="Bank BCA"
+=======
+                <label class="method-option <?= ($metode_terpilih === 'Bank BCA') ? 'selected' : '' ?>" for="pay_bca">
+                    <input type="radio" id="pay_bca" name="metode_bayar" value="Bank BCA"
+                        <?= ($metode_terpilih === 'Bank BCA') ? 'checked' : '' ?>
+>>>>>>> origin/digiwash-semoga-final
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-bca">BCA</span>
                     <div>
@@ -162,8 +198,14 @@
                     </div>
                 </label>
 
+<<<<<<< HEAD
                 <label class="method-option" for="pay_bri">
                     <input type="radio" id="pay_bri" name="metode_bayar" value="Bank BRI"
+=======
+                <label class="method-option <?= ($metode_terpilih === 'Bank BRI') ? 'selected' : '' ?>" for="pay_bri">
+                    <input type="radio" id="pay_bri" name="metode_bayar" value="Bank BRI"
+                        <?= ($metode_terpilih === 'Bank BRI') ? 'checked' : '' ?>
+>>>>>>> origin/digiwash-semoga-final
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-bri">BRI</span>
                     <div>
@@ -172,8 +214,14 @@
                     </div>
                 </label>
 
+<<<<<<< HEAD
                 <label class="method-option" for="pay_bni">
                     <input type="radio" id="pay_bni" name="metode_bayar" value="Bank BNI"
+=======
+                <label class="method-option <?= ($metode_terpilih === 'Bank BNI') ? 'selected' : '' ?>" for="pay_bni">
+                    <input type="radio" id="pay_bni" name="metode_bayar" value="Bank BNI"
+                        <?= ($metode_terpilih === 'Bank BNI') ? 'checked' : '' ?>
+>>>>>>> origin/digiwash-semoga-final
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-bni">BNI</span>
                     <div>
@@ -182,8 +230,14 @@
                     </div>
                 </label>
 
+<<<<<<< HEAD
                 <label class="method-option" for="pay_mandiri">
                     <input type="radio" id="pay_mandiri" name="metode_bayar" value="Bank Mandiri"
+=======
+                <label class="method-option <?= ($metode_terpilih === 'Bank Mandiri') ? 'selected' : '' ?>" for="pay_mandiri">
+                    <input type="radio" id="pay_mandiri" name="metode_bayar" value="Bank Mandiri"
+                        <?= ($metode_terpilih === 'Bank Mandiri') ? 'checked' : '' ?>
+>>>>>>> origin/digiwash-semoga-final
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-mandiri">MDR</span>
                     <div>
@@ -203,8 +257,14 @@
             </div>
             <div class="method-group-body" id="body-ewallet">
 
+<<<<<<< HEAD
                 <label class="method-option" for="pay_dana">
                     <input type="radio" id="pay_dana" name="metode_bayar" value="DANA"
+=======
+                <label class="method-option <?= ($metode_terpilih === 'DANA') ? 'selected' : '' ?>" for="pay_dana">
+                    <input type="radio" id="pay_dana" name="metode_bayar" value="DANA"
+                        <?= ($metode_terpilih === 'DANA') ? 'checked' : '' ?>
+>>>>>>> origin/digiwash-semoga-final
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-dana" style="font-size:9px;">DANA</span>
                     <div>
@@ -213,8 +273,14 @@
                     </div>
                 </label>
 
+<<<<<<< HEAD
                 <label class="method-option" for="pay_gopay">
                     <input type="radio" id="pay_gopay" name="metode_bayar" value="GoPay"
+=======
+                <label class="method-option <?= ($metode_terpilih === 'GoPay') ? 'selected' : '' ?>" for="pay_gopay">
+                    <input type="radio" id="pay_gopay" name="metode_bayar" value="GoPay"
+                        <?= ($metode_terpilih === 'GoPay') ? 'checked' : '' ?>
+>>>>>>> origin/digiwash-semoga-final
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-gopay">GP</span>
                     <div>
@@ -223,8 +289,14 @@
                     </div>
                 </label>
 
+<<<<<<< HEAD
                 <label class="method-option" for="pay_spay">
                     <input type="radio" id="pay_spay" name="metode_bayar" value="ShopeePay"
+=======
+                <label class="method-option <?= ($metode_terpilih === 'ShopeePay') ? 'selected' : '' ?>" for="pay_spay">
+                    <input type="radio" id="pay_spay" name="metode_bayar" value="ShopeePay"
+                        <?= ($metode_terpilih === 'ShopeePay') ? 'checked' : '' ?>
+>>>>>>> origin/digiwash-semoga-final
                         onchange="highlightOption(this)">
                     <span class="method-logo logo-spay" style="font-size:9px;">SPAY</span>
                     <div>
@@ -238,7 +310,11 @@
 
         <!-- Pay button -->
         <button type="submit" class="btn-bayar" id="btnBayar" onclick="return validasiMetode()">
+<<<<<<< HEAD
             Bayar Sekarang →
+=======
+            <?= (!empty($metode_terpilih) && $metode_terpilih !== 'Belum Dipilih') ? 'Simpan & Lanjutkan →' : 'Bayar Sekarang →' ?>
+>>>>>>> origin/digiwash-semoga-final
         </button>
 
     </form>

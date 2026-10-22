@@ -3,12 +3,53 @@ helper('foto');
 
 $nama = (string) ($nama ?? '');
 $pesananAktif = (int) ($pesananAktif ?? 0);
+<<<<<<< HEAD
 $statusCuci = (string) ($statusCuci ?? '');
 $statusBayar = (string) ($statusBayar ?? '');
+=======
+$totalPesanan = (int) ($totalPesanan ?? 0);
+$statusCuci = (string) ($statusCuci ?? '');
+$statusBayar = (string) ($statusBayar ?? '');
+$adaPesanan = ($pesananAktif > 0 || $totalPesanan > 0);
+>>>>>>> origin/digiwash-semoga-final
 
 $e = static fn(string $teks): string => htmlspecialchars($teks, ENT_QUOTES, 'UTF-8');
 $inisial = $nama !== '' ? mb_strtoupper(mb_substr($nama, 0, 1, 'UTF-8'), 'UTF-8') : '?';
 $foto = foto_profil();
+<<<<<<< HEAD
+=======
+
+// Format label status: ganti underscore jadi spasi, ucwords
+$fmtStatus = static fn(string $s): string =>
+    $s !== '' ? ucwords(str_replace('_', ' ', $s)) : 'Tidak ada';
+
+// Badge config: [keyword_lowercase => [warna-bg, warna-teks, icon-bi]]
+$badgeCuci = ['#e8f5e9', '#1b5e20', 'bi-truck'];
+$badgeBayar = ['#e3f2fd', '#0b3d5c', 'bi-credit-card-2-front-fill'];
+
+$statusCuciLabel = $fmtStatus($statusCuci);
+$statusBayarLabel = $fmtStatus($statusBayar);
+
+// Warna dinamis status bayar
+$bayarLow = strtolower($statusBayar);
+if (str_contains($bayarLow, 'lunas') || str_contains($bayarLow, 'sukses') || str_contains($bayarLow, 'berhasil')) {
+    $badgeBayar = ['#e8f5e9', '#1b5e20', 'bi-check-circle-fill'];
+} elseif (str_contains($bayarLow, 'gagal') || str_contains($bayarLow, 'ditolak')) {
+    $badgeBayar = ['#fdecea', '#b71c1c', 'bi-x-circle-fill'];
+} elseif (str_contains($bayarLow, 'menunggu') || str_contains($bayarLow, 'pending') || str_contains($bayarLow, 'verifikasi')) {
+    $badgeBayar = ['#fff8e1', '#e65100', 'bi-hourglass-split'];
+}
+
+// Warna dinamis status cuci
+$cuciLow = strtolower($statusCuci);
+if (str_contains($cuciLow, 'selesai') || str_contains($cuciLow, 'diterima') || str_contains($cuciLow, 'sampai')) {
+    $badgeCuci = ['#e8f5e9', '#1b5e20', 'bi-check-circle-fill'];
+} elseif (str_contains($cuciLow, 'proses') || str_contains($cuciLow, 'jalan') || str_contains($cuciLow, 'dikirim')) {
+    $badgeCuci = ['#e3f2fd', '#0b3d5c', 'bi-truck'];
+} elseif (str_contains($cuciLow, 'menunggu') || str_contains($cuciLow, 'pending')) {
+    $badgeCuci = ['#fff8e1', '#e65100', 'bi-hourglass-split'];
+}
+>>>>>>> origin/digiwash-semoga-final
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -24,6 +65,36 @@ $foto = foto_profil();
         .bi { line-height: 1; vertical-align: -0.125em; }
         .logo .bi { margin-right: 6px; }
 
+<<<<<<< HEAD
+=======
+        .bottom-nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .bottom-nav a span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Badge dot notifikasi */
+        .notif-badge-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444 !important;
+            border-radius: 50% !important;
+            border: 1.5px solid #fff;
+            display: inline-block;
+            padding: 0 !important;
+        }
+
+>>>>>>> origin/digiwash-semoga-final
 
         @media (min-width: 900px) {
             .dash-wrap .dash {
@@ -103,7 +174,11 @@ $foto = foto_profil();
             .dash-wrap .menu h4 { font-size: 18px; margin-bottom: 16px; }
             .dash-wrap .menu-grid {
                 display: grid;
+<<<<<<< HEAD
                 grid-template-columns: repeat(5, 1fr);
+=======
+                grid-template-columns: repeat(3, 1fr);
+>>>>>>> origin/digiwash-semoga-final
                 gap: 16px;
             }
             .dash-wrap .menu-item {
@@ -125,8 +200,23 @@ $foto = foto_profil();
 
                 <nav class="bottom-nav">
                     <a href="<?= base_url('dashboard') ?>" class="active"><span><i class="bi bi-house-door-fill"></i></span>Beranda</a>
+<<<<<<< HEAD
                     <a href="<?= base_url('pesanan/pilih-layanan') ?>"><span><i class="bi bi-basket2-fill"></i></span>Pesanan</a>
                     <a href="#" data-soon><span><i class="bi bi-bell-fill"></i></span>Notifikasi</a>
+=======
+                    <a href="<?= base_url('pesanan/riwayat') ?>"><span><i class="bi bi-receipt"></i></span>Pesanan</a>
+                    <?php if ($adaPesanan): ?>
+                    <a href="<?= base_url('pesanan/notifikasi') ?>">
+                        <span style="position:relative">
+                            <i class="bi bi-bell-fill"></i>
+                            <?php if ($pesananAktif > 0): ?>
+                                <span class="notif-badge-dot"></span>
+                            <?php endif; ?>
+                        </span>
+                        Notifikasi
+                    </a>
+                    <?php endif; ?>
+>>>>>>> origin/digiwash-semoga-final
                     <a href="<?= base_url('profil') ?>"><span><i class="bi bi-person-fill"></i></span>Akun</a>
                 </nav>
 
@@ -151,11 +241,23 @@ $foto = foto_profil();
                 </div>
                 <div class="card c-pink">
                     <small>Sistem Pengiriman</small>
+<<<<<<< HEAD
                     <strong><?= $e($statusCuci) ?></strong>
                 </div>
                 <div class="card c-green">
                     <small>Sistem Pembayaran</small>
                     <strong><?= $e($statusBayar) ?></strong>
+=======
+                    <strong style="display:inline-flex;align-items:center;gap:8px">
+                        <i class="bi <?= $badgeCuci[2] ?>"></i><?= $e($statusCuciLabel) ?>
+                    </strong>
+                </div>
+                <div class="card c-green">
+                    <small>Sistem Pembayaran</small>
+                    <strong style="display:inline-flex;align-items:center;gap:8px">
+                        <i class="bi <?= $badgeBayar[2] ?>"></i><?= $e($statusBayarLabel) ?>
+                    </strong>
+>>>>>>> origin/digiwash-semoga-final
                 </div>
             </div>
 
@@ -163,10 +265,15 @@ $foto = foto_profil();
                 <h4>Menu Utama</h4>
                 <div class="menu-grid">
                     <a class="menu-item" href="<?= base_url('pesanan/pilih-layanan') ?>"><span><i class="bi bi-clipboard-plus-fill"></i></span>Buat Pesanan</a>
+<<<<<<< HEAD
                     <a class="menu-item" href="<?= base_url('pesanan/riwayat') ?>"><span><i class="bi bi-receipt"></i></span>Riwayat Pesanan</a>
                     <a class="menu-item" href="#" data-soon><span><i class="bi bi-truck"></i></span>Tracking Laundry</a>
                     <a class="menu-item" href="#" data-soon><span><i class="bi bi-wallet2"></i></span>Pembayaran</a>
                     <a class="menu-item" href="#" data-soon><span><i class="bi bi-chat-dots-fill"></i></span>Kritik &amp; Saran</a>
+=======
+                    <a class="menu-item" href="<?= base_url('pesanan/riwayat') ?>"><span><i class="bi bi-receipt"></i></span>Pesanan</a>
+                    <a class="menu-item" href="<?= base_url('kritik-saran') ?>"><span><i class="bi bi-chat-dots-fill"></i></span>Kritik &amp; Saran</a>
+>>>>>>> origin/digiwash-semoga-final
                 </div>
             </div>
 

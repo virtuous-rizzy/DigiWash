@@ -24,13 +24,20 @@ $badge = [
 </div>
 
 <div class="metrik">
+<<<<<<< HEAD
     <div class="metrik-item"><span>Jemput</span><strong>0</strong></div>
     <div class="metrik-item"><span>Antar</span><strong>0</strong></div>
     <div class="metrik-item"><span>Selesai</span><strong>0</strong></div>
+=======
+    <div class="metrik-item"><span>Jemput</span><strong><?= (int)($ringkasan['jemput'] ?? 1) ?></strong></div>
+    <div class="metrik-item"><span>Antar</span><strong><?= (int)($ringkasan['antar'] ?? 1) ?></strong></div>
+    <div class="metrik-item"><span>Selesai</span><strong><?= (int)($ringkasan['selesai'] ?? 1) ?></strong></div>
+>>>>>>> origin/digiwash-semoga-final
 </div>
 
 <p class="subjudul">Menu tugas</p>
 <div class="admin-menu">
+<<<<<<< HEAD
     <a class="admin-card" href="#" data-soon>
         <span class="ikon-besar">📦</span>
         <span><strong>Tugas Jemput</strong><small>Ambil cucian dari rumah pelanggan</small></span>
@@ -41,6 +48,18 @@ $badge = [
     </a>
     <a class="admin-card" href="#" data-soon>
         <span class="ikon-besar">🕘</span>
+=======
+    <a class="admin-card" href="<?= base_url('kurir/tugas?tab=penjemputan') ?>">
+        <span class="ikon-besar"><i class="bi bi-box-seam-fill" style="color: #033B59; font-size: 28px;"></i></span>
+        <span><strong>Tugas Jemput</strong><small>Ambil cucian dari rumah pelanggan</small></span>
+    </a>
+    <a class="admin-card" href="<?= base_url('kurir/tugas?tab=pengantaran') ?>">
+        <span class="ikon-besar"><i class="bi bi-truck" style="color: #033B59; font-size: 28px;"></i></span>
+        <span><strong>Tugas Antar</strong><small>Antar cucian bersih ke pelanggan</small></span>
+    </a>
+    <a class="admin-card" href="<?= base_url('kurir/riwayat') ?>">
+        <span class="ikon-besar"><i class="bi bi-clock-history" style="color: #033B59; font-size: 28px;"></i></span>
+>>>>>>> origin/digiwash-semoga-final
         <span><strong>Riwayat Tugas</strong><small>Lihat tugas yang sudah selesai</small></span>
     </a>
 </div>

@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Status Pembayaran - DigiWash</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+>>>>>>> origin/digiwash-semoga-final
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
         body {
             background: #EFEEEE;
+<<<<<<< HEAD
             font-family: 'Roboto', sans-serif;
+=======
+            font-family: 'Poppins', sans-serif;
+>>>>>>> origin/digiwash-semoga-final
             display: flex;
             justify-content: center;
             min-height: 100vh;

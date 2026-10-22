@@ -12,5 +12,9 @@ class PelangganModel extends Model
     protected $allowedFields = [
         'nama', 'no_hp', 'alamat', 'alamat_alternatif',
         'email', 'password', 'tanggal_lahir', 'jenis_kelamin',
+<<<<<<< HEAD
+=======
+        'foto', 'status',
+>>>>>>> origin/digiwash-semoga-final
     ];
 }

@@ -13,7 +13,11 @@ $foto    = foto_profil();
 ?>
 
 <div class="judul-halaman">
+<<<<<<< HEAD
     <a href="<?= base_url('kurir/dashboard') ?>" class="kembali">&larr;</a>
+=======
+    <a href="<?= base_url('kurir/dashboard') ?>" class="kembali"><i class="bi bi-arrow-left"></i></a>
+>>>>>>> origin/digiwash-semoga-final
     <h3>Profil Saya</h3>
 </div>
 
@@ -26,7 +30,11 @@ $foto    = foto_profil();
             <?php else: ?>
                 <div class="hero-avatar"><?= $e($inisial) ?></div>
             <?php endif; ?>
+<<<<<<< HEAD
             <span class="foto-edit">📷</span>
+=======
+            <span class="foto-edit"><i class="bi bi-camera-fill"></i></span>
+>>>>>>> origin/digiwash-semoga-final
         </label>
         <input type="file" name="foto" id="inputFoto" accept="image/png,image/jpeg,image/webp" hidden>
     </form>
@@ -43,8 +51,13 @@ $foto    = foto_profil();
 </div>
 
 <div class="daftar-baris">
+<<<<<<< HEAD
     <a class="baris" href="<?= base_url('kurir/akun/data') ?>"><span class="ikon">👤</span><span class="teks">Data Pribadi</span><span class="panah">&rsaquo;</span></a>
     <a class="baris" href="<?= base_url('kurir/password') ?>"><span class="ikon">🔒</span><span class="teks">Ganti Kata Sandi</span><span class="panah">&rsaquo;</span></a>
+=======
+    <a class="baris" href="<?= base_url('kurir/akun/data') ?>"><span class="ikon"><i class="bi bi-person-fill" style="color: #033B59;"></i></span><span class="teks">Data Pribadi</span><span class="panah">&rsaquo;</span></a>
+    <a class="baris" href="<?= base_url('kurir/password') ?>"><span class="ikon"><i class="bi bi-lock-fill" style="color: #033B59;"></i></span><span class="teks">Ganti Kata Sandi</span><span class="panah">&rsaquo;</span></a>
+>>>>>>> origin/digiwash-semoga-final
 </div>
 
 <a href="<?= base_url('keluar') ?>" class="btn-logout" data-konfirmasi="Yakin ingin keluar?">Logout</a>
