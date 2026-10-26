@@ -188,7 +188,7 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
             var isLogout = el.classList.contains('btn-logout') || el.href.includes('keluar');
             bukaModalKonfirmasi(pesan, function () {
                 window.location.href = el.href;
-            }, isLogout, isLogout ? 'Konfirmasi Logout' : 'Konfirmasi Tindakan');
+            }, isLogout, isLogout ? 'Konfirmasi Keluar' : 'Konfirmasi Tindakan');
         });
     });
 

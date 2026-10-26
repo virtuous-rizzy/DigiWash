@@ -47,7 +47,7 @@ $foto    = foto_profil();
     <a class="baris" href="<?= base_url('kurir/password') ?>"><span class="ikon"><i class="bi bi-lock-fill" style="color: #033B59;"></i></span><span class="teks">Ganti Kata Sandi</span><span class="panah">&rsaquo;</span></a>
 </div>
 
-<a href="<?= base_url('keluar') ?>" class="btn-logout" data-konfirmasi="Yakin ingin keluar?">Logout</a>
+<a href="<?= base_url('keluar') ?>" class="btn-logout" data-konfirmasi="Yakin ingin keluar?">Keluar</a>
 
 <script>
 (function () {

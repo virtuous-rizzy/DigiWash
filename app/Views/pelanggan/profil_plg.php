@@ -4,39 +4,56 @@
 <?php
 helper('foto');
 
-$user   = (array) ($user ?? []);
-$nama   = (string) ($user['nama'] ?? '');
-$noHp   = (string) ($user['no_hp'] ?? '');
+$user = (array) ($user ?? []);
+$nama = (string) ($user['nama'] ?? '');
+$noHp = (string) ($user['no_hp'] ?? '');
 $sukses = (string) (session()->getFlashdata('success') ?? '');
 $errors = (array) (session()->getFlashdata('errors') ?? []);
 
-$e       = static fn (string $teks): string => htmlspecialchars($teks, ENT_QUOTES, 'UTF-8');
+$e = static fn(string $teks): string => htmlspecialchars($teks, ENT_QUOTES, 'UTF-8');
 $inisial = $nama !== '' ? strtoupper(substr($nama, 0, 1)) : '?';
-$foto    = foto_profil();
+$foto = foto_profil();
 ?>
 
 <!-- Bootstrap Icons (aman dobel, browser cuma load sekali) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-    :root { --warna-utama: #033B59; }
+    :root {
+        --warna-utama: #033B59;
+    }
 
     /* Tombol kembali */
-    .judul-halaman .kembali { display: inline-flex; align-items: center; font-size: 22px; line-height: 1; }
+    .judul-halaman .kembali {
+        display: inline-flex;
+        align-items: center;
+        font-size: 22px;
+        line-height: 1;
+    }
 
     /* ── Hero profil: foto, nama, no HP ── */
-    .profil-hero { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .profil-hero form { margin: 0; }
+    .profil-hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .profil-hero form {
+        margin: 0;
+    }
 
     .profil-hero .foto-wrap {
         position: relative;
         display: block;
         width: 96px;
         height: 96px;
-        margin: 0 auto 16px;      /* jarak foto → nama */
+        margin: 0 auto 16px;
+        /* jarak foto → nama */
         cursor: pointer;
         flex-shrink: 0;
     }
+
     .profil-hero .hero-foto,
     .profil-hero .hero-avatar {
         width: 96px;
@@ -45,7 +62,11 @@ $foto    = foto_profil();
         border-radius: 50%;
         display: block;
     }
-    .profil-hero .hero-foto { object-fit: cover; }
+
+    .profil-hero .hero-foto {
+        object-fit: cover;
+    }
+
     .profil-hero .hero-avatar {
         display: flex;
         align-items: center;
@@ -55,6 +76,7 @@ $foto    = foto_profil();
         font-size: 40px;
         font-weight: 700;
     }
+
     .profil-hero .foto-edit {
         position: absolute;
         right: 0;
@@ -69,9 +91,19 @@ $foto    = foto_profil();
         place-items: center;
         font-size: 13px;
     }
-    .profil-hero h3 { margin: 0 0 4px; line-height: 1.3; }
-    .profil-hero p  { margin: 0; }
-    .profil-hero .hapus-foto { margin-top: 8px; }
+
+    .profil-hero h3 {
+        margin: 0 0 4px;
+        line-height: 1.3;
+    }
+
+    .profil-hero p {
+        margin: 0;
+    }
+
+    .profil-hero .hapus-foto {
+        margin-top: 8px;
+    }
 
     /* ── Ikon menu ── */
     .daftar-baris .ikon {
@@ -83,7 +115,13 @@ $foto    = foto_profil();
         line-height: 1;
         color: var(--warna-utama);
     }
-    .daftar-baris .panah { display: inline-flex; align-items: center; font-size: 16px; line-height: 1; }
+
+    .daftar-baris .panah {
+        display: inline-flex;
+        align-items: center;
+        font-size: 16px;
+        line-height: 1;
+    }
 </style>
 
 <div class="judul-halaman">
@@ -124,29 +162,37 @@ $foto    = foto_profil();
 </div>
 
 <div class="daftar-baris">
-    <a class="baris" href="<?= base_url('profil/data') ?>"><span class="ikon"><i class="bi bi-person-fill"></i></span><span class="teks">Data Pribadi</span><span class="panah"><i class="bi bi-chevron-right"></i></span></a>
-    <a class="baris" href="<?= base_url('profil/password') ?>"><span class="ikon"><i class="bi bi-lock-fill"></i></span><span class="teks">Ganti Kata Sandi</span><span class="panah"><i class="bi bi-chevron-right"></i></span></a>
-    <a class="baris" href="<?= base_url('profil/bantuan') ?>"><span class="ikon"><i class="bi bi-question-circle-fill"></i></span><span class="teks">Bantuan</span><span class="panah"><i class="bi bi-chevron-right"></i></span></a>
-    <a class="baris" href="<?= base_url('profil/tentang') ?>"><span class="ikon"><i class="bi bi-info-circle-fill"></i></span><span class="teks">Tentang Aplikasi</span><span class="panah"><i class="bi bi-chevron-right"></i></span></a>
+    <a class="baris" href="<?= base_url('profil/data') ?>"><span class="ikon"><i
+                class="bi bi-person-fill"></i></span><span class="teks">Data Pribadi</span><span class="panah"><i
+                class="bi bi-chevron-right"></i></span></a>
+    <a class="baris" href="<?= base_url('profil/password') ?>"><span class="ikon"><i
+                class="bi bi-lock-fill"></i></span><span class="teks">Ganti Kata Sandi</span><span class="panah"><i
+                class="bi bi-chevron-right"></i></span></a>
+    <a class="baris" href="<?= base_url('profil/bantuan') ?>"><span class="ikon"><i
+                class="bi bi-question-circle-fill"></i></span><span class="teks">Bantuan</span><span class="panah"><i
+                class="bi bi-chevron-right"></i></span></a>
+    <a class="baris" href="<?= base_url('profil/tentang') ?>"><span class="ikon"><i
+                class="bi bi-info-circle-fill"></i></span><span class="teks">Tentang Aplikasi</span><span
+            class="panah"><i class="bi bi-chevron-right"></i></span></a>
 </div>
 
-<a href="<?= base_url('keluar') ?>" class="btn-logout" data-konfirmasi="Yakin ingin keluar?">Logout</a>
+<a href="<?= base_url('keluar') ?>" class="btn-logout" data-konfirmasi="Yakin ingin keluar?">Keluar</a>
 
 <script>
-(function () {
-    var input = document.getElementById('inputFoto');
-    if (input) {
-        input.addEventListener('change', function () {
-            var f = input.files[0];
-            if (!f) return;
-            if (f.size > 2 * 1024 * 1024) {
-                alert('Ukuran foto maksimal 2 MB.');
-                input.value = '';
-                return;
-            }
-            document.getElementById('formFoto').submit();
-        });
-    }
-})();
+    (function () {
+        var input = document.getElementById('inputFoto');
+        if (input) {
+            input.addEventListener('change', function () {
+                var f = input.files[0];
+                if (!f) return;
+                if (f.size > 2 * 1024 * 1024) {
+                    alert('Ukuran foto maksimal 2 MB.');
+                    input.value = '';
+                    return;
+                }
+                document.getElementById('formFoto').submit();
+            });
+        }
+    })();
 </script>
 <?= $this->endSection() ?>
