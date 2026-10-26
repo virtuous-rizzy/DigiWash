@@ -2,7 +2,7 @@
 
 **DigiWash** adalah aplikasi web layanan laundry digital. Pelanggan bisa memesan laundry, membayar, dan memantau status cucian dari rumah. Admin mengelola pesanan dan pembayaran, sedangkan kurir mengurus penjemputan dan pengantaran.
 
-Dibangun dengan **CodeIgniter 4** (PHP) dan **MySQL/MariaDB**.
+Dibangun dengan **CodeIgniter 4** (PHP) dan **MySQL**.
 
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)
 ![CodeIgniter](https://img.shields.io/badge/CodeIgniter-4.7-EF4223?logo=codeigniter&logoColor=white)
