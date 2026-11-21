@@ -14,32 +14,168 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
 ?>
 
 <style>
+    /* ── Header ── */
+    .page-title-box {
+        margin-bottom: 16px;
+    }
+
+    .btn-back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: #1e293b;
+        font-size: 20px;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .btn-back-link:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .page-heading {
+        font-size: 19px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .page-subheading {
+        font-size: 12px;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* ── Search Bar ── */
+    .search-filter-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+    .search-input-wrap {
+        position: relative;
+        flex: 1;
+    }
+
+    .search-input-wrap .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        font-size: 15px;
+        pointer-events: none;
+    }
+
+    .search-input-box {
+        width: 100%;
+        padding: 9px 12px 9px 36px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input-box:focus {
+        border-color: #033B59;
+        box-shadow: 0 0 0 3px rgba(3, 59, 89, 0.12);
+    }
+
+    .btn-filter-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        cursor: pointer;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-filter-submit:hover {
+        background: #f1f5f9;
+        border-color: #033B59;
+        color: #033B59;
+    }
+
+    /* ── Filter Tabs ── */
     .filter-tabs {
-        display: flex; gap: 8px; margin-bottom: 14px;
-        overflow-x: auto; white-space: nowrap;
-        padding-bottom: 8px;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+        scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
     }
-    .filter-tabs::-webkit-scrollbar { height: 5px; }
-    .filter-tabs::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-    .filter-tabs::-webkit-scrollbar-thumb { background: #99aaaa; border-radius: 10px; }
+
+    .filter-tabs::-webkit-scrollbar {
+        display: none;
+    }
 
     .tab-pill {
-        background: #eee; color: #1b2a3a;
-        border-radius: 20px; padding: 7px 14px;
-        font-size: 12px; font-weight: 600;
-        display: inline-flex; align-items: center; gap: 6px;
-        text-decoration: none; transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 34px;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        color: #334155;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        white-space: nowrap;
+        transition: all 0.2s;
     }
-    .tab-pill.active { background: #8fe0e8; color: #0b3d5c; }
+
+    .tab-pill.active {
+        background: #0f172a;
+        color: #fff;
+        border-color: #0f172a;
+    }
 
     .badge-count {
-        background: #176b3a; color: #fff;
-        border-radius: 50%; padding: 2px 7px; font-size: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 999px;
+        color: #fff;
+        background: #2563eb;
     }
+
     .badge-inactive {
-        background: #99aaaa; color: #fff;
-        border-radius: 50%; padding: 2px 7px; font-size: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 999px;
+        color: #fff;
+        background: #64748b;
     }
 
     .badge-keluhan { background: #ffe3e3; color: #aa0000; font-size: 10px; padding: 4px 10px; }
@@ -60,14 +196,33 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
     }
 </style>
 
-<div class="judul-halaman">
-    <a href="<?= base_url('admin/dashboard') ?>" class="kembali" aria-label="Kembali"><i class="bi bi-arrow-left"></i></a>
-    <h3>Kelola Kritik &amp; Saran</h3>
+<!-- Header -->
+<div class="page-title-box d-flex align-items-center gap-2">
+    <a href="<?= base_url('admin/dashboard') ?>" class="btn-back-link" title="Kembali ke Dashboard">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+        <h1 class="page-heading">Kelola Kritik &amp; Saran</h1>
+        <p class="page-subheading">Baca dan tanggapi masukan pelanggan</p>
+    </div>
 </div>
 
 <?php if ($sukses !== ''): ?>
     <div class="alert ok"><?= $e($sukses) ?></div>
 <?php endif; ?>
+
+<!-- Search Bar -->
+<form method="GET" action="<?= base_url('admin/kelola-kritik') ?>" class="search-filter-row">
+    <input type="hidden" name="status" value="<?= $e($status_aktif) ?>">
+    <div class="search-input-wrap">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" name="keyword" value="<?= $e($keyword ?? '') ?>" class="search-input-box"
+            placeholder="Cari kritik / saran / pelanggan...">
+    </div>
+    <button type="submit" class="btn-filter-submit">
+        <i class="bi bi-funnel"></i> Filter
+    </button>
+</form>
 
 <!-- Filter Tabs -->
 <div class="filter-tabs">
@@ -100,15 +255,6 @@ $sukses = (string) (session()->getFlashdata('success') ?? '');
         </span>
     </a>
 </div>
-
-<!-- Search Bar -->
-<form method="GET" action="<?= base_url('admin/kelola-kritik') ?>">
-    <input type="hidden" name="status" value="<?= $e($status_aktif) ?>">
-    <div class="input-group" style="margin-bottom:18px;">
-        <input type="text" name="keyword" value="<?= $e($keyword ?? '') ?>" class="form-control" placeholder="Cari kritik / saran / pelanggan..." style="border-color:#99aaaa; font-size:13px;">
-        <button type="submit" class="btn btn-outline-secondary fw-bold" style="border-color:#99aaaa; background:#fff; color:#1b2a3a;">Filter</button>
-    </div>
-</form>
 
 <!-- Cards -->
 <?php if (!empty($ulasan)): ?>

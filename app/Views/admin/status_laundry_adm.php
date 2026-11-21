@@ -79,6 +79,7 @@ $bulanIndo = [
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        height: 34px;
         padding: 6px 16px;
         border-radius: 20px;
         font-size: 13px;
@@ -530,6 +531,19 @@ $bulanIndo = [
     </div>
 </div>
 
+<!-- Search & Filter Form -->
+<form method="get" action="<?= base_url('admin/status-laundry') ?>" class="search-filter-row">
+    <input type="hidden" name="tab" value="<?= $e($tab) ?>">
+    <div class="search-input-wrap">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" name="q" value="<?= $e($q) ?>" class="search-input-box"
+            placeholder="Cari nama / no pesanan...">
+    </div>
+    <button type="submit" class="btn-filter-funnel">
+        <i class="bi bi-funnel"></i> Filter
+    </button>
+</form>
+
 <!-- Tab Filter -->
 <div class="filter-tabs">
     <a href="<?= base_url('admin/status-laundry?tab=semua' . ($q !== '' ? '&q=' . urlencode($q) : '')) ?>"
@@ -562,19 +576,6 @@ $bulanIndo = [
         <span class="badge-count badge-red"><?= (int) ($counts['ditolak'] ?? 0) ?></span>
     </a>
 </div>
-
-<!-- Search & Filter Form -->
-<form method="get" action="<?= base_url('admin/status-laundry') ?>" class="search-filter-row">
-    <input type="hidden" name="tab" value="<?= $e($tab) ?>">
-    <div class="search-input-wrap">
-        <i class="bi bi-search search-icon"></i>
-        <input type="text" name="q" value="<?= $e($q) ?>" class="search-input-box"
-            placeholder="Cari nama / no pesanan...">
-    </div>
-    <button type="submit" class="btn-filter-funnel">
-        <i class="bi bi-funnel"></i> Filter
-    </button>
-</form>
 
 <!-- Daftar Pesanan -->
 <?php if (empty($pesanan)): ?>

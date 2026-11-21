@@ -60,7 +60,7 @@ $foto    = foto_profil();
 >>>>>>> origin/digiwash-semoga-final
 </div>
 
-<a href="<?= base_url('keluar') ?>" class="btn-logout" data-konfirmasi="Yakin ingin keluar?">Logout</a>
+<a href="<?= base_url('keluar') ?>" class="btn-logout" data-konfirmasi="Yakin ingin keluar?">Keluar</a>
 
 <script>
 (function () {
