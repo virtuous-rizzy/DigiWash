@@ -3,6 +3,10 @@
 namespace App\Controllers\Pelanggan;
 
 use App\Controllers\BaseController;
+<<<<<<< HEAD
+use App\Models\AlamatModel;
+=======
+>>>>>>> origin/digiwash-semoga-final
 use App\Models\LayananModel;
 use App\Models\PelangganModel;
 use App\Models\PembayaranModel;
@@ -81,7 +85,11 @@ class Pesanan extends BaseController
 
     /**
      * Form Buat Pesanan
+<<<<<<< HEAD
+     * Menyesuaikan jenis layanan, harga aktual dari LayananModel, dan alamat pengguna dari AlamatModel.
+=======
      * Menyesuaikan jenis layanan, harga aktual dari LayananModel, dan alamat pengguna dari tabel pelanggan.
+>>>>>>> origin/digiwash-semoga-final
      */
     public function buatPesanan()
     {
@@ -91,6 +99,11 @@ class Pesanan extends BaseController
             $jenisLayanan = $this->request->getPost('layanan') ?? $jenisLayanan;
         }
 
+<<<<<<< HEAD
+        $layananModel = new LayananModel();
+        try {
+            $layananDb = $layananModel->cariByIdOrNama($jenisLayanan);
+=======
         $idReq = (int) ($this->request->getGet('id') ?? $this->request->getPost('id_layanan') ?? 0);
         $layananModel = new LayananModel();
         try {
@@ -100,16 +113,20 @@ class Pesanan extends BaseController
             if (empty($layananDb)) {
                 $layananDb = $layananModel->cariByIdOrNama($jenisLayanan);
             }
+>>>>>>> origin/digiwash-semoga-final
         } catch (\Throwable $th) {
             $layananDb = null;
         }
 
+<<<<<<< HEAD
+=======
         // Jika layanan yang dipilih dinonaktifkan, kembalikan ke halaman pilih layanan
         if ($layananDb && (int) ($layananDb['is_active'] ?? 1) === 0) {
             return redirect()->to(base_url('pesanan/pilih-layanan'))
                 ->with('errors', ['Layanan ' . ($layananDb['nama_layanan'] ?? '') . ' sedang tidak tersedia atau dinonaktifkan. Silakan pilih layanan lain.']);
         }
 
+>>>>>>> origin/digiwash-semoga-final
         $idLayanan = $layananDb ? (int) $layananDb['id_layanan'] : 1;
         $hargaPerKg = 7000;
         if ($layananDb) {
@@ -122,6 +139,23 @@ class Pesanan extends BaseController
             }
         }
 
+<<<<<<< HEAD
+        // Ambil alamat pengguna dari database
+        $idPelanggan   = $this->getIdPelanggan();
+        $alamatDefault = 'Jl. Melati No. 12, RT 02/RW 01, Kec. Sukmajaya Depok';
+
+        try {
+            $alamatModel = new AlamatModel();
+            $alamatUtama = $alamatModel->utama($idPelanggan);
+            if ($alamatUtama && ! empty($alamatUtama['alamat_lengkap'])) {
+                $alamatDefault = $alamatUtama['alamat_lengkap'];
+            } else {
+                $pelangganModel = new PelangganModel();
+                $plg = $pelangganModel->find($idPelanggan);
+                if ($plg && ! empty($plg['alamat'])) {
+                    $alamatDefault = $plg['alamat'];
+                }
+=======
         // Ambil alamat pengguna langsung dari database (tabel pelanggan)
         $idPelanggan        = $this->getIdPelanggan();
         $alamatDefault      = '';
@@ -133,6 +167,7 @@ class Pesanan extends BaseController
             if ($plg) {
                 $alamatDefault    = (string) ($plg['alamat']              ?? '');
                 $alamatAlternatif = (string) ($plg['alamat_alternatif']   ?? '');
+>>>>>>> origin/digiwash-semoga-final
             }
         } catch (\Throwable $th) {
         }
@@ -142,6 +177,13 @@ class Pesanan extends BaseController
         $tanggalHariIni = date('j') . ' ' . $bulanIndo[(int) date('n')] . ' ' . date('Y');
 
         $data = [
+<<<<<<< HEAD
+            'id_layanan'   => $idLayanan,
+            'layanan'      => $jenisLayanan,
+            'harga_per_kg' => $hargaPerKg,
+            'alamat'       => $alamatDefault,
+            'tanggal'      => $tanggalHariIni,
+=======
             'id_layanan'          => $idLayanan,
             'layanan'             => $jenisLayanan,
             'harga_per_kg'        => $hargaPerKg,
@@ -149,6 +191,7 @@ class Pesanan extends BaseController
             'alamat_alternatif'   => $alamatAlternatif,
             'tanggal'             => $tanggalHariIni,
             'tanggalYmd'          => date('Y-m-d'),
+>>>>>>> origin/digiwash-semoga-final
         ];
 
         return view('Pesanan/buat_pesanan', $data);
@@ -166,6 +209,8 @@ class Pesanan extends BaseController
             $idLayanan = $ly ? $ly['id_layanan'] : 1;
         }
 
+<<<<<<< HEAD
+=======
         $tglPost = (string) ($this->request->getPost('tanggal_penjemputan') ?? $this->request->getPost('tanggal') ?? '');
         $tanggalTampil = $tglPost;
         if ($tglPost !== '' && strtotime($tglPost)) {
@@ -174,6 +219,7 @@ class Pesanan extends BaseController
             $tanggalTampil = date('j', $tglObj) . ' ' . $bulanIndo[(int) date('n', $tglObj)] . ' ' . date('Y', $tglObj);
         }
 
+>>>>>>> origin/digiwash-semoga-final
         $data = [
             'id_layanan'    => $idLayanan,
             'id_pesanan'    => 'PSN-' . date('Ymd') . '-001',
@@ -181,7 +227,11 @@ class Pesanan extends BaseController
             'berat'         => $this->request->getPost('berat'),
             'total'         => $this->request->getPost('total_harga'),
             'alamat'        => $this->request->getPost('alamat'),
+<<<<<<< HEAD
+            'tanggal'       => $this->request->getPost('tanggal_penjemputan'),
+=======
             'tanggal'       => $tanggalTampil,
+>>>>>>> origin/digiwash-semoga-final
             'catatan'       => $this->request->getPost('catatan'),
             'detail_satuan' => $this->request->getPost('detail_satuan'),
         ];
@@ -220,6 +270,8 @@ class Pesanan extends BaseController
         $idPesananDb    = null;
         $idPembayaranDb = null;
 
+<<<<<<< HEAD
+=======
         $tglPost = (string) ($this->request->getPost('tanggal') ?? '');
         $tglDb   = date('Y-m-d H:i:s');
         if ($tglPost !== '') {
@@ -243,12 +295,17 @@ class Pesanan extends BaseController
             }
         }
 
+>>>>>>> origin/digiwash-semoga-final
         try {
             $pesananModel = new PesananModel();
             $idPesananDb  = $pesananModel->insert([
                 'id_pelanggan'       => $idPelanggan,
                 'id_layanan'         => $idLayanan,
+<<<<<<< HEAD
+                'tanggal'            => date('Y-m-d H:i:s'),
+=======
                 'tanggal'            => $tglDb,
+>>>>>>> origin/digiwash-semoga-final
                 'berat'              => $berat,
                 'alamat_pengambilan' => $alamat,
                 'alamat_pengantaran' => $alamat,
@@ -294,6 +351,17 @@ class Pesanan extends BaseController
     }
 
     /**
+<<<<<<< HEAD
+     * Halaman pilih metode pembayaran
+     */
+    public function pembayaran()
+    {
+        $session = session();
+        $data = [
+            'id_pesanan' => $session->get('pesanan_id_pesanan') ?? ('PSN-' . date('Ymd') . '-001'),
+            'total'      => $session->get('pesanan_total') ?? 0,
+            'layanan'    => $session->get('pesanan_layanan') ?? '-',
+=======
      * Helper untuk memuat data pesanan milik pelanggan dari database ke session
      */
     private function muatDataPesanan(int $idPesanan): ?array
@@ -373,6 +441,7 @@ class Pesanan extends BaseController
             'total'           => $session->get('pesanan_total') ?? 0,
             'layanan'         => $session->get('pesanan_layanan') ?? '-',
             'metode_terpilih' => $metodeTerpilih,
+>>>>>>> origin/digiwash-semoga-final
         ];
         return view('Pesanan/pembayaran', $data);
     }
@@ -380,6 +449,19 @@ class Pesanan extends BaseController
     /**
      * Proses metode pembayaran → update metode di database dan lanjut ke upload bukti
      */
+<<<<<<< HEAD
+    public function prosesPembayaran()
+    {
+        $session = session();
+        $metode  = (string) $this->request->getPost('metode_bayar');
+
+        if (! array_key_exists($metode, self::REKENING)) {
+            return redirect()->to(base_url('pesanan/pembayaran'))
+                ->with('errors', ['Pilih metode pembayaran yang tersedia.']);
+        }
+
+        if ($metode !== (string) $session->get('pesanan_metode_bayar')) {
+=======
     public function prosesPembayaran($id = null)
     {
         $session   = session();
@@ -404,12 +486,20 @@ class Pesanan extends BaseController
         $metodeBerubah = ($metode !== $metodeLama);
 
         if ($metodeBerubah) {
+>>>>>>> origin/digiwash-semoga-final
             $this->hapusBuktiTersimpan();
         }
 
         $session->set('pesanan_metode_bayar', $metode);
 
         // Update record pembayaran di database jika ada
+<<<<<<< HEAD
+        $idPembayaranDb = (int) $session->get('pembayaran_id_db');
+        if ($idPembayaranDb > 0) {
+            try {
+                $pembayaranModel = new PembayaranModel();
+                $pembayaranModel->update($idPembayaranDb, ['metode' => $metode]);
+=======
         $idPembayaranDb  = (int) $session->get('pembayaran_id_db');
         $idPesananDb     = (int) ($session->get('pesanan_id_db') ?? $idPesanan);
         $pembayaranModel = new PembayaranModel();
@@ -421,10 +511,14 @@ class Pesanan extends BaseController
                     $idPembayaranDb = (int) $existingBayar['id_pembayaran'];
                     $session->set('pembayaran_id_db', $idPembayaranDb);
                 }
+>>>>>>> origin/digiwash-semoga-final
             } catch (\Throwable $th) {
             }
         }
 
+<<<<<<< HEAD
+        return redirect()->to(base_url('pesanan/upload-bukti'));
+=======
         if ($idPembayaranDb > 0) {
             try {
                 $updateData = ['metode' => $metode];
@@ -437,11 +531,19 @@ class Pesanan extends BaseController
         }
 
         return redirect()->to(base_url('pesanan/upload-bukti' . ($idPesananDb > 0 ? '/' . $idPesananDb : '')));
+>>>>>>> origin/digiwash-semoga-final
     }
 
     /**
      * Halaman upload bukti pembayaran
      */
+<<<<<<< HEAD
+    public function uploadBukti()
+    {
+        $session = session();
+
+        if ($session->get('pesanan_total') === null) {
+=======
     public function uploadBukti($id = null)
     {
         $session   = session();
@@ -462,11 +564,24 @@ class Pesanan extends BaseController
         }
 
         if ($session->get('pesanan_total') === null && $idPesanan <= 0) {
+>>>>>>> origin/digiwash-semoga-final
             return redirect()->to(base_url('pesanan/pilih-layanan'));
         }
 
         $metode = (string) $session->get('pesanan_metode_bayar');
         if (! array_key_exists($metode, self::REKENING)) {
+<<<<<<< HEAD
+            return redirect()->to(base_url('pesanan/pembayaran'));
+        }
+
+        $data = [
+            'id_pesanan' => $session->get('pesanan_id_pesanan') ?? ('PSN-' . date('Ymd') . '-001'),
+            'layanan'    => $session->get('pesanan_layanan') ?? '-',
+            'metode'     => $metode,
+            'rekening'   => self::REKENING[$metode],
+            'total'      => (int) $session->get('pesanan_total'),
+            'bukti_url'  => $this->urlBukti(),
+=======
             return redirect()->to(base_url('pesanan/pembayaran' . ($idPesanan > 0 ? '/' . $idPesanan : '')));
         }
 
@@ -479,6 +594,7 @@ class Pesanan extends BaseController
             'rekening'      => self::REKENING[$metode],
             'total'         => (int) $session->get('pesanan_total'),
             'bukti_url'     => $this->urlBukti(),
+>>>>>>> origin/digiwash-semoga-final
         ];
 
         return view('Pesanan/upload_bukti', $data);
@@ -487,6 +603,17 @@ class Pesanan extends BaseController
     /**
      * Simpan file bukti transfer dan update status bayar di database menjadi menunggu_verifikasi
      */
+<<<<<<< HEAD
+    public function simpanBukti()
+    {
+        $session = session();
+
+        if ($session->get('pesanan_total') === null) {
+            return redirect()->to(base_url('pesanan/pilih-layanan'));
+        }
+        if (! array_key_exists((string) $session->get('pesanan_metode_bayar'), self::REKENING)) {
+            return redirect()->to(base_url('pesanan/pembayaran'));
+=======
     public function simpanBukti($id = null)
     {
         $session   = session();
@@ -504,6 +631,7 @@ class Pesanan extends BaseController
         }
         if (! array_key_exists((string) $session->get('pesanan_metode_bayar'), self::REKENING)) {
             return redirect()->to(base_url('pesanan/pembayaran' . ($idPesanan > 0 ? '/' . $idPesanan : '')));
+>>>>>>> origin/digiwash-semoga-final
         }
 
         $rules = [
@@ -520,7 +648,11 @@ class Pesanan extends BaseController
         ];
 
         if (! $this->validate($rules)) {
+<<<<<<< HEAD
+            return redirect()->to(base_url('pesanan/upload-bukti'))
+=======
             return redirect()->to(base_url('pesanan/upload-bukti' . ($idPesanan > 0 ? '/' . $idPesanan : '')))
+>>>>>>> origin/digiwash-semoga-final
                 ->with('errors', $this->validator->getErrors());
         }
 
@@ -538,6 +670,11 @@ class Pesanan extends BaseController
         $session->set('pesanan_bukti', $nama);
 
         // ── UPDATE RECORD DI DATABASE ────────────
+<<<<<<< HEAD
+        $idPembayaranDb = (int) $session->get('pembayaran_id_db');
+        $pembayaranModel = new PembayaranModel();
+
+=======
         $idPembayaranDb  = (int) $session->get('pembayaran_id_db');
         $idPesananDb     = (int) ($session->get('pesanan_id_db') ?? $idPesanan);
         $pembayaranModel = new PembayaranModel();
@@ -553,6 +690,7 @@ class Pesanan extends BaseController
             }
         }
 
+>>>>>>> origin/digiwash-semoga-final
         if ($idPembayaranDb > 0) {
             try {
                 $pembayaranModel->update($idPembayaranDb, [
@@ -576,7 +714,11 @@ class Pesanan extends BaseController
                 }
 
                 $pesananModel = new PesananModel();
+<<<<<<< HEAD
+                $idPesananDb  = $pesananModel->insert([
+=======
                 $newPesananDb = $pesananModel->insert([
+>>>>>>> origin/digiwash-semoga-final
                     'id_pelanggan'       => $idPelanggan,
                     'id_layanan'         => $idLayanan,
                     'tanggal'            => date('Y-m-d H:i:s'),
@@ -588,9 +730,14 @@ class Pesanan extends BaseController
                     'detail_satuan'      => (string) ($session->get('pesanan_detail_satuan') ?? ''),
                 ]);
 
+<<<<<<< HEAD
+                if ($idPesananDb) {
+                    $idPembayaranDb = $pembayaranModel->insert([
+=======
                 if ($newPesananDb) {
                     $idPesananDb    = (int) $newPesananDb;
                     $idPembayaranDb = (int) $pembayaranModel->insert([
+>>>>>>> origin/digiwash-semoga-final
                         'id_pesanan'    => $idPesananDb,
                         'metode'        => (string) $session->get('pesanan_metode_bayar'),
                         'status_bayar'  => 'menunggu_verifikasi',
@@ -611,12 +758,27 @@ class Pesanan extends BaseController
             }
         }
 
+<<<<<<< HEAD
+        return redirect()->to(base_url('pesanan/status-pembayaran'));
+=======
         return redirect()->to(base_url('pesanan/status-pembayaran' . ($idPesananDb > 0 ? '/' . $idPesananDb : '')));
+>>>>>>> origin/digiwash-semoga-final
     }
 
     /**
      * Halaman status pembayaran
      */
+<<<<<<< HEAD
+    public function statusPembayaran()
+    {
+        $session = session();
+
+        if ($session->get('pesanan_total') === null) {
+            return redirect()->to(base_url('pesanan/pilih-layanan'));
+        }
+        if (! array_key_exists((string) $session->get('pesanan_metode_bayar'), self::REKENING)) {
+            return redirect()->to(base_url('pesanan/pembayaran'));
+=======
     public function statusPembayaran($id = null)
     {
         $session   = session();
@@ -635,10 +797,18 @@ class Pesanan extends BaseController
         }
         if (! array_key_exists((string) $session->get('pesanan_metode_bayar'), self::REKENING)) {
             return redirect()->to(base_url('pesanan/pembayaran' . ($idPesanan > 0 ? '/' . $idPesanan : '')));
+>>>>>>> origin/digiwash-semoga-final
         }
 
         $buktiUrl = $this->urlBukti();
         if ($buktiUrl === null) {
+<<<<<<< HEAD
+            return redirect()->to(base_url('pesanan/upload-bukti'))
+                ->with('errors', ['Unggah bukti pembayaran dulu sebelum melihat status.']);
+        }
+
+        $data = [
+=======
             return redirect()->to(base_url('pesanan/upload-bukti' . ($idPesanan > 0 ? '/' . $idPesanan : '')))
                 ->with('errors', ['Unggah bukti pembayaran dulu sebelum melihat status.']);
         }
@@ -646,6 +816,7 @@ class Pesanan extends BaseController
         $idDb = (int) ($session->get('pesanan_id_db') ?? $idPesanan);
         $data = [
             'id_pesanan_db' => $idDb,
+>>>>>>> origin/digiwash-semoga-final
             'id_pembayaran' => $session->get('pesanan_id_bayar') ?? ('PAY-' . date('dmY') . '-001'),
             'id_pesanan'    => $session->get('pesanan_id_pesanan') ?? ('PSN-' . date('Ymd') . '-001'),
             'metode'        => $session->get('pesanan_metode_bayar'),
@@ -656,6 +827,18 @@ class Pesanan extends BaseController
     }
 
     /**
+<<<<<<< HEAD
+     * Halaman tracking pesanan
+     */
+    public function tracking()
+    {
+        $session = session();
+        $data = [
+            'id_pesanan' => $session->get('pesanan_id_pesanan') ?? ('PSN-' . date('Ymd') . '-001'),
+            'layanan'    => $session->get('pesanan_layanan') ?? 'Reguler',
+        ];
+        return view('Pesanan/tracking', $data);
+=======
      * Halaman tracking pesanan (Dinamis sinkron dengan database & status yang dikelola admin)
      */
     public function tracking($idPesanan = null, $source = null)
@@ -731,6 +914,7 @@ class Pesanan extends BaseController
             'estimasiHari' => (int)($pesanan['estimasi_hari'] ?? 2),
             'from'         => $from,
         ]);
+>>>>>>> origin/digiwash-semoga-final
     }
 
     /**
@@ -768,6 +952,8 @@ class Pesanan extends BaseController
         ]);
     }
 
+<<<<<<< HEAD
+=======
     /**
      * Batalkan pesanan oleh pelanggan
      * Hanya pesanan dengan status 'menunggu' atau 'dikonfirmasi' (belum diproses pengerjaan) yang dapat dibatalkan.
@@ -1098,6 +1284,7 @@ class Pesanan extends BaseController
         return date('d M', $timestamp);
     }
 
+>>>>>>> origin/digiwash-semoga-final
     /* ── Helper bukti pembayaran ─────────────────────────────── */
 
     /** URL bukti yang sudah diunggah, atau null kalau belum ada / filenya hilang. */
@@ -1106,6 +1293,8 @@ class Pesanan extends BaseController
         $nama = (string) session()->get('pesanan_bukti');
 
         if ($nama === '' || ! is_file(FCPATH . self::DIR_BUKTI . '/' . $nama)) {
+<<<<<<< HEAD
+=======
             $idPesananDb = (int) session()->get('pesanan_id_db');
             if ($idPesananDb > 0) {
                 try {
@@ -1118,6 +1307,7 @@ class Pesanan extends BaseController
                 } catch (\Throwable $th) {
                 }
             }
+>>>>>>> origin/digiwash-semoga-final
             return null;
         }
 

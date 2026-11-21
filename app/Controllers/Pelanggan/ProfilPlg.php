@@ -3,13 +3,21 @@
 namespace App\Controllers\Pelanggan;
 
 use App\Controllers\BaseController;
+<<<<<<< HEAD
+use App\Models\AlamatModel;
+=======
+>>>>>>> origin/digiwash-semoga-final
 use App\Models\PelangganModel;
 
 class ProfilPlg extends BaseController
 {
     private function idPelanggan(): int
     {
+<<<<<<< HEAD
+        return (int) session()->get('user_id');
+=======
         return (int) (session()->get('id_pelanggan') ?? session()->get('user_id') ?? 0);
+>>>>>>> origin/digiwash-semoga-final
     }
 
     private function ambilUser(): ?array
@@ -44,6 +52,10 @@ class ProfilPlg extends BaseController
 
         return view('pelanggan/data_plg', [
             'user'  => $user,
+<<<<<<< HEAD
+            'utama' => (new AlamatModel())->utama($this->idPelanggan()),
+=======
+>>>>>>> origin/digiwash-semoga-final
             'judul' => 'Data Pribadi',
         ]);
     }
@@ -55,10 +67,14 @@ class ProfilPlg extends BaseController
             return $this->keluarkan();
         }
 
+<<<<<<< HEAD
+        return view('pelanggan/data_ubah_plg', ['user' => $user, 'judul' => 'Ubah Data Pribadi']);
+=======
         return view('pelanggan/data_ubah_plg', [
             'user'  => $user,
             'judul' => 'Ubah Data Pribadi',
         ]);
+>>>>>>> origin/digiwash-semoga-final
     }
 
     public function simpan()
@@ -68,7 +84,10 @@ class ProfilPlg extends BaseController
         $rules = [
             'nama'          => 'required|min_length[3]',
             'no_hp'         => 'required|numeric|min_length[10]|is_unique[pelanggan.no_hp,id_pelanggan,' . $id . ']',
+<<<<<<< HEAD
+=======
             'alamat'        => 'permit_empty',
+>>>>>>> origin/digiwash-semoga-final
             'tanggal_lahir' => 'permit_empty|valid_date[Y-m-d]',
             'jenis_kelamin' => 'permit_empty|in_list[Laki-laki,Perempuan]',
         ];
@@ -77,6 +96,13 @@ class ProfilPlg extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
+<<<<<<< HEAD
+        $nama = trim((string) $this->request->getPost('nama'));
+
+        (new PelangganModel())->update($id, [
+            'nama'          => $nama,
+            'no_hp'         => $this->request->getPost('no_hp'),
+=======
         $nama   = trim((string) $this->request->getPost('nama'));
         $noHp   = trim((string) $this->request->getPost('no_hp'));
         $alamat = trim((string) $this->request->getPost('alamat'));
@@ -85,6 +111,7 @@ class ProfilPlg extends BaseController
             'nama'          => $nama,
             'no_hp'         => $noHp,
             'alamat'        => $alamat !== '' ? $alamat : null,
+>>>>>>> origin/digiwash-semoga-final
             'tanggal_lahir' => $this->request->getPost('tanggal_lahir') ?: null,
             'jenis_kelamin' => $this->request->getPost('jenis_kelamin') ?: null,
         ]);
@@ -138,6 +165,8 @@ class ProfilPlg extends BaseController
     {
         return view('pelanggan/tentang_plg', ['judul' => 'Tentang Aplikasi']);
     }
+<<<<<<< HEAD
+=======
     // ===== ALAMAT =====
     public function alamat()
     {
@@ -199,6 +228,7 @@ class ProfilPlg extends BaseController
         return redirect()->to('/profil/alamat')->with('success', 'Alamat berhasil dihapus.');
     }
 
+>>>>>>> origin/digiwash-semoga-final
     public function foto()
 {
     $rules = [

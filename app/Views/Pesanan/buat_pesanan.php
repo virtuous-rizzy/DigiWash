@@ -5,13 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buat Pesanan - DigiWash</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+<<<<<<< HEAD
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+=======
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+>>>>>>> origin/digiwash-semoga-final
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background: #F0EFEF;
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif;
+=======
             font-family: 'Poppins', sans-serif;
+>>>>>>> origin/digiwash-semoga-final
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -39,7 +47,11 @@
         }
         .page-title {
             position: absolute; left: 50%; transform: translateX(-50%);
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 600;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 600;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 20px; line-height: 22px; color: #000; white-space: nowrap;
         }
 
@@ -47,7 +59,11 @@
         .form-area { padding: 0 23px; }
 
         .section-label {
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 600;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 600;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 13px; line-height: 22px; color: #000;
             display: block; margin-bottom: 6px;
         }
@@ -58,7 +74,11 @@
             margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .service-box-label {
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 600;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 600;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 13px; line-height: 22px; color: #000; margin-bottom: 4px;
         }
         .service-box-inner {
@@ -68,6 +88,17 @@
         .service-box-icon i { color: #033B59; }
         .service-box-info { flex: 1; }
         .service-box-name {
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-size: 13px; line-height: 22px; color: #000;
+        }
+        .service-box-price {
+            font-family: 'Roboto', sans-serif; font-weight: 400;
+            font-size: 13px; line-height: 22px; color: #555;
+        }
+        .btn-ubah {
+            font-family: 'Roboto', sans-serif; font-weight: 600;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: 13px; line-height: 22px; color: #000;
         }
@@ -77,6 +108,7 @@
         }
         .btn-ubah {
             font-family: 'Poppins', sans-serif; font-weight: 600;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 15px; line-height: 22px; color: #033B59;
             text-decoration: none; white-space: nowrap;
             background: none; border: none; cursor: pointer; padding: 0;
@@ -98,7 +130,11 @@
         .counter-divider { width: 1px; height: 46px; background: #000; }
         .counter-value {
             flex: 1; text-align: center;
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 300; font-size: 20px;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 300; font-size: 20px;
+>>>>>>> origin/digiwash-semoga-final
             color: #000; border: none; background: transparent; outline: none;
         }
 
@@ -110,7 +146,11 @@
             gap: 8px; min-height: 55px;
         }
         .info-card-addr {
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 400;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 400;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 12px; line-height: 22px; color: #000; flex: 1;
         }
 
@@ -118,14 +158,22 @@
         .input-box {
             background: #fff; border: 1px solid #D2CBCB; border-radius: 10px;
             height: 41px; width: 100%; padding: 8px 17px;
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 400;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 400;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 13px; color: #000; outline: none; margin-bottom: 20px;
         }
         .input-box:focus { border-color: #033B59; }
         .textarea-box {
             background: #fff; border: 1px solid #D2CBCB; border-radius: 10px;
             width: 100%; padding: 10px 17px;
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 200;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 200;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 13px; color: #000; outline: none;
             resize: vertical; min-height: 41px; margin-bottom: 20px;
         }
@@ -137,6 +185,8 @@
             transform: translateY(-50%); font-size: 16px; color: #033B59; opacity: 0.6;
             pointer-events: none; line-height: 1;
         }
+<<<<<<< HEAD
+=======
         .input-date-box {
             cursor: pointer;
             position: relative;
@@ -148,6 +198,7 @@
             opacity: 0;
             cursor: pointer;
         }
+>>>>>>> origin/digiwash-semoga-final
 
         /* ── Cost box ── */
         .cost-box {
@@ -163,7 +214,11 @@
         .btn-submit {
             width: 100%; height: 41px; background: #033B59;
             border: 1px solid #D2CBCB; border-radius: 10px;
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 700;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 700;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 16px; color: #fff; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: background 0.2s;
@@ -174,7 +229,11 @@
         .satuan-banner {
             background: #E8F4FD; border-radius: 10px; padding: 12px 17px;
             margin-bottom: 16px; text-align: center;
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif; font-weight: 600;
+=======
             font-family: 'Poppins', sans-serif; font-weight: 600;
+>>>>>>> origin/digiwash-semoga-final
             font-size: 13px; line-height: 22px; color: #033B59;
         }
         .satuan-banner i { margin-right: 6px; }
@@ -210,6 +269,12 @@
         .subtotal-label { font-weight: 700; font-size: 13px; color: #033B59; }
         .subtotal-val { font-weight: 700; font-size: 14px; color: #019D13; }
 
+<<<<<<< HEAD
+        /* ── BS5 Modal overrides ── */
+        .modal-content { border-radius: 14px; }
+        .modal-header { border-bottom: 1px solid #f0eeee; padding: 16px 20px 12px; }
+        .modal-title { font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 16px; color: #033B59; }
+=======
         /* ── Kartu pilih alamat di modal ── */
         .alamat-pilih-card {
             border: 1.5px solid #e2e8f0;
@@ -229,6 +294,7 @@
         .modal-content { border-radius: 14px; }
         .modal-header { border-bottom: 1px solid #f0eeee; padding: 16px 20px 12px; }
         .modal-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 16px; color: #033B59; }
+>>>>>>> origin/digiwash-semoga-final
         .modal-title i { margin-right: 6px; }
         .modal-body { padding: 16px 20px; font-size: 13px; color: #333; }
         .modal-footer { border-top: 1px solid #f0eeee; padding: 12px 20px; gap: 10px; }
@@ -314,18 +380,25 @@
     </div>
 
     <div class="form-area">
+<<<<<<< HEAD
+=======
         <?php
             $alamatUtama = (string) ($alamat ?? '');
             $alamatAlt   = (string) ($alamat_alternatif ?? '');
             // Pilih default: utama jika ada, alternatif jika utama kosong
             $alamatAwal  = $alamatUtama !== '' ? $alamatUtama : $alamatAlt;
         ?>
+>>>>>>> origin/digiwash-semoga-final
         <form action="<?= base_url('pesanan/ringkasan') ?>" method="post" id="formPesanan">
             <?= csrf_field() ?>
             <!-- Hidden inputs – JANGAN DIHAPUS -->
             <input type="hidden" name="id_layanan" value="<?= (int) ($id_layanan ?? 1) ?>">
             <input type="hidden" name="layanan" value="<?= (string) $layanan ?>">
+<<<<<<< HEAD
+            <input type="hidden" name="alamat" id="inputAlamat" value="<?= (string) $alamat ?>">
+=======
             <input type="hidden" name="alamat" id="inputAlamat" value="<?= htmlspecialchars($alamatAwal, ENT_QUOTES) ?>">
+>>>>>>> origin/digiwash-semoga-final
             <input type="hidden" name="tanggal_penjemputan" value="<?= (string) $tanggal ?>">
             <input type="hidden" id="harga_per_kg" value="<?= (int) $harga_per_kg ?>">
             <input type="hidden" id="detail_satuan" name="detail_satuan" value="">
@@ -479,9 +552,15 @@
                     <div>
                         <span class="section-label">Alamat Penjemputan</span>
                         <div class="info-card">
+<<<<<<< HEAD
+                            <div class="info-card-addr" id="displayAlamat"><?= (string) $alamat ?></div>
+                            <button type="button" class="btn-ubah"
+                                data-bs-toggle="modal" data-bs-target="#modalUbahAlamat">Ubah</button>
+=======
                             <div class="info-card-addr" id="displayAlamat"><?= htmlspecialchars($alamatAwal, ENT_QUOTES) ?></div>
                             <button type="button" class="btn-ubah"
                                 data-bs-toggle="modal" data-bs-target="#modalPilihAlamat">Ubah</button>
+>>>>>>> origin/digiwash-semoga-final
                         </div>
                     </div>
 
@@ -489,6 +568,10 @@
                     <div>
                         <span class="section-label">Tanggal Penjemputan</span>
                         <div class="input-icon-group">
+<<<<<<< HEAD
+                            <input type="text" class="input-box" value="<?= (string) $tanggal ?>" readonly>
+                            <span class="input-icon"><i class="bi bi-calendar-event-fill"></i></span>
+=======
                             <input type="date"
                                    id="tanggal_penjemputan"
                                    name="tanggal_penjemputan"
@@ -500,6 +583,7 @@
                             <span class="input-icon" onclick="var el = document.getElementById('tanggal_penjemputan'); if (el.showPicker) { el.showPicker(); } else { el.focus(); }">
                                 <i class="bi bi-calendar-event-fill"></i>
                             </span>
+>>>>>>> origin/digiwash-semoga-final
                         </div>
                     </div>
                 </div>
@@ -533,6 +617,33 @@
     </div><!-- /.form-area -->
 </div><!-- /.mobile-wrap -->
 
+<<<<<<< HEAD
+<!-- ══ Modal Ubah Alamat (Bootstrap 5) ══ -->
+<div class="modal fade" id="modalUbahAlamat" tabindex="-1" aria-labelledby="modalUbahAlamatLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUbahAlamatLabel"><i class="bi bi-geo-alt-fill"></i>Ubah Alamat Penjemputan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="inputAlamatBaru" class="form-label fw-semibold" style="font-size:13px; color:#333;">
+                    Masukkan alamat baru:
+                </label>
+                <textarea id="inputAlamatBaru" class="form-control" rows="3"
+                    style="font-size:13px; border-radius:10px; border-color:#D2CBCB;"
+                    placeholder="Contoh: Jl. Mawar No. 5, RT 01/RW 03, Depok"></textarea>
+                <div id="alamatError" class="text-danger mt-1" style="font-size:12px; display:none;">
+                    Alamat tidak boleh kosong.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary rounded-3"
+                    data-bs-dismiss="modal" style="font-size:13px;">Batal</button>
+                <button type="button" class="btn rounded-3 fw-bold text-white"
+                    style="background:#033B59; font-size:13px;" onclick="simpanAlamat()">
+                    Simpan Alamat
+=======
 <!-- ══ Modal Pilih Alamat ══ -->
 <div class="modal fade" id="modalPilihAlamat" tabindex="-1" aria-labelledby="modalPilihAlamatLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -600,6 +711,7 @@
                 <button type="button" class="btn rounded-3 fw-bold text-white"
                     style="background:#033B59; font-size:13px;" onclick="konfirmasiPilihAlamat()">
                     <i class="bi bi-check-lg"></i> Pilih Alamat Ini
+>>>>>>> origin/digiwash-semoga-final
                 </button>
             </div>
         </div>
@@ -660,6 +772,27 @@
         }
     }
 
+<<<<<<< HEAD
+    /* ── Simpan alamat dari modal ── */
+    function simpanAlamat() {
+        let val = document.getElementById('inputAlamatBaru').value.trim();
+        let errEl = document.getElementById('alamatError');
+        if (!val) {
+            errEl.style.display = 'block';
+            return;
+        }
+        errEl.style.display = 'none';
+        document.getElementById('inputAlamat').value = val;
+        document.getElementById('displayAlamat').innerText = val;
+        bootstrap.Modal.getInstance(document.getElementById('modalUbahAlamat')).hide();
+    }
+
+    /* Isi textarea modal saat dibuka */
+    document.getElementById('modalUbahAlamat').addEventListener('show.bs.modal', function () {
+        document.getElementById('inputAlamatBaru').value =
+            document.getElementById('inputAlamat').value;
+    });
+=======
     let alamatData = {
         utama: <?= json_encode((string) ($alamat ?? '')) ?>,
         alternatif: <?= json_encode((string) ($alamat_alternatif ?? '')) ?>
@@ -715,6 +848,7 @@
             }
         });
     }
+>>>>>>> origin/digiwash-semoga-final
 
     /* Tandai kartu satuan yang sudah berisi (nilai awal) */
     if (isSatuan) {

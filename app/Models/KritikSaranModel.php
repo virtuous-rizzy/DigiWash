@@ -1,9 +1,24 @@
 <?php
+<<<<<<< HEAD
+
 namespace App\Models;
+
+=======
+namespace App\Models;
+>>>>>>> origin/digiwash-semoga-final
 use CodeIgniter\Model;
 
 class KritikSaranModel extends Model
 {
+<<<<<<< HEAD
+    protected $table         = 'kritik_saran';
+    protected $primaryKey    = 'id_kritik';
+    protected $returnType    = 'array';
+    protected $allowedFields = [
+        'id_pelanggan', 'pesan', 'tanggal',
+    ];
+}
+=======
     protected $table            = 'kritik_saran';
     protected $primaryKey       = 'id_kritik_saran';
     protected $useAutoIncrement = true;
@@ -72,3 +87,4 @@ class KritikSaranModel extends Model
         return $builder->orderBy('kritik_saran.tanggal', 'DESC')->findAll();
     }
 }
+>>>>>>> origin/digiwash-semoga-final

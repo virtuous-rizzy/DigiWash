@@ -55,6 +55,9 @@ class PembayaranModel extends Model
             ->join('pelanggan pl', 'pl.id_pelanggan = ps.id_pelanggan', 'left')
             ->join('layanan l',    'l.id_layanan = ps.id_layanan', 'left');
 
+<<<<<<< HEAD
+        if (! empty($status) && $status !== 'semua') {
+=======
         if ($status === 'dibatalkan') {
             $builder->groupStart()
                 ->like('ps.catatan', 'dibatalkan')
@@ -73,6 +76,7 @@ class PembayaranModel extends Model
         } elseif ($status === 'gagal') {
             $builder->where('pb.status_bayar', 'gagal');
         } elseif (! empty($status) && $status !== 'semua') {
+>>>>>>> origin/digiwash-semoga-final
             $builder->where('pb.status_bayar', $status);
         }
 
@@ -106,11 +110,14 @@ class PembayaranModel extends Model
             return false;
         }
 
+<<<<<<< HEAD
+=======
         // Transaksi yang sudah lunas atau sudah ditolak tidak boleh diubah lagi
         if ($transaksi['status_bayar'] === 'lunas' || $transaksi['status_bayar'] === 'gagal') {
             return false;
         }
 
+>>>>>>> origin/digiwash-semoga-final
         $this->update($idPembayaran, [
             'status_bayar' => 'lunas',
             'id_admin'     => $idAdmin,
@@ -140,17 +147,28 @@ class PembayaranModel extends Model
             return false;
         }
 
+<<<<<<< HEAD
+=======
         // Transaksi yang sudah ditolak atau sudah lunas tidak boleh diubah lagi
         if ($transaksi['status_bayar'] === 'gagal' || $transaksi['status_bayar'] === 'lunas') {
             return false;
         }
 
+>>>>>>> origin/digiwash-semoga-final
         $this->update($idPembayaran, [
             'status_bayar' => 'gagal',
             'id_admin'     => $idAdmin,
         ]);
 
         if (! empty($transaksi['id_pesanan'])) {
+<<<<<<< HEAD
+            $this->db->table('pesanan')
+                ->where('id_pesanan', (int) $transaksi['id_pesanan'])
+                ->update([
+                    'status_pesanan' => 'dibatalkan',
+                    'id_admin'       => $idAdmin,
+                ]);
+=======
             $idPesananInt = (int) $transaksi['id_pesanan'];
             $currentPsn = $this->db->table('pesanan')->where('id_pesanan', $idPesananInt)->get()->getRowArray();
             $catatanPsn = trim((string)($currentPsn['catatan'] ?? ''));
@@ -176,6 +194,7 @@ class PembayaranModel extends Model
                     'status_antar' => 'menunggu_kurir',
                 ]);
             }
+>>>>>>> origin/digiwash-semoga-final
         }
 
         return true;

@@ -10,7 +10,11 @@ class DistribusiModel extends Model
     protected $primaryKey    = 'id_distribusi';
     protected $returnType    = 'array';
     protected $allowedFields = [
+<<<<<<< HEAD
+        'id_pesanan', 'id_kurir', 'jenis_kendaraan', 'biaya', 'status_antar',
+=======
         'id_pesanan', 'id_kurir', 'status_antar',
+>>>>>>> origin/digiwash-semoga-final
     ];
 
     /** Ambil info distribusi dengan relasi kurir dan pesanan */
@@ -23,6 +27,9 @@ class DistribusiModel extends Model
             ->get()
             ->getRowArray();
     }
+<<<<<<< HEAD
+}
+=======
 
     /**
      * Ambil daftar tugas kurir lengkap dengan data pesanan dan pelanggan riil
@@ -288,3 +295,4 @@ class DistribusiModel extends Model
     }
 }
 
+>>>>>>> origin/digiwash-semoga-final

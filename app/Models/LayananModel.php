@@ -20,6 +20,8 @@ class LayananModel extends Model
         return $this->where('is_active', 1)->findAll();
     }
 
+<<<<<<< HEAD
+=======
     /**
      * Ambil semua layanan untuk admin dengan filter status dan kata kunci
      */
@@ -71,6 +73,7 @@ class LayananModel extends Model
             ->countAllResults() > 0;
     }
 
+>>>>>>> origin/digiwash-semoga-final
     /** Ambil layanan berdasarkan ID numerik atau substring nama (misal: 'Reguler', 'Express'). */
     public function cariByIdOrNama($idOrNama): ?array
     {

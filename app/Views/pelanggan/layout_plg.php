@@ -7,6 +7,11 @@ $e          = static fn(string $teks): string => htmlspecialchars($teks, ENT_QUO
 $inisial    = $nama !== '' ? strtoupper(substr($nama, 0, 1)) : '?';
 $fotoHeader = foto_profil();
 
+<<<<<<< HEAD
+// Menu aktif ditentukan dari segmen pertama URL
+// contoh: /dashboard -> 'dashboard', /pesanan/pilih-layanan -> 'pesanan', /profil/data -> 'profil'
+$segmen = (string) service('uri')->getSegment(1);
+=======
 $idPelanggan = (int) (session()->get('id_pelanggan') ?? session()->get('user_id') ?? 0);
 $pesananAktif = 0;
 $totalPesanan = 0;
@@ -26,6 +31,7 @@ if ($idPelanggan > 0) {
 // contoh: /dashboard -> 'dashboard', /pesanan/riwayat -> 'pesanan', /profil/data -> 'profil'
 $segmen = (string) service('uri')->getSegment(1);
 $segmen2 = (string) service('uri')->getSegment(2);
+>>>>>>> origin/digiwash-semoga-final
 
 $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
     return in_array($segmen, $daftarSegmen, true) ? ' class="active" aria-current="page"' : '';
@@ -38,16 +44,27 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Digiwash - <?= $e($judul) ?></title>
+<<<<<<< HEAD
+    <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+=======
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
+>>>>>>> origin/digiwash-semoga-final
 
     <style>
          .bi { line-height: 1; vertical-align: -0.125em; }
         .logo .bi { margin-right: 6px; }
+<<<<<<< HEAD
+        /* Menu yang sedang dibuka: warna abu */
+        .bottom-nav a.active,
+        .bottom-nav a.active span {
+            color: #8A8A8A;
+=======
 
         .bottom-nav a {
             color: #033B59;
@@ -95,6 +112,7 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
             border: 1.5px solid #fff;
             display: inline-block;
             padding: 0 !important;
+>>>>>>> origin/digiwash-semoga-final
         }
     </style>
 </head>
@@ -108,6 +126,10 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
 
                 <nav class="bottom-nav">
                     <a href="<?= base_url('dashboard') ?>"<?= $menuAktif(['dashboard', '']) ?>><span><i class="bi bi-house-door-fill"></i></span>Beranda</a>
+<<<<<<< HEAD
+                    <a href="<?= base_url('pesanan/pilih-layanan') ?>"<?= $menuAktif(['pesanan']) ?>><span><i class="bi bi-basket2-fill"></i></span>Pesanan</a>
+                    <a href="#" data-soon><span><i class="bi bi-bell-fill"></i></span>Notifikasi</a>
+=======
                     <a href="<?= base_url('pesanan/riwayat') ?>"<?= ($segmen === 'pesanan' && $segmen2 !== 'notifikasi') ? ' class="active" aria-current="page"' : '' ?>><span><i class="bi bi-receipt"></i></span>Pesanan</a>
                     <?php if ($adaPesanan || ($segmen === 'pesanan' && $segmen2 === 'notifikasi')): ?>
                     <a href="<?= base_url('pesanan/notifikasi') ?>"<?= ($segmen === 'pesanan' && $segmen2 === 'notifikasi') ? ' class="active" aria-current="page"' : '' ?>>
@@ -120,6 +142,7 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
                         Notifikasi
                     </a>
                     <?php endif; ?>
+>>>>>>> origin/digiwash-semoga-final
                     <a href="<?= base_url('profil') ?>"<?= $menuAktif(['profil']) ?>><span><i class="bi bi-person-fill"></i></span>Akun</a>
                 </nav>
                 <div class="avatar" style="overflow:hidden">
@@ -140,6 +163,8 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<<<<<<< HEAD
+=======
     <!-- Modal Konfirmasi Pelanggan (Sesuai Gaya Modal Admin) -->
     <div class="modal fade" id="modalKonfirmasiPlg" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
@@ -170,6 +195,7 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> origin/digiwash-semoga-final
     <script>
         (function() {
             var toast = document.getElementById('toast'),
@@ -189,12 +215,22 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
                     tampilkan('Fitur segera hadir');
                 });
             });
+<<<<<<< HEAD
+            document.querySelectorAll('a[data-konfirmasi]').forEach(function(el) {
+                el.addEventListener('click', function(ev) {
+                    if (!confirm(el.getAttribute('data-konfirmasi'))) ev.preventDefault();
+                });
+            });
+=======
+>>>>>>> origin/digiwash-semoga-final
             document.querySelectorAll('[data-toggle-pw]').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var input = document.getElementById(btn.getAttribute('data-toggle-pw'));
                     input.type = input.type === 'password' ? 'text' : 'password';
                 });
             });
+<<<<<<< HEAD
+=======
 
             var targetAction = null;
             var modalEl = document.getElementById('modalKonfirmasiPlg');
@@ -259,6 +295,7 @@ $menuAktif = static function (array $daftarSegmen) use ($segmen): string {
                     }, isDanger, isDanger ? 'Konfirmasi Tindakan' : 'Konfirmasi');
                 });
             });
+>>>>>>> origin/digiwash-semoga-final
         })();
     </script>
 </body>

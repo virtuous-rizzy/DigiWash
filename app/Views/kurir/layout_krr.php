@@ -15,6 +15,9 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Digiwash Kurir</title>
+<<<<<<< HEAD
+    <link rel="stylesheet" href="<?= base_url('css/digiwash.css') ?>">
+=======
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
@@ -61,12 +64,22 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
             }
         }
     </style>
+>>>>>>> origin/digiwash-semoga-final
 </head>
 <body>
 <div class="dash-wrap">
     <div class="dash">
 
         <div class="dash-head">
+<<<<<<< HEAD
+            <div class="logo">🧺 DIGIWASH</div>
+
+            <nav class="bottom-nav">
+                <a href="<?= base_url('kurir/dashboard') ?>" class="<?= $aktif === 'beranda' ? 'active' : '' ?>"><span>🏠</span>Beranda</a>
+                <a href="#" data-soon><span>📋</span>Tugas</a>
+                <a href="#" data-soon><span>🕘</span>Riwayat</a>
+                <a href="<?= base_url('kurir/akun') ?>" class="<?= $aktif === 'akun' ? 'active' : '' ?>"><span>👤</span>Akun</a>
+=======
             <div class="logo"><i class="bi bi-basket2-fill" style="color: #033B59; margin-right: 6px;"></i>DIGIWASH</div>
 
             <nav class="bottom-nav">
@@ -74,6 +87,7 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
                 <a href="<?= base_url('kurir/tugas') ?>" class="<?= $aktif === 'tugas' ? 'active' : '' ?>"><span><i class="bi bi-card-checklist"></i></span>Tugas</a>
                 <a href="<?= base_url('kurir/riwayat') ?>" class="<?= $aktif === 'riwayat' ? 'active' : '' ?>"><span><i class="bi bi-clock-history"></i></span>Riwayat</a>
                 <a href="<?= base_url('kurir/akun') ?>" class="<?= $aktif === 'akun' ? 'active' : '' ?>"><span><i class="bi bi-person-fill"></i></span>Akun</a>
+>>>>>>> origin/digiwash-semoga-final
             </nav>
 
             <div class="avatar">
@@ -99,6 +113,8 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<<<<<<< HEAD
+=======
 <!-- Modal Konfirmasi Kurir (Sesuai Gaya Modal Admin) -->
 <div class="modal fade" id="modalKonfirmasiKrr" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
@@ -129,6 +145,7 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> origin/digiwash-semoga-final
 <script>
 (function () {
     var toast = document.getElementById('toast'), timer;
@@ -140,6 +157,16 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
     document.querySelectorAll('[data-soon]').forEach(function (el) {
         el.addEventListener('click', function (ev) { ev.preventDefault(); tampilkan('Fitur segera hadir'); });
     });
+<<<<<<< HEAD
+    document.querySelectorAll('a[data-konfirmasi]').forEach(function (el) {
+        el.addEventListener('click', function (ev) {
+            if (!confirm(el.getAttribute('data-konfirmasi'))) ev.preventDefault();
+        });
+    });
+    document.querySelectorAll('form[data-konfirmasi]').forEach(function (f) {
+        f.addEventListener('submit', function (ev) {
+            if (!confirm(f.getAttribute('data-konfirmasi'))) ev.preventDefault();
+=======
 
     var targetAction = null;
     var modalEl = document.getElementById('modalKonfirmasiKrr');
@@ -203,6 +230,7 @@ $errors  = (array) (session()->getFlashdata('errors') ?? []);
                 f.dataset.confirmed = 'true';
                 f.submit();
             }, isDanger, judul);
+>>>>>>> origin/digiwash-semoga-final
         });
     });
 })();

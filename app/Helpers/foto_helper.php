@@ -41,6 +41,8 @@ if (! function_exists('foto_profil')) {
 
         return base_url('uploads/profil/' . $nama);
     }
+<<<<<<< HEAD
+=======
 }
 
 if (! function_exists('url_foto_profil')) {
@@ -77,4 +79,5 @@ if (! function_exists('url_foto_profil')) {
 
         return null;
     }
+>>>>>>> origin/digiwash-semoga-final
 }

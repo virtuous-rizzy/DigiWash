@@ -3,12 +3,26 @@
 namespace App\Controllers\Kurir;
 
 use App\Controllers\BaseController;
+<<<<<<< HEAD
+=======
 use App\Models\DistribusiModel;
+>>>>>>> origin/digiwash-semoga-final
 
 class DashboardKrr extends BaseController
 {
     public function index()
     {
+<<<<<<< HEAD
+        $kurir = \Config\Database::connect()->table('kurir')
+            ->select('nama, status')
+            ->where('id_kurir', (int) session()->get('user_id'))
+            ->get()->getRowArray() ?? [];
+
+        return view('kurir/dashboard_krr', [
+            'nama'   => (string) ($kurir['nama'] ?? session()->get('nama')),
+            'status' => (string) ($kurir['status'] ?? 'tersedia'),
+            'aktif'  => 'beranda',
+=======
         $idKurir = (int) (session()->get('id_kurir') ?? session()->get('user_id') ?? 1);
         $kurir = \Config\Database::connect()->table('kurir')
             ->select('nama, status')
@@ -36,6 +50,7 @@ class DashboardKrr extends BaseController
             'status'    => (string) ($kurir['status'] ?? 'tersedia'),
             'ringkasan' => $ringkasan,
             'aktif'     => 'beranda',
+>>>>>>> origin/digiwash-semoga-final
         ]);
     }
 }

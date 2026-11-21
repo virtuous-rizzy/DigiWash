@@ -34,7 +34,10 @@ class PesananModel extends Model
                 'l.harga_flat',
                 'l.jenis_layanan',
                 'pb.status_bayar',
+<<<<<<< HEAD
+=======
                 'pb.bukti_bayar',
+>>>>>>> origin/digiwash-semoga-final
                 'pb.metode',
                 // Hitung total: prioritaskan total_bayar di tabel pembayaran, jika tidak ada hitung dari harga layanan
                 'IF(pb.total_bayar IS NOT NULL AND pb.total_bayar > 0, pb.total_bayar, IF(l.harga_flat > 0, l.harga_flat, l.harga_per_kg * p.berat)) AS total_harga',
@@ -66,7 +69,10 @@ class PesananModel extends Model
                 'l.harga_flat',
                 'l.jenis_layanan',
                 'pb.status_bayar',
+<<<<<<< HEAD
+=======
                 'pb.bukti_bayar',
+>>>>>>> origin/digiwash-semoga-final
                 'pb.metode',
                 'IF(pb.total_bayar IS NOT NULL AND pb.total_bayar > 0, pb.total_bayar, IF(l.harga_flat > 0, l.harga_flat, l.harga_per_kg * p.berat)) AS total_harga',
             ])
@@ -90,7 +96,11 @@ class PesananModel extends Model
             ->select([
                 'p.*',
                 'l.nama_layanan', 'l.harga_per_kg', 'l.harga_flat', 'l.jenis_layanan', 'l.estimasi_hari',
+<<<<<<< HEAD
+                'pb.id_pembayaran', 'pb.metode', 'pb.status_bayar',
+=======
                 'pb.id_pembayaran', 'pb.metode', 'pb.status_bayar', 'pb.bukti_bayar',
+>>>>>>> origin/digiwash-semoga-final
                 'IF(pb.total_bayar IS NOT NULL AND pb.total_bayar > 0, pb.total_bayar, IF(l.harga_flat > 0, l.harga_flat, l.harga_per_kg * p.berat)) AS total_harga',
             ])
             ->join('layanan l',     'l.id_layanan    = p.id_layanan', 'left')
@@ -111,6 +121,9 @@ class PesananModel extends Model
             ->whereNotIn('status_pesanan', ['selesai', 'dibatalkan'])
             ->countAllResults();
     }
+<<<<<<< HEAD
+}
+=======
 
     /**
      * Ambil semua pesanan untuk panel Admin (Mengupdate Status Laundry)
@@ -356,3 +369,4 @@ class PesananModel extends Model
     }
 }
 
+>>>>>>> origin/digiwash-semoga-final

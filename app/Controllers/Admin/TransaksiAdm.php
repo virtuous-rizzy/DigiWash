@@ -27,6 +27,27 @@ class TransaksiAdm extends BaseController
         }
 
         // Hitung statistik transaksi
+<<<<<<< HEAD
+        $totalMenunggu = 0;
+        $totalLunas    = 0;
+        $totalDitolak  = 0;
+
+        try {
+            $db = \Config\Database::connect();
+            $counts = $db->table('pembayaran')
+                ->select("status_bayar, COUNT(*) as jml")
+                ->groupBy('status_bayar')
+                ->get()
+                ->getResultArray();
+
+            foreach ($counts as $c) {
+                if ($c['status_bayar'] === 'menunggu_verifikasi') {
+                    $totalMenunggu = (int) $c['jml'];
+                } elseif ($c['status_bayar'] === 'lunas') {
+                    $totalLunas = (int) $c['jml'];
+                } elseif ($c['status_bayar'] === 'gagal') {
+                    $totalDitolak = (int) $c['jml'];
+=======
         $totalMenunggu   = 0;
         $totalLunas      = 0;
         $totalDitolak    = 0;
@@ -61,6 +82,7 @@ class TransaksiAdm extends BaseController
                     $totalDibatalkan++;
                 } else {
                     $totalDitolak++;
+>>>>>>> origin/digiwash-semoga-final
                 }
             }
         } catch (\Throwable $th) {
@@ -113,6 +135,16 @@ class TransaksiAdm extends BaseController
         }
 
         $data = [
+<<<<<<< HEAD
+            'transaksi'     => $transaksi,
+            'statusFilter'  => $statusFilter,
+            'keyword'       => $keyword,
+            'totalMenunggu' => $totalMenunggu,
+            'totalLunas'    => $totalLunas,
+            'totalDitolak'  => $totalDitolak,
+            'totalSemua'    => count($transaksi),
+            'aktif'         => 'transaksi',
+=======
             'transaksi'       => $transaksi,
             'statusFilter'    => $statusFilter,
             'keyword'         => $keyword,
@@ -122,6 +154,7 @@ class TransaksiAdm extends BaseController
             'totalDibatalkan' => $totalDibatalkan,
             'totalSemua'      => $totalSemua > 0 ? $totalSemua : count($transaksi),
             'aktif'           => 'transaksi',
+>>>>>>> origin/digiwash-semoga-final
         ];
 
         return view('admin/transaksi_adm', $data);
@@ -132,6 +165,19 @@ class TransaksiAdm extends BaseController
      */
     public function verifikasi(int $idPembayaran)
     {
+<<<<<<< HEAD
+        $idAdmin = (int) (session()->get('id_admin') ?? 1);
+        $model   = new PembayaranModel();
+
+        try {
+            $berhasil = $model->verifikasiTransaksi($idPembayaran, $idAdmin);
+            if ($berhasil) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('success', 'Transaksi berhasil diverifikasi dan ditandai Lunas.');
+            }
+        } catch (\Throwable $th) {
+            log_message('error', 'Verifikasi gagal: ' . $th->getMessage());
+=======
         $idAdmin = (int) (session()->get('id_admin') ?? session()->get('user_id') ?? 1);
         $model   = new PembayaranModel();
 
@@ -161,6 +207,7 @@ class TransaksiAdm extends BaseController
             log_message('error', 'Verifikasi gagal: ' . $th->getMessage());
             return redirect()->to(base_url('admin/transaksi'))
                 ->with('errors', ['Terjadi kesalahan saat memverifikasi transaksi: ' . $th->getMessage()]);
+>>>>>>> origin/digiwash-semoga-final
         }
 
         return redirect()->to(base_url('admin/transaksi'))
@@ -172,6 +219,19 @@ class TransaksiAdm extends BaseController
      */
     public function tolak(int $idPembayaran)
     {
+<<<<<<< HEAD
+        $idAdmin = (int) (session()->get('id_admin') ?? 1);
+        $model   = new PembayaranModel();
+
+        try {
+            $berhasil = $model->tolakTransaksi($idPembayaran, $idAdmin);
+            if ($berhasil) {
+                return redirect()->to(base_url('admin/transaksi'))
+                    ->with('success', 'Transaksi berhasil ditolak.');
+            }
+        } catch (\Throwable $th) {
+            log_message('error', 'Tolak gagal: ' . $th->getMessage());
+=======
         $idAdmin = (int) (session()->get('id_admin') ?? session()->get('user_id') ?? 1);
         $model   = new PembayaranModel();
 
@@ -201,6 +261,7 @@ class TransaksiAdm extends BaseController
             log_message('error', 'Tolak gagal: ' . $th->getMessage());
             return redirect()->to(base_url('admin/transaksi'))
                 ->with('errors', ['Terjadi kesalahan saat menolak transaksi: ' . $th->getMessage()]);
+>>>>>>> origin/digiwash-semoga-final
         }
 
         return redirect()->to(base_url('admin/transaksi'))

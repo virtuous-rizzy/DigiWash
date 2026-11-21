@@ -11,7 +11,11 @@ $errors = is_array($errors) ? $errors : [];
     <title>Upload Bukti Pembayaran - DigiWash</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
+<<<<<<< HEAD
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+=======
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+>>>>>>> origin/digiwash-semoga-final
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -32,7 +36,11 @@ $errors = is_array($errors) ? $errors : [];
             justify-content: center;
             align-items: flex-start;
             background: var(--warna-latar);
+<<<<<<< HEAD
+            font-family: 'Roboto', sans-serif;
+=======
             font-family: 'Poppins', sans-serif;
+>>>>>>> origin/digiwash-semoga-final
         }
 
         .mobile-wrap {
@@ -169,6 +177,8 @@ $errors = is_array($errors) ? $errors : [];
         }
         .link-ganti-metode:hover { text-decoration: underline; }
 
+<<<<<<< HEAD
+=======
         .link-batal-transaksi {
             display: inline-block; margin-top: 10px;
             font-size: 13px; font-weight: 500; color: #dc2626;
@@ -177,6 +187,7 @@ $errors = is_array($errors) ? $errors : [];
         }
         .link-batal-transaksi:hover { text-decoration: underline; color: #b91c1c; }
 
+>>>>>>> origin/digiwash-semoga-final
         /* ===== Tablet & desktop ===== */
         @media (min-width: 768px) {
             body { padding: 0 24px 32px; }
@@ -223,7 +234,11 @@ $errors = is_array($errors) ? $errors : [];
 
     <!-- Header -->
     <div class="page-header">
+<<<<<<< HEAD
+        <a href="<?= base_url('pesanan/pembayaran') ?>" class="btn-back" aria-label="Kembali">
+=======
         <a href="<?= base_url('dashboard') ?>" class="btn-back" title="Kembali ke Beranda" aria-label="Kembali">
+>>>>>>> origin/digiwash-semoga-final
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
         </a>
         <h1 class="page-title">Upload Bukti Bayar</h1>
@@ -283,10 +298,16 @@ $errors = is_array($errors) ? $errors : [];
 
         <!-- ══ Kanan: upload ══ -->
         <div class="col-kanan">
+<<<<<<< HEAD
+            <form action="<?= base_url('pesanan/simpan-bukti') ?>" method="post"
+                  enctype="multipart/form-data" id="formBukti" novalidate>
+                <?= csrf_field() ?>
+=======
             <form action="<?= base_url('pesanan/simpan-bukti' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '')) ?>" method="post"
                   enctype="multipart/form-data" id="formBukti" novalidate>
                 <?= csrf_field() ?>
                 <input type="hidden" name="id_pesanan" value="<?= esc((string) ($id_pesanan_db ?? '')) ?>">
+>>>>>>> origin/digiwash-semoga-final
 
                 <div class="card-box">
                     <h2 class="card-title">Bukti Pembayaran</h2>
@@ -320,6 +341,12 @@ $errors = is_array($errors) ? $errors : [];
                     <span>Kirim Bukti Pembayaran</span>
                 </button>
 
+<<<<<<< HEAD
+                <a href="<?= base_url('pesanan/pembayaran') ?>" class="link-ganti-metode">
+                    Ganti metode pembayaran
+                </a>
+            </form>
+=======
                 <a href="<?= base_url('pesanan/pembayaran' . (!empty($id_pesanan_db) ? '/' . $id_pesanan_db : '') . '?from=upload-bukti') ?>" class="link-ganti-metode">
                     Ganti metode pembayaran
                 </a>
@@ -339,6 +366,7 @@ $errors = is_array($errors) ? $errors : [];
                     <input type="hidden" name="id_pesanan" value="<?= $id_pesanan_db ?>">
                 </form>
             <?php endif; ?>
+>>>>>>> origin/digiwash-semoga-final
         </div>
 
     </div>
@@ -437,6 +465,31 @@ $errors = is_array($errors) ? $errors : [];
 
         /* Salin nomor rekening */
         var btnSalin = document.getElementById('btnSalin');
+<<<<<<< HEAD
+        btnSalin.addEventListener('click', function () {
+            var teks = document.getElementById('noRek').textContent.trim();
+            var label = btnSalin.querySelector('span');
+
+            function berhasil() {
+                label.textContent = 'Tersalin';
+                btnSalin.classList.add('ok');
+                setTimeout(function () {
+                    label.textContent = 'Salin';
+                    btnSalin.classList.remove('ok');
+                }, 1800);
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(teks).then(berhasil);
+            } else {
+                var t = document.createElement('textarea');
+                t.value = teks; document.body.appendChild(t); t.select();
+                try { document.execCommand('copy'); berhasil(); } catch (err) {}
+                document.body.removeChild(t);
+            }
+        });
+    })();
+=======
         if (btnSalin) {
             btnSalin.addEventListener('click', function () {
                 var teks = document.getElementById('noRek').textContent.trim();
@@ -469,6 +522,7 @@ $errors = is_array($errors) ? $errors : [];
             if (f) f.submit();
         }
     }
+>>>>>>> origin/digiwash-semoga-final
 </script>
 </body>
 

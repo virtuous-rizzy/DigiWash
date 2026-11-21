@@ -193,6 +193,12 @@ $foto = foto_profil();
                 document.getElementById('formFoto').submit();
             });
         }
+
+        document.querySelectorAll('form[data-konfirmasi]').forEach(function (f) {
+            f.addEventListener('submit', function (ev) {
+                if (!confirm(f.getAttribute('data-konfirmasi'))) ev.preventDefault();
+            });
+        });
     })();
 </script>
 <?= $this->endSection() ?>

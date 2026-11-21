@@ -2,9 +2,15 @@
 
 <?= $this->section('isi') ?>
 <?php
+<<<<<<< HEAD
+$e            = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
+$jmlAdmin     = (int) ($jmlAdmin ?? 0);
+$jmlKurir     = (int) ($jmlKurir ?? 0);
+=======
 $e = static fn(string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 $jmlAdmin = (int) ($jmlAdmin ?? 0);
 $jmlKurir = (int) ($jmlKurir ?? 0);
+>>>>>>> origin/digiwash-semoga-final
 $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
 ?>
 
@@ -15,10 +21,27 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
 
 <p class="subjudul">Pekerjaan harian</p>
 <div class="admin-menu">
+<<<<<<< HEAD
+    <a class="admin-card" href="#" data-soon>
+        <span class="ikon-besar"><i class="bi bi-box-seam-fill" style="color: #033B59; font-size: 32px;"></i></span>
+        <span><strong>Memproses Pesanan</strong><small>Lihat dan kelola pesanan baru</small></span>
+    </a>
+=======
+>>>>>>> origin/digiwash-semoga-final
     <a class="admin-card" href="<?= base_url('admin/transaksi') ?>">
         <span class="ikon-besar"><i class="bi bi-cash-stack" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Memproses Transaksi</strong><small>Konfirmasi pembayaran dan kelola transaksi</small></span>
     </a>
+<<<<<<< HEAD
+    <a class="admin-card" href="#" data-soon>
+        <span class="ikon-besar"><i class="bi bi-arrow-repeat" style="color: #033B59; font-size: 32px;"></i></span>
+        <span><strong>Mengupdate Status Laundry</strong><small>Ubah status: diterima, dicuci, selesai, diantar</small></span>
+    </a>
+    <a class="admin-card" href="#" data-soon>
+        <span class="ikon-besar"><i class="bi bi-chat-dots-fill" style="color: #033B59; font-size: 32px;"></i></span>
+        <span><strong>Kritik &amp; Saran</strong><small>Baca dan tanggapi masukan pelanggan</small></span>
+    </a>
+=======
     <a class="admin-card" href="<?= base_url('admin/status-laundry') ?>">
         <span class="ikon-besar"><i class="bi bi-arrow-repeat" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Mengupdate Status Laundry</strong><small>Ubah status: diterima, dicuci, selesai,
@@ -32,6 +55,7 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
         <span class="ikon-besar"><i class="bi bi-list-check" style="color: #033B59; font-size: 32px;"></i></span>
         <span><strong>Kelola Layanan</strong><small>Tambah, edit, atau hapus layanan laundry</small></span>
     </a>
+>>>>>>> origin/digiwash-semoga-final
 </div>
 
 <p class="subjudul">Pengelolaan</p>
@@ -45,6 +69,10 @@ $jmlPelanggan = (int) ($jmlPelanggan ?? 0);
     </a>
 </div>
 
+<<<<<<< HEAD
+<p class="subjudul">Pesanan terbaru</p>
+<div class="panel kosong"><p>Belum ada pesanan.</p></div>
+=======
 <style>
     .pesanan-terbaru-header {
         display: flex;
@@ -422,4 +450,5 @@ $pesananTerbaru = (array) ($pesananTerbaru ?? []);
         <p class="text-muted small mt-2 mb-0">Belum ada pesanan terbaru.</p>
     </div>
 <?php endif; ?>
+>>>>>>> origin/digiwash-semoga-final
 <?= $this->endSection() ?>
