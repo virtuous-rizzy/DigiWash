@@ -92,6 +92,7 @@ $routes->group('admin', ['filter' => 'role:admin'], static function ($routes) {
     $routes->get('kelola/tambah', 'Admin\KelolaAdm::tambah');
     $routes->post('kelola/simpan', 'Admin\KelolaAdm::simpan');
     $routes->post('kelola/status/(:segment)/(:num)', 'Admin\KelolaAdm::status/$1/$2');
+    $routes->post('kelola/reset-password/(:segment)/(:num)', 'Admin\KelolaAdm::resetPassword/$1/$2');
 
     $routes->get('transaksi', 'Admin\TransaksiAdm::index');
     $routes->post('transaksi/verifikasi/(:num)', 'Admin\TransaksiAdm::verifikasi/$1');

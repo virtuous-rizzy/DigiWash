@@ -50,6 +50,14 @@
 
         <button type="submit" class="btn btn-dark btn-small">Masuk</button>
     </form>
+
+    <a href="https://wa.me/6281249540215?text=Halo%20min%20saya%20ingin%20minta%20bantuannya%20terkait%20..."
+       target="_blank"
+       rel="noopener noreferrer"
+       style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;padding:11px 16px;border-radius:12px;background:#25D366;color:#fff;font-size:14px;font-weight:600;text-decoration:none;">
+        <i class="bi bi-whatsapp" style="font-size:1.1rem"></i>
+        Butuh Bantuan? Chat Admin
+    </a>
 </div>
 <script>
 function togglePw(){const e=document.getElementById('pw');e.type=e.type==='password'?'text':'password';}

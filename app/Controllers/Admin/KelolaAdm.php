@@ -132,6 +132,53 @@ class KelolaAdm extends BaseController
         return redirect()->to('/admin/kelola')->with('success', 'Akun ' . $peran . ' baru berhasil ditambahkan.');
     }
 
+    public function resetPassword(string $peran, int $id)
+    {
+        if (! in_array($peran, self::PERAN, true)) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        // Admin tidak bisa reset password dirinya sendiri via halaman ini
+        if ($peran === 'admin' && $id === $this->idSaya()) {
+            return redirect()->back()
+                ->with('errors', ['Gunakan menu Kata Sandi di halaman Akun kamu untuk mengubah password sendiri.']);
+        }
+
+        $rules = [
+            'password_baru'  => 'required|min_length[6]',
+            'password_ulang' => 'required|matches[password_baru]',
+        ];
+
+        $pesan = [
+            'password_baru'  => ['required' => 'Password baru wajib diisi.', 'min_length' => 'Password minimal 6 karakter.'],
+            'password_ulang' => ['required' => 'Konfirmasi password wajib diisi.', 'matches' => 'Konfirmasi password tidak cocok.'],
+        ];
+
+        if (! $this->validate($rules, $pesan)) {
+            return redirect()->back()->with('errors', $this->validator->getErrors());
+        }
+
+        $db    = \Config\Database::connect();
+        $tabel = self::TABEL[$peran];
+        $kunci = self::KUNCI[$peran];
+
+        $akun = $db->table($tabel)->where($kunci, $id)->get()->getRowArray();
+
+        if (! $akun) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        $db->table($tabel)->where($kunci, $id)->update([
+            'password' => password_hash(
+                (string) $this->request->getPost('password_baru'),
+                PASSWORD_DEFAULT
+            ),
+        ]);
+
+        return redirect()->to('/admin/kelola')
+            ->with('success', 'Kata sandi ' . $akun['nama'] . ' berhasil direset.');
+    }
+
     public function status(string $peran, int $id)
     {
         if (! in_array($peran, self::PERAN, true)) {
